@@ -1,0 +1,56 @@
+{
+  "controllers": [
+  
+  
+       {
+      "controllerId": 1,
+      "controllerCfgPath": "/home/carma/src/resources/421.cfg",
+      "moe_dir": null,
+      "start_time": null,
+      "bind_ip": null,
+      "web_port": 0,
+      "snmp_port": 5050,
+      "harness_port": 0,
+      "sumoTlId": 421,
+      "enableWebPanel": true,
+      "evcPhases": [{"evcPhaseId": 2, "sumoTlStateIndex":[4,5,6,7]},
+                      {"evcPhaseId": 4, "sumoTlStateIndex":[8,9,10,11]},
+                      {"evcPhaseId": 6, "sumoTlStateIndex":[12,13,14,15]},
+                      {"evcPhaseId": 8, "sumoTlStateIndex":[0,1,2,3]}]
+      },
+      {
+      "controllerId": 2,
+      "controllerCfgPath": "/home/carma/src/resources/965.cfg",
+      "moe_dir": null,
+      "start_time": null,
+      "bind_ip": null,
+      "web_port": 0,
+      "snmp_port": 5050,
+      "harness_port": 0,
+      "sumoTlId": 965,
+      "enableWebPanel": true,
+      "evcPhases": [{"evcPhaseId": 2, "sumoTlStateIndex":[0,1,2,3],     "sumoInductionLoopId": ["e1_5","e1_5","e1_4","e1_4"]},
+                    {"evcPhaseId": 4, "sumoTlStateIndex":[4,5,6,7],     "sumoInductionLoopId": ["e1_3","e1_3","e1_2","e1_2"]},
+                    {"evcPhaseId": 6, "sumoTlStateIndex":[8,9,10,11],   "sumoInductionLoopId": ["e1_1","e1_1","e1_0","e1_0"]},
+                    {"evcPhaseId": 8, "sumoTlStateIndex":[12,13,14,15], "sumoInductionLoopId": ["e1_7","e1_7","e1_6","e1_6"]}]
+      },
+ 
+      {
+      "controllerId": 3,
+      "controllerCfgPath": "/home/carma/src/resources/685.cfg",
+      "moe_dir": null,
+      "start_time": null,
+      "bind_ip": null,
+      "web_port": 0,
+      "snmp_port": 5050,
+      "harness_port": 0,
+      "sumoTlId": 685,
+      "enableWebPanel": true,
+      "evcPhases": [{"evcPhaseId": 2, "sumoTlStateIndex":[4,5,6]},
+                      {"evcPhaseId": 4, "sumoTlStateIndex":[7,8,9,10]},
+                      {"evcPhaseId": 6, "sumoTlStateIndex":[11,12,13]},
+                      {"evcPhaseId": 8, "sumoTlStateIndex":[0,1,2,3]}]
+      }
+
+    ]
+}
