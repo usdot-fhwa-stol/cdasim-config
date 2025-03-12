@@ -46,7 +46,7 @@ Use the following command
 
 `./generate_random_background_traffic.sh simulation_duration number_of_vehicles random_number_seed` 
 
-If command line argumentd are not provided the script asks for the simulation duration, number of vehicles ,a random number seed and generates the `Town05.rou.xml` in the same directory 
+If command line arguments are not provided the script asks for the simulation duration, number of vehicles ,a random number seed and generates the `Town05.rou.xml` in the same directory 
 
 ### Utilizing `od2trips` to generate Background Traffic
 The script `generate_route_from_OD_matrix.sh` located in the `xil-Town05/cdasim_config/sumo_background_traffic/`  utilizes sumo  [od2trips](https://sumo.dlr.de/docs/od2trips.html) tool to generate background traffic for Town05 given Traffic assignment zones (TAZ) and OD matrix
