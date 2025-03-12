@@ -260,9 +260,9 @@ services:
     container_name: carma_messenger_bridge_1
     command:
       bash -c 'export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
-      && source /opt/ros/foxy/setup.bash 
+      && source /opt/ros/humble/setup.bash
       && source /home/carma/install/setup.bash
-      && ros2 launch msger_mosaic_bridge mosaic_adapter_launch.py 
+      && ros2 launch msger_mosaic_bridge mosaic_adapter_launch.py
       role_id:=msger_1
       messenger_ip_address:=172.7.0.2
       cdasim_ip_address:=172.2.0.2
@@ -294,7 +294,7 @@ services:
       bash -c "wait-for-it 172.7.0.3:11311 -- roslaunch ns3_adapter ns3_adapter.launch
       role_id:='msger_1'
       remap_ns:=/hardware_interface/comms"
-  
+
   carma-messenger-vehicle-plugin_1:
     image: ${DOCKER_ORG}/cdasim:${DOCKER_TAG}
     networks:
@@ -305,7 +305,7 @@ services:
       - ./carma_messenger/logs:/home/carma/src/carma_messenger_vehicle_plugin/logs
       - ./carma_messenger/resources:/home/carma/src/carma_messenger_vehicle_plugin/src/resources
     command: bash -c "cd /home/carma/src/carma_messenger_vehicle_plugin/src && python3 msger_veh_wrapper.py --traci-ip 172.2.0.2 --traci-order-num 3"
-    
+
 #############################################################################
   carma-cloud:
     image: usdotfhwastol/carma-cloud:carma-system-4.6.1
