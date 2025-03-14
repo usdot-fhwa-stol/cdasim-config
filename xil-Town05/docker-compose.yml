@@ -146,7 +146,6 @@ services:
       - /opt/carma/routes:/opt/carma/routes
       - /opt/carma/yolo:/opt/carma/yolo
       - ./ns3_adapter/adapter_1/parameters.yaml:/opt/carma/install/ns3_adapter/share/ns3_adapter/config/parameters.yaml
-      - /home/carma/carma_ws/src/carma-ns3-adapter/ns3_adapter/launch/:/opt/carma/install/ns3_adapter/share/ns3_adapter/launch
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
       && wait-for-it 172.3.0.2:11311 -- roslaunch ns3_adapter ns3_adapter.launch enable_ros1_record:=true
