@@ -159,4 +159,57 @@ topics:
     queue_size: 1
     direction: 2to1
 
-services_1_to_2: []
+  - topic: /guidance/route_event
+    type: carma_planning_msgs/msg/RouteEvent
+    queue_size: 1
+    direction: 2to1
+
+  - topic: /guidance/state
+    type: carma_planning_msgs/msg/GuidanceState
+    queue_size: 1
+    direction: 2to1
+
+  - topic: /localization/current_pose
+    type: geometry_msgs/msg/PoseStamped
+    queue_size: 1
+    direction: 2to1
+
+  - topic: /hardware_interface/vehicle_cmd
+    type: autoware_msgs/msg/VehicleCmd
+    queue_size: 1
+
+  - topic: /guidance/twist_filter_node/result/twist/lateral_jerk
+    type: std_msgs/msg/Float32
+    queue_size: 1
+
+  - topic: /hardware_interface/vehicle/twist
+    type: geometry_msgs/msg/TwistStamped
+    queue_size: 1
+
+  - topic: /hardware_interface/vehicle_status
+    type: autoware_msgs/msg/VehicleStatus
+    queue_size: 1
+
+  - topic: /hardware_interface/driver_discovery
+    type: carma_driver_msgs/msg/DriverDiscovery
+    queue_size: 1
+
+services_2_to_1:
+
+  - service: /guidance/set_guidance_active
+    type: carma_planning_msgs/srv/SetGuidanceActive
+
+  - service: /guidance/plugins/get_active_plugins
+    type: carma_planning_msgs/srv/PluginList
+
+  - service: /guidance/plugins/get_registered_plugins
+    type: carma_planning_msgs/srv/PluginList
+
+  - service: /guidance/plugins/activate_plugin
+    type: carma_planning_msgs/srv/PluginActivation
+
+  - service: /guidance/get_available_routes
+    type: carma_planning_msgs/srv/GetAvailableRoutes
+
+  - service: /guidance/set_active_route
+    type: carma_planning_msgs/srv/SetActiveRoute
