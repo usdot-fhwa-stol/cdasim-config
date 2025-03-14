@@ -6,18 +6,21 @@
 environment:
   environment_perception_controller:
     ros__parameters:
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /environment
-      required_subsystem_nodes: ['']
-      unmanaged_required_nodes:
-        - /hardware_interface/velodyne_lidar_driver_wrapper_node
+      required_subsystem_nodes: [""]
+      unmanaged_required_nodes: [""]
       full_subsystem_required: true
 
 hardware_interface:
   drivers_controller:
     ros__parameters:
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /hardware_interface
-      required_subsystem_nodes: ['']
-      unmanaged_required_nodes: ['']
+      required_subsystem_nodes: [""]
+      unmanaged_required_nodes: [""]
       excluded_namespace_nodes:
         - /hardware_interface/carla_lidar_driver
         - /hardware_interface/carla_gnss_driver
@@ -32,18 +35,22 @@ hardware_interface:
 message:
   v2x_controller:
     ros__parameters:
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /message
-      required_subsystem_nodes: ['']
+      required_subsystem_nodes: [""]
       unmanaged_required_nodes:
         - /hardware_interface/dsrc_driver_node
-      full_subsystem_required: true
+      full_subsystem_required: false
 
 guidance:
   guidance_controller:
     ros__parameters:
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /guidance
-      required_subsystem_nodes: ['']
-      unmanaged_required_nodes: [''] # TODO add the controller driver once it is integrated with ROS2
+      required_subsystem_nodes: [""]
+      unmanaged_required_nodes: [""] # TODO add the controller driver once it is integrated with ROS2
       full_subsystem_required: true
       required_plugins:
         - /guidance/plugins/route_following_plugin
@@ -76,22 +83,22 @@ guidance:
         - /guidance/plugins/lci_strategic_plugin
         - /guidance/plugins/intersection_transit_maneuvering
 
-
 localization:
   localization_controller:
     ros__parameters:
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /localization
-      required_subsystem_nodes: ['']
-      unmanaged_required_nodes: ['']
+      required_subsystem_nodes: [""]
+      unmanaged_required_nodes: [""]
       full_subsystem_required: true
-      sensor_nodes:
-        - /hardware_interface/velodyne_lidar_driver_wrapper_node
+      sensor_nodes: [""]
       # TODO update the fault map once ros2 gps is integrated
       sensor_fault_map: '
         {
-          "sensor_fault_map":
-          [
-            [0,0]
-          ]
+        "sensor_fault_map":
+        [
+        [0,0]
+        ]
         }
         '
