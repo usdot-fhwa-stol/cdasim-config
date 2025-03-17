@@ -11,10 +11,10 @@ min_approach_distance : 20.0
 trajectory_smoothing_activation_distance: 20.0
 
 # Double: A buffer infront of the stopping location which will still be considered a valid stop. Units in meters
-stopping_location_buffer : 1.0
+stopping_location_buffer : 5.0
 
 # Double: A buffer in seconds around the green phase which will reduce the phase length such that vehicle still considers it non-green
-green_light_time_buffer : 0.5
+green_light_time_buffer : 0.1
 
 # Double: Minimum allowable speed in trajectory smoothing algorithm m/s
 algo_minimum_speed : 2.235
