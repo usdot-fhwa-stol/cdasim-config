@@ -125,7 +125,7 @@ def generate_launch_description():
     is_cp_mot_enabled = LaunchConfiguration('is_cp_mot_enabled')
     declare_is_cp_mot_enabled = DeclareLaunchArgument(
         name='is_cp_mot_enabled',
-        default_value = 'True',
+        default_value = 'False',
         description = 'True if user wants Cooperative Perception capability using Multiple Object Tracking to be enabled'
     )
 
@@ -145,7 +145,8 @@ def generate_launch_description():
             'area' : area,
             'arealist_path' : arealist_path,
             'vector_map_file' : vector_map_file,
-            'use_sim_time' : use_sim_time
+            'use_sim_time' : use_sim_time,
+            'is_cp_mot_enabled': is_cp_mot_enabled
             }.items()
     )
 
