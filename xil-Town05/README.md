@@ -18,13 +18,17 @@ This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario
 | SUMO      | 1.15       |
 | EVC       | 0.9.2 |
 
-## EVC Configuration
+## Econolite Virtual Controller
+### EVC Configuration
 
 ![Alt text](docs/clearance.png)
 ![Alt text](docs/minGreen.png)
 ![Alt text](docs/passage.png)
 
 The configuration shows above will apply to 421.cfg, 685.cfg and 965.cfg
+
+### PyEOS Bundle
+Follow the [README.md](./PyEOS/README.md) to replace PyEOS bundle
 
 ## Sumo Background Traffic
 The scenario starts with no background Sumo traffic, but a route file for Sumo background traffic can be generated and added as a docker volume in the `xil-Town05/docker-compose.yml'` to add sumo background traffic in the simulation
