@@ -27,8 +27,12 @@ This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario
 
 The configuration shows above will apply to 421.cfg, 685.cfg and 965.cfg
 
-### PyEOS Bundle
-Follow the [README.md](./PyEOS/README.md) to replace PyEOS bundle
+### PyEOS Bundle Folder
+PyEOS folder serves as a placeholder where users can place the PyEOS bundle, a personal bundle provided by the Econolite team. The bundle file in PyEOS folder will be mounted to the EVC-SUMO Docker container when the `start_simulation.sh` script is executed.
+
+The first time `start_simulation.sh` is run, EVC-SUMO will prompt for an Econolite login with a username and password. Upon successful login, the credentials will be stored in the Docker volume, and the bundle file will be automatically deleted.
+
+If the credential volumes, pyeos_data, is removed, the bundle file must be place to PyEOS folder and the login again.
 
 ## Sumo Background Traffic
 The scenario starts with no background Sumo traffic, but a route file for Sumo background traffic can be generated and added as a docker volume in the `xil-Town05/docker-compose.yml'` to add sumo background traffic in the simulation
