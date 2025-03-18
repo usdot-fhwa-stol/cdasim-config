@@ -2,7 +2,7 @@
 services:
   carma-simulation:
     privileged: true
-    image: ${DOCKER_ORG}/cdasim:${DOCKER_TAG}
+    image: usdotfhwastol/cdasim:carma-system-4.5.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
@@ -41,7 +41,7 @@ services:
     command: roscore
 
   platform_1:
-    image: local/carma-platform:latest
+    image: ${DOCKER_ORG}/carma-platform:${DOCKER_TAG}
     networks:
       carma_net_1:
         ipv4_address: 172.3.0.4
@@ -353,7 +353,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
   econolite-virtual-controller:
-    image: ${DOCKER_ORG}/econolite-virtual-controller:${DOCKER_TAG}
+    image: usdotfhwastol/econolite-virtual-controller:carma-system-4.5.0
     container_name: evc
     restart: always
     networks:
