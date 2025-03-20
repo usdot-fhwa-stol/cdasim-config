@@ -3,6 +3,14 @@
 # NOTE: A custom dynamic_bridge is used in CARMA Platform which will automatically connect topics and services, but
 #       this file allows for certain topics to be pre-configured with specified QoS settings.
 topics:
+  - topic: /carla/carma_1/camera/rgb/front/image_color
+    type: sensor_msgs/msg/Image
+    queue_size: 1
+    direction: 1to2
+  - topic: /carla/carma_1/camera/rgb/front/camera_info
+    type: sensor_msgs/msg/CameraInfo
+    queue_size: 1
+    direction: 1to2
   - topic: /guidance/plugins/debug/trajectory_planning
     type: carma_debug_ros2_msgs/msg/TrajectoryCurvatureSpeeds
     queue_size: 1
