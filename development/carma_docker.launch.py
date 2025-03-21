@@ -27,9 +27,9 @@ def generate_launch_description():
     """
     Launch CARMA System.
     """
-    
+
     # Parse the log config file and convert it to an environment variable
-    config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'carma_rosconsole.conf') 
+    config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'carma_rosconsole.conf')
     logging_env_var = SetEnvironmentVariable('CARMA_ROS_LOGGING_CONFIG', generate_log_levels(config_file_path))
 
     # Declare the vehicle_calibration_dir launch argument
@@ -71,8 +71,8 @@ def generate_launch_description():
     # Declare enable_guidance_plugin_validate
     enable_guidance_plugin_validator = LaunchConfiguration('enable_guidance_plugin_validator')
     declare_enable_guidance_plugin_validator = DeclareLaunchArgument(
-        name = 'enable_guidance_plugin_validator', 
-        default_value='true', 
+        name = 'enable_guidance_plugin_validator',
+        default_value='true',
         description='Flag indicating whether the Guidance Plugin Validator node will actively validate guidance strategic, tactical, and control plugins'
     )
 
@@ -111,8 +111,8 @@ def generate_launch_description():
     # Declare is_ros2_tracing_enabled
     is_ros2_tracing_enabled = LaunchConfiguration('is_ros2_tracing_enabled')
     declare_is_ros2_tracing_enabled = DeclareLaunchArgument(
-        name='is_ros2_tracing_enabled', 
-        default_value = 'False', 
+        name='is_ros2_tracing_enabled',
+        default_value = 'False',
         description = 'True if user wants ROS 2 Tracing logs to be generated from CARMA Platform'
     )
 
@@ -152,5 +152,6 @@ def generate_launch_description():
         declare_arealist_path,
         declare_vector_map_file,
         declare_is_ros2_tracing_enabled,
+        declare_use_foxglove_arg,
         carma_src_launch
     ])
