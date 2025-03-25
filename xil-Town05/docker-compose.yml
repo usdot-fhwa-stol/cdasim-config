@@ -125,7 +125,7 @@ services:
 
   # This node also records rosbag
   ns3_adapter_1:
-    image: ${DOCKER_ORG}/carma-ns3-adapter:${DOCKER_TAG}-noetic
+    image: ${DOCKER_ORG}/carma-ns3-adapter:${DOCKER_TAG}
     networks:
       carma_net_1:
         ipv4_address: 172.3.0.7
