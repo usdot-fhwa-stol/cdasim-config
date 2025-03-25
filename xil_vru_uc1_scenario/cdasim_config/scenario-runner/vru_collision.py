@@ -40,8 +40,8 @@ from srunner.scenarioconfigs.scenario_configuration import ScenarioConfiguration
 Configurations
 """
 
-WALKING_PERSON_SPEED_IN_MS = 1.0
-WALKING_PERSON_TRIGGER_WALKING_DISTANCE_IN_METERS = 0.1
+WALKING_PERSON_SPEED_IN_MS = 1.2
+WALKING_PERSON_TRIGGER_WALKING_DISTANCE_IN_METERS = 50.0
 
 class VulnerableRoadUserCollision(BasicScenario):
     def __init__(
@@ -83,14 +83,24 @@ class VulnerableRoadUserCollision(BasicScenario):
 
         # This is where the action takes place
         spectator = world.get_spectator()
-        spectator.set_transform(
-            carla.Transform(
-                carla.Location(265.4068, -160.1683, 21.2939),
-                carla.Rotation(-60.0360, -126.9920, 0.0),
-            )
+        spectator_transform = carla.Transform(
+            carla.Location(265.4068, -160.1683, 21.2939),
+            carla.Rotation(-60.0360, -126.9920, 0.0)
         )
+        spectator.set_transform(spectator_transform)
 
+        # Create a blueprint for the camera
+        camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
+        # Set camera attributes (resolution, FOV, etc.)
+        camera_bp.set_attribute('image_size_x', '1980')
+        camera_bp.set_attribute('image_size_x', '1080')
+        camera_bp.set_attribute('fov', '90')
+
+        camera = world.spawn_actor(camera_bp, spectator_transform)
+
+        camera.attributes['role_name'] = 'intersection_spectator'
         self.other_actors_dict = {}
+        self.other_actors_dict["intersection_spectator"] = camera
 
     def _initialize_actors(self, config: ScenarioConfiguration) -> None:
         """

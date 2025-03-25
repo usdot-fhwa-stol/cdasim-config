@@ -57,7 +57,7 @@ enable_object_avoidance: true
 # Acceleration limit
 # Value type: Desired
 # Units: m/s^2
-vehicle_acceleration_limit: 8.0
+vehicle_acceleration_limit: 2.0
 
 # Deceleration limit
 # Value type: Desired
@@ -125,6 +125,7 @@ excluded_lidar_topics:
   - /environment/detection/object_tracker/objects
   - /environment/detection/object_tracker/objects_markers
   - /environment/detection/objects
+  - /tf
 
 exclude_camera: true
 excluded_camera_topics:

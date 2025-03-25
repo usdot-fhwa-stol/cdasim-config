@@ -1,0 +1,34 @@
+{
+    "CollisionTest": {
+        "children": [],
+        "feedback_message": "",
+        "blackbox_level": 4,
+        "_terminate_on_failure": false,
+        "test_status": "FAILURE",
+        "expected_value_success": 0,
+        "expected_value_acceptable": null,
+        "actual_value": 1,
+        "optional": false,
+        "_collision_sensor": null,
+        "other_actor": null,
+        "other_actor_type": null,
+        "registered_collisions": [],
+        "last_id": null,
+        "collision_time": 16.100000239908695,
+        "terminate_on_failure": false
+    },
+    "RunningRedLightTest": {
+        "children": [],
+        "feedback_message": "",
+        "blackbox_level": 4,
+        "_terminate_on_failure": false,
+        "test_status": "FAILURE",
+        "expected_value_success": 0,
+        "expected_value_acceptable": null,
+        "actual_value": 1,
+        "optional": false,
+        "_last_red_light_id": 182,
+        "debug": false,
+        "terminate_on_failure": false
+    }
+}
