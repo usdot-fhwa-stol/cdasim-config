@@ -89,7 +89,6 @@ services:
       && wait-for-it 172.3.0.2:11311 -- rosparam load /opt/carma/vehicle/config/bridge.yml
       && source /home/carma/.base-image/workspace/install/setup.bash
       && ros2 run ros1_bridge dynamic_bridge --multi-threads'
-
   carma-carla-integration_1:
     image: ${DOCKER_ORG}/carma-carla-integration:${DOCKER_TAG}
     networks:
@@ -99,6 +98,7 @@ services:
         ipv4_address: 172.2.0.6
     container_name: carma-carla-integration_1
     volumes:
+      - ./carma-carla-integration/sensors.json:/home/carma/carma-carla-integration/carma-carla-agent/agent/config/sensors.json
       - ./carma-carla-integration/carma_carla_agent.launch:/home/carma/carma-carla-integration/carma-carla-agent/launch/carma_carla_agent.launch
     volumes_from:
       - container:carma-config:ro
@@ -106,7 +106,6 @@ services:
       ROS_IP: 172.3.0.6
       ROS_MASTER_URI: http://172.3.0.2:11311/
       PYTHONUNBUFFERED: 1
-
     # sleep is for carla simulator to become available
     # start_delay_in_seconds is carla game time seconds to adjust when to engage for the scenario
     # and account for delay required for world model to fully update after route is selected
