@@ -1,0 +1,214 @@
+{
+  "configById": {
+    "RawMessages!hbol20": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/message/incoming_spat",
+      "fontSize": 12,
+      "expansion": {
+        "intersection_state_list": "e",
+        "0~intersection_state_list": "e",
+        "id~0~intersection_state_list": "e",
+        "status~0~intersection_state_list": "e",
+        "lane_id_list~0~intersection_state_list": "e",
+        "movement_list~0~intersection_state_list": "e",
+        "0~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~0~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~0~movement_list~0~intersection_state_list": "e",
+        "1~movement_list~0~intersection_state_list": "e",
+        "movement_event_list~1~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~1~movement_list~0~intersection_state_list": "e",
+        "2~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~2~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~2~movement_list~0~intersection_state_list": "e",
+        "3~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~3~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~3~movement_list~0~intersection_state_list": "e",
+        "4~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~4~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~4~movement_list~0~intersection_state_list": "e",
+        "5~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~5~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~5~movement_list~0~intersection_state_list": "e",
+        "6~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~6~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~6~movement_list~0~intersection_state_list": "e",
+        "7~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~7~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~7~movement_list~0~intersection_state_list": "e",
+        "8~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~8~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~8~movement_list~0~intersection_state_list": "e",
+        "9~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~9~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~9~movement_list~0~intersection_state_list": "e",
+        "10~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~10~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~10~movement_list~0~intersection_state_list": "e",
+        "11~movement_list~0~intersection_state_list": "c",
+        "movement_event_list~11~movement_list~0~intersection_state_list": "e",
+        "0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
+        "event_state~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
+        "timing~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
+        "advisory_speed_list~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~11~movement_list~0~intersection_state_list": "e",
+        "connection_maneuver_assist_list~0~intersection_state_list": "e"
+      }
+    },
+    "RawMessages!2w2g0b5": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/guidance/final_maneuver_plan",
+      "fontSize": 12,
+      "expansion": {
+        "maneuvers": "e",
+        "0~maneuvers": "e",
+        "stop_and_wait_maneuver~0~maneuvers": "e"
+      }
+    },
+    "Image!3mnp456": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/carla/carma_1/camera/rgb/front/image_color",
+        "calibrationTopic": "/carla/carma_1/camera/rgb/front/camera_info"
+      }
+    },
+    "Plot!3gzn772": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/guidance/ctrl_cmd.cmd.linear_velocity",
+          "enabled": true,
+          "color": "#4e98e2"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240
+    },
+    "RawMessages!os6rgs": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/guidance/ctrl_cmd",
+      "fontSize": 12
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "direction": "row",
+    "first": "RawMessages!hbol20",
+    "second": {
+      "direction": "row",
+      "first": "RawMessages!2w2g0b5",
+      "second": {
+        "first": "Image!3mnp456",
+        "second": {
+          "first": "Plot!3gzn772",
+          "second": "RawMessages!os6rgs",
+          "direction": "column"
+        },
+        "direction": "column",
+        "splitPercentage": 43.40878828229028
+      },
+      "splitPercentage": 40.83129584352079
+    },
+    "splitPercentage": 27.22419928825623
+  }
+}
