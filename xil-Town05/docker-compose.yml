@@ -153,7 +153,7 @@ services:
       && wait-for-it 172.3.0.2:11311 -- roslaunch ns3_adapter ns3_adapter.launch enable_ros1_record:=true
       role_id:='carma_1'
       remap_ns:=/hardware_interface/comms"
-      
+
   mmitssvsp:
     container_name: mmitss_vsp1
     image: usdotfhwastoldev/mmitss-vsp:develop
@@ -167,7 +167,7 @@ services:
         - SIMULATION_MODE=True
         - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
-        
+
   mmitssmrp:
     container_name: mmitss_mrp_town5
     image: usdotfhwastoldev/mmitss-mrp:develop
@@ -179,23 +179,23 @@ services:
     environment:
         - TZ=America/New_York
         - SIMULATION_MODE=True
-  
+
 
   zookeeper:
     image: wurstmeister/zookeeper
-    container_name: zookeeper
+    container_name: zookeeper_1
     networks:
       carma_streets_net_1:
         ipv4_address: 172.4.0.3
     volumes:
-      - zookeeper-datavolume:/opt/zookeeper-3.4.13/data
+      - zookeeper-datavolume-1:/opt/zookeeper-3.4.13/data
 
-  kafka:
+  kafka_1:
     image: wurstmeister/kafka
-    container_name: kafka
+    container_name: kafka_1
     depends_on:
-      - zookeeper
-    network_mode: service:zookeeper
+      - zookeeper_1
+    network_mode: service:zookeeper_1
     # Health check to confirm kafka server is healthy (script is a client) and all topics
     # have been created (time_sync is last topic).
     healthcheck:
@@ -226,29 +226,29 @@ services:
       KAFKA_LOG_DIRS: "/kafka/kafka-logs"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - kafka-datavolume:/kafka/kafka-logs
+      - kafka-datavolume-1:/kafka/kafka-logs
 
   ##############################################################
   # Kafka Owl for monitoring kafka traffic. UI can be accessed on
   # configurable port set in performance/kowl.yaml NOTE: IS NOT
   # NECESSARY FOR DEPLOYMENT BUT HELFUL FOR DEBUGGING!
   ################################################################
-  kowl:
+  kowl_1:
+    container_name: kowl_1
     image: quay.io/cloudhut/kowl
-    container_name: kowl
     restart: on-failure
-    network_mode: service:zookeeper
+    network_mode: service:zookeeper_1
     depends_on:
-      kafka:
+      kafka_1:
         condition: service_healthy
     environment:
       CONFIG_FILEPATH: /etc/kowl/kowl.yaml
     volumes:
       - ./kowl:/etc/kowl/
 
-  db:
+  db_1:
     image: mysql:5.7
-    container_name: mysql
+    container_name: db_1
     restart: always
     environment:
       - MYSQL_DATABASE=IVP
@@ -261,32 +261,148 @@ services:
       carma_sim_net:
         ipv4_address: 172.2.0.8
     volumes:
-      - mysql-datavolume:/var/lib/mysql
+      - mysql-datavolume-1:/var/lib/mysql
       - ./secrets:/secrets
       - ./mysql:/docker-entrypoint-initdb.d
 
-  php:
+  php_1:
     image: usdotfhwaops/php:${OPS_DOCKER_TAG}
-    container_name: php
-    network_mode: service:db
+    container_name: php_1
+    network_mode: service:db_1
     depends_on:
-      - v2xhub
+      - v2xhub_1
     stdin_open: true
     tty: true
 
-  v2xhub:
+  v2xhub_1:
     image: usdotfhwaops/v2xhub:${OPS_DOCKER_TAG}
-    container_name: v2xhub
-    network_mode: service:db
+    container_name: v2xhub_1
+    network_mode: service:db_1
     restart: always
     depends_on:
-      - db
+      - db_1
     environment:
       MYSQL_PASSWORD: /home/V2X-Hub/secrets/mysql_password.txt
       SIMULATION_MODE: ${SIMULATION_MODE}
       SIMULATION_IP: 172.2.0.2
       SIMULATION_REGISTRATION_PORT: 1615
       LOCAL_IP: 172.2.0.8
+      TIME_SYNC_TOPIC: time_sync
+      TIME_SYNC_PORT: 7575
+      SIM_V2X_PORT: 1517
+      SIM_INTERACTION_PORT: 7576
+      V2X_PORT: 8686
+      SENSOR_JSON_FILE_PATH: /home/V2X-Hub/sensor_configurations/sensors.json
+      INFRASTRUCTURE_ID: ${INFRASTRUCTURE_ID}
+    volumes:
+      - ./logs:/var/log/tmx
+      - ./MAP:/var/www/plugins/MAP
+      - ./secrets:/home/V2X-Hub/secrets
+
+
+  zookeeper_2:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper_2
+    networks:
+      carma_streets_net_1:
+        ipv4_address: 172.4.0.13
+    volumes:
+      - zookeeper-datavolume-2:/opt/zookeeper-3.4.13/data
+
+  kafka_2:
+    image: wurstmeister/kafka
+    depends_on:
+      - zookeeper_2
+    network_mode: service:zookeeper_2
+    # Health check to confirm kafka server is healthy (script is a client) and all topics
+    # have been created (time_sync is last topic).
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--describe", "--bootstrap-server", "172.4.0.13:9092", "--topic", "time_sync"]
+      interval: 2s
+      timeout: 10s
+      retries: 10
+    environment:
+      DOCKER_HOST_IP: 172.4.0.13
+      KAFKA_ADVERTISED_HOST_NAME: 172.4.0.13
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_CREATE_TOPICS: "\
+        v2xhub_scheduling_plan_sub:1:1,\
+        v2xhub_bsm_in:1:1,\
+        v2xhub_mobility_operation_in:1:1,\
+        v2xhub_mobility_path_in:1:1,\
+        vehicle_status_intent_output:1:1,\
+        v2xhub_map_msg_in:1:1,\
+        modified_spat:1:1,\
+        desired_phase_plan:1:1,\
+        tsc_config_state:1:1,\
+        v2xhub_sim_sensor_detected_object:1:1,\
+        v2xhub_sdsm_sub,\
+        time_sync:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LOG_DIRS: "/kafka/kafka-logs"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kafka-datavolume-2:/kafka/kafka-logs
+
+  ##############################################################
+  # Kafka Owl for monitoring kafka traffic. UI can be accessed on
+  # configurable port set in performance/kowl.yaml NOTE: IS NOT
+  # NECESSARY FOR DEPLOYMENT BUT HELFUL FOR DEBUGGING!
+  ################################################################
+  kowl_2:
+    container_name: kowl_2
+    image: quay.io/cloudhut/kowl
+    restart: on-failure
+    network_mode: service:zookeeper_2
+    depends_on:
+      kafka_2:
+        condition: service_healthy
+    environment:
+      CONFIG_FILEPATH: /etc/kowl/kowl.yaml
+    volumes:
+      - ./kowl:/etc/kowl/
+
+  db_2:
+    container_name: db_2
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_DATABASE=IVP
+      - MYSQL_USER=IVP
+      - MYSQL_PASSWORD_FILE=/secrets/mysql_password.txt
+      - MYSQL_ROOT_PASSWORD_FILE=/secrets/mysql_root_password.txt
+    networks:
+      carma_streets_net_1:
+        ipv4_address: 172.4.0.12
+      carma_sim_net:
+        ipv4_address: 172.2.0.18
+    volumes:
+      - mysql-datavolume-2:/var/lib/mysql
+      - ./secrets:/secrets
+      - ./mysql:/docker-entrypoint-initdb.d
+
+  php_2:
+    image: usdotfhwaops/php:${OPS_DOCKER_TAG}
+    container_name: php_2
+    network_mode: service:db_2
+    depends_on:
+      - v2xhub_2
+    stdin_open: true
+    tty: true
+
+  v2xhub_2:
+    image: usdotfhwaops/v2xhub:${OPS_DOCKER_TAG}
+    container_name: v2xhub_2
+    network_mode: service:db_2
+    restart: always
+    depends_on:
+      - db_2
+    environment:
+      MYSQL_PASSWORD: /home/V2X-Hub/secrets/mysql_password.txt
+      SIMULATION_MODE: ${SIMULATION_MODE}
+      SIMULATION_IP: 172.2.0.2
+      SIMULATION_REGISTRATION_PORT: 1615
+      LOCAL_IP: 172.2.0.18
       TIME_SYNC_TOPIC: time_sync
       TIME_SYNC_PORT: 7575
       SIM_V2X_PORT: 1517
@@ -339,26 +455,29 @@ services:
       bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
                socat UDP-LISTEN:${EVC_PORT_2},fork UDP:127.0.0.1:${EVC_PORT_2} & \
                socat UDP-LISTEN:${EVC_PORT_3},fork UDP:127.0.0.1:${EVC_PORT_3} & \
-               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2" 
+               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
 
 networks:
   carma_sim_net:
     ipam:
       config:
-        - subnet: 172.2.0.0/16
+        - subnet: 172.2.0.0/24
 
   carma_net_1:
     ipam:
       config:
-        - subnet: 172.3.0.0/16
+        - subnet: 172.3.0.0/24
 
   carma_streets_net_1:
     ipam:
       config:
-        - subnet: 172.4.0.0/16
+        - subnet: 172.4.0.0/24
 
 volumes:
-  mysql-datavolume:
-  kafka-datavolume:
-  zookeeper-datavolume:
+  mysql-datavolume-1:
+  kafka-datavolume-1:
+  zookeeper-datavolume-1:
+  mysql-datavolume-2:
+  kafka-datavolume-2:
+  zookeeper-datavolume-2:
   pyeos_data:
