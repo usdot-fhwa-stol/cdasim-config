@@ -3,9 +3,9 @@
         {
             "type": "sensor.camera.rgb",
             "id": "follow",
-            "x": -5.0, "y": 0.0, "z": 5, "roll": 0.0, "pitch": -45.0, "yaw": 0.0,
-            "image_size_x": 800,
-            "image_size_y": 600,
+            "x": -5.0, "y": 0.0, "z": 5, "roll": 0.0, "pitch": -35.0, "yaw": 0.0,
+            "image_size_x": 1600,
+            "image_size_y": 900,
             "fov": 120.0,
             "sensor_tick": 0.05,
             "gamma": 2.2,
