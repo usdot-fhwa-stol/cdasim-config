@@ -55,7 +55,7 @@ enable_object_avoidance: true
 # Acceleration limit
 # Value type: Desired
 # Units: m/s^2
-vehicle_acceleration_limit: 8.0
+vehicle_acceleration_limit: 2.0
 
 # Deceleration limit
 # Value type: Desired
@@ -102,7 +102,7 @@ vehicle_participant_type: "vehicle:car"
 
 # Parameters to enable either ROS 1 or ROS 2 (or both) rosbag logging
 use_ros1_rosbag: true
-use_ros2_rosbag: false
+use_ros2_rosbag: true
 
 # Topics to exclude from rosbag recording
 exclude_default: true
