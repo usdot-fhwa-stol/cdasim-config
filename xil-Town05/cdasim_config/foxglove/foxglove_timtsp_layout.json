@@ -1,120 +1,280 @@
 {
   "configById": {
-    "RawMessages!hbol20": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/message/incoming_spat",
-      "fontSize": 12,
-      "expansion": {
-        "intersection_state_list": "e",
-        "0~intersection_state_list": "e",
-        "id~0~intersection_state_list": "e",
-        "status~0~intersection_state_list": "e",
-        "lane_id_list~0~intersection_state_list": "e",
-        "movement_list~0~intersection_state_list": "e",
-        "0~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~0~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~0~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~0~movement_list~0~intersection_state_list": "e",
-        "1~movement_list~0~intersection_state_list": "e",
-        "movement_event_list~1~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~1~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~1~movement_list~0~intersection_state_list": "e",
-        "2~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~2~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~2~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~2~movement_list~0~intersection_state_list": "e",
-        "3~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~3~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~3~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~3~movement_list~0~intersection_state_list": "e",
-        "4~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~4~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~4~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~4~movement_list~0~intersection_state_list": "e",
-        "5~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~5~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~5~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~5~movement_list~0~intersection_state_list": "e",
-        "6~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~6~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~6~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~6~movement_list~0~intersection_state_list": "e",
-        "7~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~7~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~7~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~7~movement_list~0~intersection_state_list": "e",
-        "8~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~8~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~8~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~8~movement_list~0~intersection_state_list": "e",
-        "9~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~9~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~9~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~9~movement_list~0~intersection_state_list": "e",
-        "10~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~10~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~10~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~10~movement_list~0~intersection_state_list": "e",
-        "11~movement_list~0~intersection_state_list": "c",
-        "movement_event_list~11~movement_list~0~intersection_state_list": "e",
-        "0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
-        "event_state~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
-        "timing~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
-        "advisory_speed_list~0~movement_event_list~11~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~11~movement_list~0~intersection_state_list": "e",
-        "connection_maneuver_assist_list~0~intersection_state_list": "e"
-      }
+    "3D!4grgnmx": {
+      "cameraState": {
+        "perspective": true,
+        "distance": 88.5208228512074,
+        "phi": 54.49235048678625,
+        "thetaOffset": 54.513212795551574,
+        "targetOffset": [
+          -69.59679962428758,
+          0.18466350544021126,
+          3.042557317758767e-15
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000,
+        "logDepth": true
+      },
+      "followMode": "follow-position",
+      "followTf": "world",
+      "scene": {
+        "syncCamera": false,
+        "enableStats": false,
+        "ignoreColladaUpAxis": false,
+        "meshUpAxis": "y_up",
+        "backgroundColor": "#0d0101"
+      },
+      "transforms": {
+        "frame:carma_1": {
+          "visible": false
+        },
+        "frame:200": {
+          "visible": false
+        },
+        "frame:233": {
+          "visible": false
+        },
+        "frame:232": {
+          "visible": false
+        },
+        "frame:231": {
+          "visible": false
+        },
+        "frame:230": {
+          "visible": false
+        },
+        "frame:229": {
+          "visible": false
+        },
+        "frame:228": {
+          "visible": false
+        },
+        "frame:227": {
+          "visible": false
+        },
+        "frame:226": {
+          "visible": false
+        },
+        "frame:225": {
+          "visible": false
+        },
+        "frame:224": {
+          "visible": false
+        },
+        "frame:223": {
+          "visible": false
+        },
+        "frame:222": {
+          "visible": false
+        },
+        "frame:221": {
+          "visible": false
+        },
+        "frame:220": {
+          "visible": false
+        },
+        "frame:219": {
+          "visible": false
+        },
+        "frame:218": {
+          "visible": false
+        },
+        "frame:217": {
+          "visible": false
+        },
+        "frame:216": {
+          "visible": false
+        },
+        "frame:215": {
+          "visible": false
+        },
+        "frame:214": {
+          "visible": false
+        },
+        "frame:213": {
+          "visible": false
+        },
+        "frame:base_link": {
+          "visible": false
+        },
+        "frame:map": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/carla/carma_1/camera/rgb/front/camera_info": {
+          "visible": false
+        },
+        "/carla/carma_1/camera/rgb/front/image_color": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/carla/carma_1/camera/rgb/front/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/carla/carma_1/lidar/lidar/point_cloud": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/carma_1/radar/radar_fc/radar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/carma_1/radar/radar_fl/radar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/carma_1/radar/radar_fr/radar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/carma_1/radar/radar_rl/radar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/carma_1/semantic_lidar/front/point_cloud": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/marker": {
+          "visible": true,
+          "showOutlines": true
+        },
+        "/localization/current_pose": {
+          "visible": false
+        },
+        "/carla/carma_1/radar/radar_rr/radar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/lidar/front/point_cloud": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/environment/lanelet2_map_viz": {
+          "visible": true,
+          "showOutlines": true,
+          "namespaces": {
+            "center_lane_line": {
+              "visible": true
+            },
+            "road_lanelets": {
+              "visible": true
+            },
+            "right_lane_bound": {
+              "visible": true
+            },
+            "left_lane_bound": {
+              "visible": true
+            },
+            "lanelet direction": {
+              "visible": true
+            }
+          }
+        },
+        "/environment/j2735_map_msg_visualizer": {
+          "visible": false
+        },
+        "/environment/tcm_visualizer": {
+          "visible": false
+        },
+        "/carla/carma_1/camera/rgb/follow/image_color": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/carla/carma_1/camera/rgb/follow/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/carla/carma_1/camera/rgb/follow/camera_info": {
+          "visible": false
+        },
+        "/environment/fused_external_objects_viz": {
+          "visible": false
+        },
+        "/guidance/host_marker": {
+          "visible": false
+        },
+        "/guidance/label_marker": {
+          "visible": false
+        },
+        "/guidance/route_marker": {
+          "visible": false
+        },
+        "/guidance/trajectory_visualizer": {
+          "visible": false
+        },
+        "/localization/gnss_pose": {
+          "visible": false
+        },
+        "/environment/motion_computation_visualize": {
+          "visible": true
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": false,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "a046e010-1c97-4f13-a98c-e5df09e8fe3a",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
     },
-    "RawMessages!2w2g0b5": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/guidance/final_maneuver_plan",
-      "fontSize": 12,
-      "expansion": {
-        "maneuvers": "e",
-        "0~maneuvers": "e",
-        "stop_and_wait_maneuver~0~maneuvers": "e"
-      }
-    },
-    "Image!3mnp456": {
+    "Image!42wyoxw": {
       "cameraState": {
         "distance": 20,
         "perspective": true,
@@ -155,17 +315,34 @@
         "poseEstimateThetaDeviation": 0.26179939
       },
       "imageMode": {
-        "imageTopic": "/carla/carma_1/camera/rgb/front/image_color",
-        "calibrationTopic": "/carla/carma_1/camera/rgb/front/camera_info"
+        "imageTopic": "/carla/carma_1/camera/rgb/follow/image_color",
+        "calibrationTopic": "/carla/carma_1/camera/rgb/follow/camera_info"
       }
     },
-    "Plot!3gzn772": {
+    "StateTransitions!4i410mk": {
+      "paths": [
+        {
+          "value": "/message/incoming_spat.intersection_state_list[0].movement_list[4].movement_event_list[0].event_state.movement_phase_state",
+          "timestampMethod": "receiveTime",
+          "label": "Signal Group 4 and 8"
+        },
+        {
+          "value": "/message/incoming_spat.intersection_state_list[0].movement_list[1].movement_event_list[0].event_state.movement_phase_state",
+          "timestampMethod": "receiveTime",
+          "label": "Signal Group 2 and 6"
+        }
+      ],
+      "isSynced": true,
+      "foxglovePanelTitle": "SPAT"
+    },
+    "Plot!17e6g7l": {
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/guidance/ctrl_cmd.cmd.linear_velocity",
+          "value": "/hardware_interface/vehicle/twist.twist.linear.x",
           "enabled": true,
-          "color": "#4e98e2"
+          "color": "#4e98e2",
+          "label": "Vehicle Speed (m/s)"
         }
       ],
       "showXAxisLabels": true,
@@ -176,14 +353,6 @@
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240
-    },
-    "RawMessages!os6rgs": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/guidance/ctrl_cmd",
-      "fontSize": 12
     }
   },
   "globalVariables": {},
@@ -193,22 +362,17 @@
   },
   "layout": {
     "direction": "row",
-    "first": "RawMessages!hbol20",
+    "first": "3D!4grgnmx",
     "second": {
-      "direction": "row",
-      "first": "RawMessages!2w2g0b5",
+      "first": "Image!42wyoxw",
       "second": {
-        "first": "Image!3mnp456",
-        "second": {
-          "first": "Plot!3gzn772",
-          "second": "RawMessages!os6rgs",
-          "direction": "column"
-        },
-        "direction": "column",
-        "splitPercentage": 43.40878828229028
+        "first": "StateTransitions!4i410mk",
+        "second": "Plot!17e6g7l",
+        "direction": "row"
       },
-      "splitPercentage": 40.83129584352079
+      "direction": "column",
+      "splitPercentage": 65.78171091445427
     },
-    "splitPercentage": 27.22419928825623
+    "splitPercentage": 34.8623853211009
   }
 }
