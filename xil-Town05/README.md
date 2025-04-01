@@ -101,5 +101,6 @@ Service logs can be found under `/opt/carma-simulation/logs/`. After running `./
 Service logs can be found under `./cdasim_config/<streets_service_name>/logs`. After running `./stop_simulation` Kafka logs will be collected and added to a zip file under `./cdasim_config/`
 ### Data Analysis
 Data processing and analysis scripts for plotting collected data from CARMA Streets and CARMA Platform can be found [here](https://github.com/usdot-fhwa-stol/carma-analytics-fotda/tree/develop/src). Additionally under `./cdasim_config/foxglove` we have provided a dashboard configuration which can be used with rosbags collected in this scenario to replay the data and plot CARLA and CARMA Platform Data. For more information about how to use fox glove (https://foxglove.dev/)
+![Alt text](./docs/foxglove.png)
 
-<![](./docs/floxglove_example.gif)>
+
