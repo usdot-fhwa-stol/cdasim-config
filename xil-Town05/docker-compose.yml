@@ -151,6 +151,29 @@ services:
       && wait-for-it 172.3.0.2:11311 -- roslaunch ns3_adapter ns3_adapter.launch enable_ros1_record:=true
       role_id:='carma_1'
       remap_ns:=/hardware_interface/comms"
+      
+  mmitssvsp:
+    container_name: mmitss_vsp1
+    image: mmitssuarizona/mmitss-carma-vsp-ros2-x86:CDA1.0
+    volumes:
+      - ./mmitss/mmitss_vsp1/nojournal:/nojournal
+    networks:
+        carma_net_1:
+            ipv4_address: 172.3.0.8
+    environment:
+        - TZ=America/New_York
+        
+  mmitssmrp:
+    container_name: mmitss_mrp_town5
+    image: mmitssuarizona/mmitss-carma-mrp-kafka-x86:CDA1.1
+    volumes:
+      - ./mmitss/mmitss_mrp1/nojournal:/nojournal
+    networks:
+        carma_streets_net_1:
+            ipv4_address: 172.4.0.5
+    environment:
+        - TZ=America/New_York
+  
 
   zookeeper:
     image: wurstmeister/zookeeper
