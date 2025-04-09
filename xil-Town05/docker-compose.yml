@@ -89,6 +89,7 @@ services:
       && wait-for-it 172.3.0.2:11311 -- rosparam load /opt/carma/vehicle/config/bridge.yml
       && source /home/carma/.base-image/workspace/install/setup.bash
       && ros2 run ros1_bridge dynamic_bridge --multi-threads'
+
   carma-carla-integration_1:
     image: ${DOCKER_ORG}/carma-carla-integration:${DOCKER_TAG}
     networks:
@@ -106,6 +107,7 @@ services:
       ROS_IP: 172.3.0.6
       ROS_MASTER_URI: http://172.3.0.2:11311/
       PYTHONUNBUFFERED: 1
+
     # sleep is for carla simulator to become available
     # start_delay_in_seconds is carla game time seconds to adjust when to engage for the scenario
     # and account for delay required for world model to fully update after route is selected
@@ -150,6 +152,31 @@ services:
       && wait-for-it 172.3.0.2:11311 -- roslaunch ns3_adapter ns3_adapter.launch enable_ros1_record:=true
       role_id:='carma_1'
       remap_ns:=/hardware_interface/comms"
+      
+  mmitssvsp:
+    container_name: mmitss_vsp1
+    image: mmitssuarizona/mmitss-carma-vsp-ros2-x86:CDA1.2
+    volumes:
+      - ./mmitss/mmitss_vsp1/nojournal:/nojournal
+    networks:
+        carma_net_1:
+            ipv4_address: 172.3.0.8
+    environment:
+        - TZ=America/New_York
+        - SIMULATION_MODE=True
+        
+  mmitssmrp:
+    container_name: mmitss_mrp_town5
+    image: mmitssuarizona/mmitss-carma-mrp-kafka-x86:CDA1.2
+    volumes:
+      - ./mmitss/mmitss_mrp1/nojournal:/nojournal
+    networks:
+        carma_streets_net_1:
+            ipv4_address: 172.4.0.10
+    environment:
+        - TZ=America/New_York
+        - SIMULATION_MODE=True
+  
 
   zookeeper:
     image: wurstmeister/zookeeper
