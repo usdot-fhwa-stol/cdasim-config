@@ -9,7 +9,7 @@ This **CARMA Config** includes the docker-compose and configuration file setup f
 This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario which includes **CARLA**, **SUMO** , **NS3** (CV2X Model), a **Virtual Signal Controller** and **CARMA Platform**.  The scenario takes place in an intersection in **CARLA Town 5** and spawns 1 **CARMA Platform Vehicle**.
 
 ### Scenario: TIM/TSP
-![Alt text](docs/Town05.png)
+![Alt text](docs/Town05_.png)
 ## Simulators
 
 | Simulator      | Version |
