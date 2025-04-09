@@ -20,7 +20,7 @@
       },
       {
       "controllerId": 2,
-      "controllerCfgPath": "/home/carma/src/resources/965_v2xhub_binary.cfg",
+      "controllerCfgPath": "/home/carma/src/resources/965_mmitss_binary.cfg",
       "moe_dir": null,
       "start_time": 0,
       "bind_ip": null,

@@ -61,11 +61,12 @@
 	},
 	"TimeSyncDebug" : false,
 	"TimeSyncPort":{
-		"PriorityRequestServer": 30001,
-		"PriorityRequestSolver": 30002,
-		"MapSPaTBroadcaster": 30003,
-		"TrafficControllerInterface": 30004,
-		"SignalCoordination": 30006	
+		"PriorityRequestServer": 30011,
+		"PriorityRequestSolver": 30012,
+		"MapSPaTBroadcaster": 30013,
+		"TrafficControllerInterface": 30014,
+		"SignalCoordination": 30016,
+		"SnmpEngine":30017	
 	},
 	"psid": {
 		"map": "8002",
