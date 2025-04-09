@@ -17,7 +17,6 @@ services:
       - ./cdasim/logback.xml:/opt/carma-simulation/etc/logback.xml
       - ./sumo_background_traffic/Town05.rou.xml:/opt/carma-simulation/scenarios/Town05/sumo/Town05.rou.xml
       - ./sumo_background_traffic/Town05.sumocfg:/opt/carma-simulation/scenarios/Town05/sumo/Town05.sumocfg
-      - ./sumo_background_traffic/Town05.net.xml:/opt/carma-simulation/scenarios/Town05/sumo/Town05.net.xml
     deploy:
       resources:
         reservations:
