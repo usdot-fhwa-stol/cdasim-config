@@ -33,24 +33,6 @@
                     {"evcPhaseId": 4, "sumoTlStateIndex":[4,5,6,7],     "sumoInductionLoopId": ["e1_3","e1_3","e1_2","e1_2"]},
                     {"evcPhaseId": 6, "sumoTlStateIndex":[8,9,10,11],   "sumoInductionLoopId": ["e1_1","e1_1","e1_0","e1_0"]},
                     {"evcPhaseId": 8, "sumoTlStateIndex":[12,13,14,15], "sumoInductionLoopId": ["e1_7","e1_7","e1_6","e1_6"]}]
-      },
-
-      {
-      "controllerId": 3,
-      "controllerCfgPath": "/home/carma/src/resources/685.cfg",
-      "moe_dir": null,
-      "start_time": 0,
-      "bind_ip": null,
-      "web_port": 0,
-      "snmp_port": 5052,
-      "harness_port": 0,
-      "sumoTlId": 685,
-      "enableWebPanel": true,
-      "evcPhases": [{"evcPhaseId": 2, "sumoTlStateIndex":[4,5,6]},
-                      {"evcPhaseId": 4, "sumoTlStateIndex":[7,8,9,10]},
-                      {"evcPhaseId": 6, "sumoTlStateIndex":[11,12,13]},
-                      {"evcPhaseId": 8, "sumoTlStateIndex":[0,1,2,3]}]
       }
-
     ]
 }
