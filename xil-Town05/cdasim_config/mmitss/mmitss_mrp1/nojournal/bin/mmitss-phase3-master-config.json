@@ -104,7 +104,7 @@
 	},
 	"SignalController": {
                 "IpAddress": "172.4.0.4",
-                "NtcipPort": 5051,
+                "NtcipPort": 5055,
                 "TimingPlanUpdateInterval_sec": 600,
                 "NtcipBackupTime_sec": 300,
                 "Vendor": "Econolite",
