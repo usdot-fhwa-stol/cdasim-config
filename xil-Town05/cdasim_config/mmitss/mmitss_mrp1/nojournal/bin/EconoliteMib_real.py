@@ -37,7 +37,7 @@ OIDs in this module can be used.
 
 # Object that controls the broadcast of SPAT blob from the controller:
 # For MMITSS applications, this object needs to be set to the value = 6.
-asc3ViiMessageEnable            =   "1.3.6.1.4.1.1206.3.5.2.9.44.1.1"
+# asc3ViiMessageEnable            =   "1.3.6.1.4.1.1206.3.5.2.9.44.1.1"
 
 # Object that returns the ID of the currently active timing plan:
 CUR_TIMING_PLAN                 =   "1.3.6.1.4.1.1206.3.5.2.1.22.0"   

@@ -107,8 +107,8 @@
                 "NtcipPort": 5051,
                 "TimingPlanUpdateInterval_sec": 600,
                 "NtcipBackupTime_sec": 300,
-                "Vendor": "standardmib",
-                "TimingPlanMib": "/nojournal/bin/StandardMib_Siemens.py",
+                "Vendor": "Econolite",
+                "TimingPlanMib": "/nojournal/bin/EconoliteMib.py",
                 "InactiveVehPhases": [],
                 "InactivePedPhases": [],
                 "SplitPhases": {
