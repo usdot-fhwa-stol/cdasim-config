@@ -222,7 +222,7 @@ services:
         v2xhub_sim_sensor_detected_object:1:1,\
         v2xhub_sdsm_sub,\
         time_sync:1:1"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_1:2181
       KAFKA_LOG_DIRS: "/kafka/kafka-logs"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -263,7 +263,7 @@ services:
     volumes:
       - mysql-datavolume-1:/var/lib/mysql
       - ./secrets:/secrets
-      - ./mysql:/docker-entrypoint-initdb.d
+      - ./mysql_1:/docker-entrypoint-initdb.d
 
   php_1:
     image: usdotfhwaops/php:${OPS_DOCKER_TAG}
@@ -310,6 +310,7 @@ services:
       - zookeeper-datavolume-2:/opt/zookeeper-3.4.13/data
 
   kafka_2:
+    container_name: kafka_2
     image: wurstmeister/kafka
     depends_on:
       - zookeeper_2
@@ -338,7 +339,7 @@ services:
         v2xhub_sim_sensor_detected_object:1:1,\
         v2xhub_sdsm_sub,\
         time_sync:1:1"
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_2:2181
       KAFKA_LOG_DIRS: "/kafka/kafka-logs"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -379,7 +380,7 @@ services:
     volumes:
       - mysql-datavolume-2:/var/lib/mysql
       - ./secrets:/secrets
-      - ./mysql:/docker-entrypoint-initdb.d
+      - ./mysql_2:/docker-entrypoint-initdb.d
 
   php_2:
     image: usdotfhwaops/php:${OPS_DOCKER_TAG}
@@ -409,7 +410,7 @@ services:
       SIM_INTERACTION_PORT: 7576
       V2X_PORT: 8686
       SENSOR_JSON_FILE_PATH: /home/V2X-Hub/sensor_configurations/sensors.json
-      INFRASTRUCTURE_ID: ${INFRASTRUCTURE_ID}
+      INFRASTRUCTURE_ID: rsu_2234
     volumes:
       - ./logs:/var/log/tmx
       - ./MAP:/var/www/plugins/MAP
