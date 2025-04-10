@@ -173,7 +173,6 @@ services:
     image: mmitssuarizona/mmitss-carma-mrp-kafka-x86:CDA1.2
     volumes:
       - ./mmitss/mmitss_mrp1/nojournal:/nojournal
-      - /home/yilin/SIP_project/Leidos/mmitss/mmitss/src/mrp/map-spat-broadcaster:/mmitss/mapbroattmp
     networks:
         carma_streets_net_1:
             ipv4_address: 172.4.0.10
