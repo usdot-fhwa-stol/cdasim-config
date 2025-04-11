@@ -156,7 +156,7 @@ services:
       
   mmitssvsp:
     container_name: mmitss_vsp1
-    image: mmitssuarizona/mmitss-carma-vsp-ros2-x86:CDA1.2
+    image: usdotfhwastoldev/mmitss-vsp:develop
     volumes:
       - ./mmitss/mmitss_vsp1/nojournal:/nojournal
     networks:
@@ -170,7 +170,7 @@ services:
         
   mmitssmrp:
     container_name: mmitss_mrp_town5
-    image: mmitssuarizona/mmitss-carma-mrp-kafka-x86:CDA1.2
+    image: usdotfhwastoldev/mmitss-mrp:develop
     volumes:
       - ./mmitss/mmitss_mrp1/nojournal:/nojournal
     networks:
