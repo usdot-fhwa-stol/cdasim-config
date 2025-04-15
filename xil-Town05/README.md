@@ -38,16 +38,19 @@ If the credential volumes, pyeos_data, is removed, the bundle file must be place
 To support additional SNMP ports in the econolite-virtual-controller service:
 
 1. Identify the new UDP port used by the EVC application’s SNMP service (e.g., via netstat -tulnp in the container).
-2. Update the docker-compose.yml econolite-virtual-controller service:
+2. Add port variable in .env inside the cdasim_config:
+```YAML
+
+# EVC SNMP Port
+EVC_PORT_1=5055
+EVC_PORT_2=<new-port>
+```
+3. Update the docker-compose.yml econolite-virtual-controller service:
 Add a new socat command in the command section:
 ```YAML
-socat UDP-LISTEN:<new-port>,fork UDP:127.0.0.1:<new-port> &
+socat UDP-LISTEN:${EVC_PORT_2}$,fork UDP:127.0.0.1:${EVC_PORT_2} &
 ```
-Add the new port to the ports section:
-```YAML
-- "<new-port>:<new-port>/udp"
-```
-The overall will look like this:
+The overall docker-compose.yml for evc section will look like this:
 ```YAML
   econolite-virtual-controller:
     image: usdotfhwastol/econolite-virtual-controller:latest
@@ -68,8 +71,8 @@ The overall will look like this:
     depends_on:
       - carma-simulation
     command: >
-      bash -c "socat UDP-LISTEN:5055,fork UDP:127.0.0.1:5055 & \
-               socat UDP-LISTEN:<new-port>,fork UDP:127.0.0.1:<new-port> & \
+      bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
+               socat UDP-LISTEN:${EVC_PORT_2},fork UDP:127.0.0.1:${EVC_PORT_2} & \
                cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
 
 ```

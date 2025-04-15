@@ -336,7 +336,7 @@ services:
       - carma-simulation
     # The socat command is for addressing Jira Bug TT-182 with the EVC
     command: >
-      bash -c "socat UDP-LISTEN:5055,fork UDP:127.0.0.1:5055 & \
+      bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
                cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2" 
 
 networks:
