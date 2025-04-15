@@ -48,7 +48,7 @@ Add the new port to the ports section:
 - "<new-port>:<new-port>/udp"
 ```
 The overall will look like this:
-```
+```YAML
   econolite-virtual-controller:
     image: usdotfhwastol/econolite-virtual-controller:latest
     container_name: evc
