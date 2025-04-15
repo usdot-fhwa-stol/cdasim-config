@@ -334,11 +334,15 @@ services:
       - pyeos_data:/home/carma/shared_data
     depends_on:
       - carma-simulation
+    
+    # The expose port is for addressing Jira Bug TT-182 with the EVC
     ports:
-      - "5055:5055/udp"   # Expose SNMP port 5055 (UDP)
+      - "5055:5055/udp"   # Expose SNMP port 5055 (UDP);
+
+    # The socat command is for addressing Jira Bug TT-182 with the EVC
     command: >
       bash -c "socat UDP-LISTEN:5055,fork UDP:127.0.0.1:5055 & \
-               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
+               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2" 
 
 networks:
   carma_sim_net:

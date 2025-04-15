@@ -34,7 +34,7 @@ The first time `start_simulation.sh` is run, EVC-SUMO will prompt for an Econoli
 
 If the credential volumes, pyeos_data, is removed, the bundle file must be place to PyEOS folder and the login again.
 
-### Setup SNMP Port
+### Setup SNMP Port (This is for addressing the bug with EVC in pyeos version 0.9.2)
 To support additional SNMP ports in the econolite-virtual-controller service:
 
 1. Identify the new UDP port used by the EVC application’s SNMP service (e.g., via netstat -ulnp in the container).
