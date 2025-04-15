@@ -334,8 +334,12 @@ services:
       - pyeos_data:/home/carma/shared_data
     depends_on:
       - carma-simulation
+    # The socat command is for addressing Jira Bug TT-182 with the EVC
     command: >
-      bash -c "cd docker && ./start_evc.sh --traci-ip 172.2.0.2"
+      bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
+               socat UDP-LISTEN:${EVC_PORT_2},fork UDP:127.0.0.1:${EVC_PORT_2} & \
+               socat UDP-LISTEN:${EVC_PORT_3},fork UDP:127.0.0.1:${EVC_PORT_3} & \
+               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2" 
 
 networks:
   carma_sim_net:

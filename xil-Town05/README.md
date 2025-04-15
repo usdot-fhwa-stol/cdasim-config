@@ -34,6 +34,49 @@ The first time `start_simulation.sh` is run, EVC-SUMO will prompt for an Econoli
 
 If the credential volumes, pyeos_data, is removed, the bundle file must be place to PyEOS folder and the login again.
 
+### Setup SNMP Port (This is for addressing the bug with EVC in pyeos version 0.9.2)
+To support additional SNMP ports in the econolite-virtual-controller service:
+
+1. Identify the new UDP port used by the EVC application’s SNMP service (e.g., via netstat -tulnp in the container).
+2. Add port variable in .env inside the cdasim_config:
+```YAML
+
+# EVC SNMP Port
+EVC_PORT_1=5055
+EVC_PORT_2=<new-port>
+```
+3. Update the docker-compose.yml econolite-virtual-controller service:
+Add a new socat command in the command section:
+```YAML
+socat UDP-LISTEN:${EVC_PORT_2}$,fork UDP:127.0.0.1:${EVC_PORT_2} &
+```
+The overall docker-compose.yml for evc section will look like this:
+```YAML
+  econolite-virtual-controller:
+    image: usdotfhwastol/econolite-virtual-controller:latest
+    container_name: evc
+    restart: always
+    networks:
+      carma_sim_net:
+        ipv4_address: 172.2.0.4
+      carma_streets_net_1:
+        ipv4_address: 172.4.0.4
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./evc_sumo/:/home/carma/src/resources/
+      - ./PyEOS/:/home/carma/PyEOS
+      - pyeos_data:/home/carma/shared_data
+    depends_on:
+      - carma-simulation
+    command: >
+      bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
+               socat UDP-LISTEN:${EVC_PORT_2},fork UDP:127.0.0.1:${EVC_PORT_2} & \
+               cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
+
+```
+
 ## Sumo Background Traffic
 The scenario starts with no background Sumo traffic, but a route file for Sumo background traffic can be generated and added as a docker volume in the `xil-Town05/docker-compose.yml'` to add sumo background traffic in the simulation
 
