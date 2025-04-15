@@ -37,7 +37,7 @@ If the credential volumes, pyeos_data, is removed, the bundle file must be place
 ### Setup SNMP Port (This is for addressing the bug with EVC in pyeos version 0.9.2)
 To support additional SNMP ports in the econolite-virtual-controller service:
 
-1. Identify the new UDP port used by the EVC application’s SNMP service (e.g., via netstat -ulnp in the container).
+1. Identify the new UDP port used by the EVC application’s SNMP service (e.g., via netstat -tulnp in the container).
 2. Update the docker-compose.yml econolite-virtual-controller service:
 Add a new socat command in the command section:
 ```YAML
@@ -67,9 +67,6 @@ The overall will look like this:
       - pyeos_data:/home/carma/shared_data
     depends_on:
       - carma-simulation
-    ports:
-      - "5055:5055/udp"   # Expose SNMP port 5055 (UDP)
-      - "<new-port>:<new-port>/udp"
     command: >
       bash -c "socat UDP-LISTEN:5055,fork UDP:127.0.0.1:5055 & \
                socat UDP-LISTEN:<new-port>,fork UDP:127.0.0.1:<new-port> & \
