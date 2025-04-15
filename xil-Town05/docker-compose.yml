@@ -334,8 +334,11 @@ services:
       - pyeos_data:/home/carma/shared_data
     depends_on:
       - carma-simulation
+    ports:
+      - "5055:5055/udp"
     command: >
-      bash -c "cd docker && ./start_evc.sh --traci-ip 172.2.0.2"
+      bash -c "socat UDP-LISTEN:5055,fork UDP:127.0.0.1:5055 & cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
+
 
 networks:
   carma_sim_net:
