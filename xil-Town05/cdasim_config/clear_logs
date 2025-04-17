@@ -15,3 +15,8 @@ rm -r /opt/carma/logs/carma_1/*
 rm -r /opt/carma/logs/carma_2/*
 echo "Clearing CARMA Cloud logs ..."
 rm -r carmacloudvol/logs/*
+echo "Clearing MMITSS logs ...."
+rm -r mmitss/mmitss_mrp1/nojournal/bin/log/*.log
+rm -r mmitss/mmitss_vsp1/nojournal/bin/log/*.log
+rm -r mmitss/mmitss_mrp1/nojournal/bin/v2x-data/*
+rm -r mmitss/mmitss_vsp1/nojournal/bin/v2x-data/*
