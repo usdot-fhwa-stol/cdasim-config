@@ -58,6 +58,11 @@ topics:
     type: geometry_msgs/msg/PoseArray
     queue_size: 1
 
+  - topic: /environment/j2735_map_msg_visualizer
+    type: visualization_msgs/msg/MarkerArray
+    queue_size: 1
+    direction: 2to1
+
   - topic: /environment/semantic_map
     type: autoware_lanelet2_msgs/msg/MapBin
     queue_size: 1
@@ -133,6 +138,12 @@ topics:
   - topic: /message/incoming_map
     type: carma_v2x_msgs/msg/MapData
     queue_size: 1
+
+  - topic: /message/outgoing_j2735_bsm
+    type: carma_v2x_msgs/msg/BSM
+    queue_size: 1
+    direction: 2to1
+
 
   - topic: /environment/output/markers
     type: visualization_msgs/msg/MarkerArray
