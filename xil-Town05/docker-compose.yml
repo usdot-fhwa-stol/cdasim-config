@@ -181,7 +181,7 @@ services:
         - SIMULATION_MODE=True
 
 
-  zookeeper:
+  zookeeper_1:
     image: wurstmeister/zookeeper
     container_name: zookeeper_1
     networks:
@@ -299,7 +299,17 @@ services:
       - ./MAP:/var/www/plugins/MAP
       - ./secrets:/home/V2X-Hub/secrets
 
-
+  mmitssmrp_2:
+    container_name: mmitss_mrp_2
+    image: usdotfhwastoldev/mmitss-mrp:develop
+    volumes:
+      - ./mmitss/mmitss_mrp2/nojournal:/nojournal
+    networks:
+        carma_streets_net_1:
+            ipv4_address: 172.4.0.21
+    environment:
+        - TZ=America/New_York
+        - SIMULATION_MODE=True
   zookeeper_2:
     image: wurstmeister/zookeeper
     container_name: zookeeper_2
