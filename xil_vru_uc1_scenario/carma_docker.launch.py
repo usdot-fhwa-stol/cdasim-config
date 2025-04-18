@@ -120,15 +120,6 @@ def generate_launch_description():
         description='List of String: Guidance Control Plugins that will be validated by the Guidance Plugin Validator Node if enabled'
     )
 
-    # When enabled, the vehicle fuses incoming SDSM with its own sensor data to create a more accurate representation of the environment
-    # When turned off, topics get remapped to solely rely on its own sensor data
-    is_cp_mot_enabled = LaunchConfiguration('is_cp_mot_enabled')
-    declare_is_cp_mot_enabled = DeclareLaunchArgument(
-        name='is_cp_mot_enabled',
-        default_value = 'True',
-        description = 'True if user wants Cooperative Perception capability using Multiple Object Tracking to be enabled'
-    )
-
     # Launch the core carma launch file
     carma_src_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ get_package_share_directory('carma'), '/launch/carma_src.launch.py']),
@@ -145,8 +136,7 @@ def generate_launch_description():
             'area' : area,
             'arealist_path' : arealist_path,
             'vector_map_file' : vector_map_file,
-            'use_sim_time' : use_sim_time,
-            'is_cp_mot_enabled': is_cp_mot_enabled
+            'use_sim_time' : use_sim_time
             }.items()
     )
 
@@ -165,6 +155,5 @@ def generate_launch_description():
         declare_arealist_path,
         declare_vector_map_file,
         declare_use_sim_time,
-        declare_is_cp_mot_enabled,
         carma_src_launch
     ])
