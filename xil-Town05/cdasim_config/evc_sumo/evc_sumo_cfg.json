@@ -2,7 +2,7 @@
   "controllers": [
       {
       "controllerId": 1,
-      "controllerCfgPath": "/home/carma/src/resources/965_mmitss_binaryntcip.cfg",
+      "controllerCfgPath": "/home/carma/src/resources/965_mmitss_mrp1_binary.cfg",
       "moe_dir": null,
       "start_time": 0,
       "bind_ip": null,
@@ -19,7 +19,7 @@
 
       {
       "controllerId": 2,
-      "controllerCfgPath": "/home/carma/src/resources/829.cfg",
+      "controllerCfgPath": "/home/carma/src/resources/829_mmitss_mrp2_binary.cfg",
       "moe_dir": null,
       "start_time": 0,
       "bind_ip": null,

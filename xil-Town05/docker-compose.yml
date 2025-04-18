@@ -154,7 +154,7 @@ services:
       role_id:='carma_1'
       remap_ns:=/hardware_interface/comms"
 
-  mmitssvsp:
+  mmitss_vsp1:
     container_name: mmitss_vsp1
     image: usdotfhwastoldev/mmitss-vsp:develop
     volumes:
@@ -168,8 +168,8 @@ services:
         - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 
-  mmitssmrp:
-    container_name: mmitss_mrp_town5
+  mmitss_mrp1:
+    container_name: mmitss_mrp1
     image: usdotfhwastoldev/mmitss-mrp:develop
     volumes:
       - ./mmitss/mmitss_mrp1/nojournal:/nojournal
@@ -244,7 +244,7 @@ services:
     environment:
       CONFIG_FILEPATH: /etc/kowl/kowl.yaml
     volumes:
-      - ./kowl:/etc/kowl/
+      - ./kowl_1:/etc/kowl/
 
   db_1:
     image: mysql:5.7
@@ -295,11 +295,11 @@ services:
       SENSOR_JSON_FILE_PATH: /home/V2X-Hub/sensor_configurations/sensors.json
       INFRASTRUCTURE_ID: ${INFRASTRUCTURE_ID}
     volumes:
-      - ./logs:/var/log/tmx
+      - ./v2xhub_1/logs:/var/log/tmx
       - ./MAP:/var/www/plugins/MAP
       - ./secrets:/home/V2X-Hub/secrets
 
-  mmitssmrp_2:
+  mmitss_mrp_2:
     container_name: mmitss_mrp_2
     image: usdotfhwastoldev/mmitss-mrp:develop
     volumes:
@@ -371,7 +371,7 @@ services:
     environment:
       CONFIG_FILEPATH: /etc/kowl/kowl.yaml
     volumes:
-      - ./kowl:/etc/kowl/
+      - ./kowl_2:/etc/kowl/
 
   db_2:
     container_name: db_2
@@ -422,7 +422,7 @@ services:
       SENSOR_JSON_FILE_PATH: /home/V2X-Hub/sensor_configurations/sensors.json
       INFRASTRUCTURE_ID: rsu_2234
     volumes:
-      - ./logs:/var/log/tmx
+      - ./v2xhub_2/logs:/var/log/tmx
       - ./MAP:/var/www/plugins/MAP
       - ./secrets:/home/V2X-Hub/secrets
 
