@@ -1434,7 +1434,7 @@
     </edge>
 
     <tlLogic id="421" type="static" programID="0" offset="0">
-        <phase duration="42" state="ggggrrrrggggrrrr"/>
+        <phase duration="42" state="rrrrggggrrrrgggg"/>
         <param key="linkSignalID:0" value="2386"/>
         <param key="linkSignalID:1" value="2386"/>
         <param key="linkSignalID:10" value="2388"/>
