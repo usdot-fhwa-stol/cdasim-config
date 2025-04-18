@@ -139,10 +139,9 @@ topics:
     type: carma_v2x_msgs/msg/MapData
     queue_size: 1
 
-  - topic: /message/outgoing_j2735_bsm
+  - topic: /message/bsm_outbound
     type: carma_v2x_msgs/msg/BSM
     queue_size: 1
-    direction: 2to1
 
 
   - topic: /environment/output/markers
