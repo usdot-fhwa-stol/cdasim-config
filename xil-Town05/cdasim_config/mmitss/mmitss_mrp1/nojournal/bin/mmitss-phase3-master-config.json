@@ -105,10 +105,11 @@
 	"SignalController": {
                 "IpAddress": "172.4.0.4",
                 "NtcipPort": 5055,
+				"SNMPCommunity": "administrator",
                 "TimingPlanUpdateInterval_sec": 600,
                 "NtcipBackupTime_sec": 300,
-                "Vendor": "Econolite",
-                "TimingPlanMib": "/nojournal/bin/EconoliteMib_real.py",
+                "Vendor": "Standard",
+                "TimingPlanMib": "/nojournal/bin/StandardMib_Siemens.py",
                 "InactiveVehPhases": [],
                 "InactivePedPhases": [],
                 "SplitPhases": {
