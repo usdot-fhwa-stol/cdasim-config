@@ -170,7 +170,7 @@ services:
 
   mmitss_mrp1:
     container_name: mmitss_mrp1
-    image: usdotfhwastoldev/mmitss-mrp:feature-fix-kafka-transceiver
+    image: usdotfhwastoldev/mmitss-mrp:develop
     volumes:
       - ./mmitss/mmitss_mrp1/nojournal:/nojournal
     networks:
