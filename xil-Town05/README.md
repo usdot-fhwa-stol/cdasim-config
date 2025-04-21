@@ -142,7 +142,14 @@ The Virtual Signal Controller is built locally and currently only available to l
 CDASim is a testing environment that allows users to test and evaluate CDA UC functionality and performance.
 > [!IMPORTANT]
 > To ensure proper collection of all data for simulation please use `./start_simulation` and `./stop_simulation` scripts respectively
-
+### Profiles
+This CDASim config contains at least one docker compose profile. Profiles help you adjust your Compose application for different environments or use cases by selectively activating services. In our case, this allows us to spawn slighlty difference scenarios with difference actors enabled and disabled. By specifying no profile you only use the default services
+**Default**: single vehicle, single intersection
+**2-intersection**: single vehicle, two intersections
+To modify this simply edit the `.env` file under `cdasim_config/`
+```
+COMPOSE_PROFILES=2-intersection
+```
 ### Data Collection
 #### CARMA Platform
 Both service logs and ros bags logs can be found under `/opt/carma/logs/`
@@ -153,5 +160,3 @@ Service logs can be found under `./cdasim_config/<streets_service_name>/logs`. A
 ### Data Analysis
 Data processing and analysis scripts for plotting collected data from CARMA Streets and CARMA Platform can be found [here](https://github.com/usdot-fhwa-stol/carma-analytics-fotda/tree/develop/src). Additionally under `./cdasim_config/foxglove` we have provided a dashboard configuration which can be used with rosbags collected in this scenario to replay the data and plot CARLA and CARMA Platform Data. For more information about how to use fox glove (https://foxglove.dev/)
 ![Alt text](./docs/foxglove.png)
-
-
