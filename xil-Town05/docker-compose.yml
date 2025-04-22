@@ -164,7 +164,7 @@ services:
             ipv4_address: 172.3.0.8
     environment:
         - TZ=America/New_York
-        - SIMULATION_MODE=True
+        - SIMULATION_MODE=${SIMULATION_MODE}
         - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 
@@ -178,7 +178,7 @@ services:
             ipv4_address: 172.4.0.10
     environment:
         - TZ=America/New_York
-        - SIMULATION_MODE=True
+        - SIMULATION_MODE=${SIMULATION_MODE}
 
 
   zookeeper_1:
@@ -302,6 +302,7 @@ services:
   mmitss_mrp_2:
     container_name: mmitss_mrp_2
     image: usdotfhwastoldev/mmitss-mrp:develop
+    profiles: [2-intersection]
     volumes:
       - ./mmitss/mmitss_mrp2/nojournal:/nojournal
     networks:
@@ -309,10 +310,11 @@ services:
             ipv4_address: 172.4.0.21
     environment:
         - TZ=America/New_York
-        - SIMULATION_MODE=True
+        - SIMULATION_MODE=${SIMULATION_MODE}
   zookeeper_2:
     image: wurstmeister/zookeeper
     container_name: zookeeper_2
+    profiles: [2-intersection]
     networks:
       carma_streets_net_1:
         ipv4_address: 172.4.0.13
@@ -322,6 +324,8 @@ services:
   kafka_2:
     container_name: kafka_2
     image: wurstmeister/kafka
+    profiles: [2-intersection]
+
     depends_on:
       - zookeeper_2
     network_mode: service:zookeeper_2
@@ -363,6 +367,8 @@ services:
   kowl_2:
     container_name: kowl_2
     image: quay.io/cloudhut/kowl
+    profiles: [2-intersection]
+
     restart: on-failure
     network_mode: service:zookeeper_2
     depends_on:
@@ -375,6 +381,7 @@ services:
 
   db_2:
     container_name: db_2
+    profiles: [2-intersection]
     image: mysql:5.7
     restart: always
     environment:
@@ -395,6 +402,7 @@ services:
   php_2:
     image: usdotfhwaops/php:${OPS_DOCKER_TAG}
     container_name: php_2
+    profiles: [2-intersection]
     network_mode: service:db_2
     depends_on:
       - v2xhub_2
@@ -404,6 +412,7 @@ services:
   v2xhub_2:
     image: usdotfhwaops/v2xhub:${OPS_DOCKER_TAG}
     container_name: v2xhub_2
+    profiles: [2-intersection]
     network_mode: service:db_2
     restart: always
     depends_on:
