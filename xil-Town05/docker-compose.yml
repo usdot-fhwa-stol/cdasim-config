@@ -156,7 +156,7 @@ services:
 
   mmitss_vsp1:
     container_name: mmitss_vsp1
-    image: usdotfhwastoldev/mmitss-vsp:feature-heading-fix-test
+    image: usdotfhwastoldev/mmitss-vsp:develop
     volumes:
       - ./mmitss/mmitss_vsp1/nojournal:/nojournal
     networks:
