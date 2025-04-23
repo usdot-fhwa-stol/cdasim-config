@@ -166,6 +166,7 @@ services:
         - TZ=America/New_York
         - SIMULATION_MODE=${SIMULATION_MODE}
         - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+        - ROS_LOG_DIR=/nojournal/bin/log/
 
 
   mmitss_mrp1:
