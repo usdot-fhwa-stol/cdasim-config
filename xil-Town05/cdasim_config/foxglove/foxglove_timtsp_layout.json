@@ -2,19 +2,18 @@
   "configById": {
     "3D!4grgnmx": {
       "cameraState": {
-        "perspective": true,
         "distance": 88.5208228512074,
+        "perspective": true,
         "phi": 54.49235048678625,
-        "thetaOffset": 54.513212795551574,
-        "targetOffset": [
-          -69.59679962428758,
-          0.18466350544021126,
-          3.042557317758767e-15
-        ],
         "target": [
           0,
           0,
           0
+        ],
+        "targetOffset": [
+          -69.59679962428758,
+          0.18466350544021126,
+          3.042557317758767e-15
         ],
         "targetOrientation": [
           0,
@@ -22,6 +21,7 @@
           0,
           1
         ],
+        "thetaOffset": 54.513212795551574,
         "fovy": 45,
         "near": 0.5,
         "far": 5000,
@@ -202,7 +202,7 @@
           }
         },
         "/environment/j2735_map_msg_visualizer": {
-          "visible": false
+          "visible": true
         },
         "/environment/tcm_visualizer": {
           "visible": false
@@ -322,7 +322,7 @@
     "StateTransitions!4i410mk": {
       "paths": [
         {
-          "value": "/message/incoming_spat.intersection_state_list[0].movement_list[4].movement_event_list[0].event_state.movement_phase_state",
+          "value": "/message/incoming_spat.intersection_state_list[0].movement_list[3].movement_event_list[0].event_state.movement_phase_state",
           "timestampMethod": "receiveTime",
           "label": "Signal Group 4 and 8"
         },
@@ -373,6 +373,6 @@
       "direction": "column",
       "splitPercentage": 65.78171091445427
     },
-    "splitPercentage": 34.8623853211009
+    "splitPercentage": 57.72833723653395
   }
 }
