@@ -20,6 +20,7 @@
 	"CoordinationPlanCheckingTimeInterval": 300,
 	"PeerDataDecoding": false,
 	"OffmapBsmFiltering": true,
+	"Scale_factor":4,
 	"PortNumber": {
 		"MessageTransceiver": {
 			"MessageSender": 10003,
