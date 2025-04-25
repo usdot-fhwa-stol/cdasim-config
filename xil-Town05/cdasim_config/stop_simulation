@@ -23,7 +23,7 @@ echo "Collecting RTF data into ${filename_rtf}.csv"
 carma_simulation_log_dir=$(ls -td /opt/carma-simulation/logs/*/ | head -n 1)
 echo "Collecting RTF data from ${carma_simulation_log_dir}MOSAIC.log"
 cat ${carma_simulation_log_dir}MOSAIC.log 2>&1 |  /opt/carma-simulation/scripts/extract_rtf_data > ${filename_rtf}.csv
-# Get mmitts service execution data
+
 echo "Stopping simulation ..."
 carma stop all
 # Kafka message volumes retain messages and consumer offsets from previous run
