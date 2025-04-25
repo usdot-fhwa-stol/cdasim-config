@@ -215,13 +215,13 @@ services:
         v2xhub_mobility_path_in:1:1,\
         vehicle_status_intent_output:1:1,\
         v2xhub_map_msg_in:1:1,\
-        v2xhub_srm_in:1:1,\
-        v2xhub_ssm_out:1:1,\
         modified_spat:1:1,\
         desired_phase_plan:1:1,\
         tsc_config_state:1:1,\
         v2xhub_sim_sensor_detected_object:1:1,\
         v2xhub_sdsm_sub,\
+        v2xhub_srm_in,\
+        v2xhub_ssm_sub,\
         time_sync:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper_1:2181
       KAFKA_LOG_DIRS: "/kafka/kafka-logs"

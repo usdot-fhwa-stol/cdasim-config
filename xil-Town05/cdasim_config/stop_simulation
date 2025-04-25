@@ -6,7 +6,7 @@
 # Prunes all Kafka related volumes
 if ! [ -f /opt/carma-streets/scripts/collect_kafka_logs.py ] ; then
   echo "Installing collect_kafka_logs.py into /opt/carma-streets/scripts/ ...."
-  wget -q https://raw.githubusercontent.com/usdot-fhwa-stol/carma-streets/master/collect_kafka_logs.py -P /opt/carma-streets/scripts
+  wget -q https://raw.githubusercontent.com/usdot-fhwa-stol/carma-streets/develop/collect_kafka_logs.py -P /opt/carma-streets/scripts
   sudo chmod 777 /opt/carma-streets/scripts/collect_kafka_logs.py
 fi
 if ! [ -f /opt/carma-simulation/scripts/extract_rtf_data ] ; then
