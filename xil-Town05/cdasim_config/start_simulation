@@ -13,7 +13,9 @@ export ROS_MASTER_URI=http://172.3.0.2:11311/
 docker volume rm \
   carma_kafka-datavolume-1 \
   carma_zookeeper-datavolume-1 \
+  carma_mysql-datavolume-1 \
   carma_kafka-datavolume-2 \
   carma_zookeeper-datavolume-2 \
+  carma_mysql-datavolume-2 \
 
 carma start all
