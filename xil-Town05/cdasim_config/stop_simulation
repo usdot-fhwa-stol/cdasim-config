@@ -11,7 +11,7 @@ if ! [ -f /opt/carma-streets/scripts/collect_kafka_logs.py ] ; then
 fi
 if ! [ -f /opt/carma-simulation/scripts/extract_rtf_data ] ; then
   echo "Installing extract_rtf_data into /opt/carma-simulation/scripts/ ...."
-  wget -q https://raw.githubusercontent.com/usdot-fhwa-stol/carma-analytics-fotda/master/vru_use_case_scripts/extract_rtf_data -P /opt/carma-simulation/scripts
+  wget -q https://raw.githubusercontent.com/usdot-fhwa-stol/carma-analytics-fotda/develop/vru_use_case_scripts/extract_rtf_data -P /opt/carma-simulation/scripts
   sudo chmod 777 /opt/carma-simulation/scripts/extract_rtf_data
 fi
 filename=carma_streets_kafka_"$(date +%F_%H-%M-%S)"
@@ -36,4 +36,4 @@ docker volume rm \
   carma_mysql-datavolume-1 \
   carma_kafka-datavolume-2 \
   carma_zookeeper-datavolume-2 \
-  carma_mysql-datavolume-2
+  carma_mysql-datavolume-2 \
