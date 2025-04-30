@@ -16,6 +16,6 @@ docker volume rm \
   carma_mysql-datavolume-1 \
   carma_kafka-datavolume-2 \
   carma_zookeeper-datavolume-2 \
-  carma_mysql-datavolume-2
+  carma_mysql-datavolume-2 \
 
 carma start all

@@ -148,6 +148,8 @@ services:
       - /opt/carma/routes:/opt/carma/routes
       - /opt/carma/yolo:/opt/carma/yolo
       - ./ns3_adapter/adapter_1/parameters.yaml:/opt/carma/install/ns3_adapter/share/ns3_adapter/config/parameters.yaml
+      - ./ns3_adapter/adapter_1/wave.json:/opt/carma/install/ns3_adapter/share/ns3_adapter/config/wave.json
+
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
       && wait-for-it 172.3.0.2:11311 -- roslaunch ns3_adapter ns3_adapter.launch enable_ros1_record:=true
@@ -167,6 +169,8 @@ services:
         - SIMULATION_MODE=${SIMULATION_MODE}
         - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
         - ROS_LOG_DIR=/nojournal/bin/log/
+        - LOGS_DIR=/nojournal/bin/log/
+        - PERFORMANCE_LOGGING=TRUE
 
 
   mmitss_mrp1:
@@ -174,12 +178,16 @@ services:
     image: usdotfhwastoldev/mmitss-mrp:develop
     volumes:
       - ./mmitss/mmitss_mrp1/nojournal:/nojournal
+    depends_on:
+      - kafka_1
     networks:
         carma_streets_net_1:
             ipv4_address: 172.4.0.10
     environment:
         - TZ=America/New_York
         - SIMULATION_MODE=${SIMULATION_MODE}
+        - LOGS_DIR=/nojournal/bin/log/
+        - PERFORMANCE_LOGGING=TRUE
 
 
   zookeeper_1:
@@ -219,9 +227,9 @@ services:
         desired_phase_plan:1:1,\
         tsc_config_state:1:1,\
         v2xhub_sim_sensor_detected_object:1:1,\
-        v2xhub_sdsm_sub,\
-        v2xhub_srm_in,\
-        v2xhub_ssm_sub,\
+        v2xhub_sdsm_sub:1:1,\
+        v2xhub_srm_in:1:1,\
+        v2xhub_ssm_sub:1:1,\
         time_sync:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper_1:2181
       KAFKA_LOG_DIRS: "/kafka/kafka-logs"
@@ -304,6 +312,8 @@ services:
     container_name: mmitss_mrp_2
     image: usdotfhwastoldev/mmitss-mrp:develop
     profiles: [2-intersection]
+    depends_on:
+      - kafka_2
     volumes:
       - ./mmitss/mmitss_mrp2/nojournal:/nojournal
     networks:
