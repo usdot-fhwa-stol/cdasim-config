@@ -1,0 +1,47 @@
+
+services:
+
+  platform_ros2_1:
+    image: usdotfhwastol/carma-platform:carma-system-4.5.0
+    container_name: platform_ros2_1
+    environment:
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
+    volumes_from:
+      - container:carma-config:ro
+    volumes:
+      - /opt/carma/logs/carma_1:/opt/carma/logs
+      - /opt/carma/.ros:/home/carma/.ros
+      - /opt/carma/vehicle/calibration:/opt/carma/vehicle/calibration
+      - /opt/carma/maps:/opt/carma/maps
+      - /opt/carma/routes:/opt/carma/routes
+      - /opt/carma/yolo:/opt/carma/yolo
+      # ILC tuning for carma-cloud workzone (carma_2) is breaking k900 normal lanefolow regression testing, so using different tuning
+      - ./carma/inlanecruising_config/parameters.yaml:/opt/carma/install_ros2/inlanecruising_plugin/share/inlanecruising_plugin/config/parameters.yaml
+      - ./carma/environment.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/environment.launch.py
+      - ./carma/light_controlled_intersection_tactical_plugin/parameters.yaml:/opt/carma/install_ros2/light_controlled_intersection_tactical_plugin/share/light_controlled_intersection_tactical_plugin/config/parameters.yaml
+      - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install_ros2/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
+      - ./carma/plugins.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/plugins.launch.py
+      - ./carma/system_controller/config.yaml:/opt/carma/install_ros2/system_controller/share/system_controller/config/config.yaml
+    command: >
+      bash -c 'export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install_ros2/setup.bash
+      && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
+
+  ## ROS2
+  carma-carla-integration_1:
+    image: usdotfhwastol/carma-carla-integration:carma-system-4.5.0
+    container_name: carma-carla-integration_1
+    volumes_from:
+      - container:carma-config:ro
+    environment:
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
+    command: >
+      bash -c "wait-for-it.sh 127.0.0.1:11311
+      && export PYTHONPATH=$PYTHONPATH:~/PythonAPI/carla/dist/carla-0.10.0-cp310-cp310-linux_x86_64.whl
+      && source ~/carma_carla_ws/devel/setup.bash
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
+      && roslaunch carma_carla_agent carma_carla_agent.launch
+      role_name:='carma_1'
+      host:='127.0.0.1'
+      selected_route:='Town10_route'
+      start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
+      spawn_point:='11.2,-200.8,0,0,0,90'"
