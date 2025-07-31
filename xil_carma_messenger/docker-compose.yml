@@ -96,6 +96,7 @@ services:
       - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install_ros2/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       - ./carma/plugins.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/plugins.launch.py
       - ./carma/system_controller/config.yaml:/opt/carma/install_ros2/system_controller/share/system_controller/config/config.yaml
+      - ./carma/motion_computation/parameters.yaml :/opt/carma/install_ros2/motion_computation/share/motion_computation/config/parameters.yaml
     command: >
       bash -c 'export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install_ros2/setup.bash
       && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
