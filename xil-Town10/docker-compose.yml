@@ -28,7 +28,7 @@ services:
 
   ## ROS2
   carma-carla-integration_1:
-    image: usdotfhwastol/carma-carla-integration:carma-system-4.5.0
+    image: usdotfhwastol/carma-carla-integration:latest
     container_name: carma-carla-integration_1
     volumes_from:
       - container:carma-config:ro
@@ -36,10 +36,8 @@ services:
       RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     command: >
       bash -c "wait-for-it.sh 127.0.0.1:11311
-      && export PYTHONPATH=$PYTHONPATH:~/PythonAPI/carla/dist/carla-0.10.0-cp310-cp310-linux_x86_64.whl
-      && source ~/carma_carla_ws/devel/setup.bash
       && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
-      && roslaunch carma_carla_agent carma_carla_agent.launch
+      && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
       host:='127.0.0.1'
       selected_route:='Town10_route'
