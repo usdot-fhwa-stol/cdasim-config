@@ -42,4 +42,4 @@ services:
       host:='127.0.0.1'
       selected_route:='Town10_route'
       start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
-      spawn_point:='11.2,-200.8,0,0,0,90'"
+      spawn_point:='-44.4,87.2,0,0,0,90'"
