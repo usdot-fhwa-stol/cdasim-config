@@ -38,6 +38,7 @@ services:
     network_mode: host
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      && source /home/carma/carma-carla-integration/install/setup.bash
       && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=127.0.0.1
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
