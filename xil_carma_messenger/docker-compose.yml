@@ -133,6 +133,8 @@ services:
       carma_sim_net:
         ipv4_address: 172.2.0.6
     container_name: carma-carla-integration_1
+    volumes:
+      - ./carma-carla/set_spectator_view.py:/home/carma/carma-carla-integration/carla-health-poll/src/set_spectator_view.py
     volumes_from:
       - container:carma-config:ro
     environment:
@@ -147,6 +149,7 @@ services:
       && export PYTHONPATH=$PYTHONPATH:~/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg:/home/carma/carla-sensor-lib/src
       && source ~/carma_carla_ws/devel/setup.bash
       && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/set_spectator_view.py --host 172.2.0.2 --z 230 --roll 270 --x 200 --y -300
       && roslaunch carma_carla_agent carma_carla_agent.launch
       role_name:='carma_1'
       host:='172.2.0.2'
