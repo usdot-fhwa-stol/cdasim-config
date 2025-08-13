@@ -2,10 +2,8 @@
 services:
 
   platform_ros2_1:
-    image: usdotfhwastol/carma-platform:carma-system-4.5.0
+    image: usdotfhwastol/carma-platform:carma-system-4.10.0
     container_name: platform_ros2_1
-    environment:
-      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     volumes_from:
       - container:carma-config:ro
     network_mode: host
@@ -23,11 +21,9 @@ services:
       - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install_ros2/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       - ./carma/plugins.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/plugins.launch.py
       - ./carma/system_controller/config.yaml:/opt/carma/install_ros2/system_controller/share/system_controller/config/config.yaml
-    command: >
-      bash -c 'export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install_ros2/setup.bash
-      && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
+    command: bash -c 'source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
-  ## ROS2
+  # ## ROS2
   carma-carla-integration_1:
     image: usdotfhwastol/carma-carla-integration:latest
     container_name: carma-carla-integration_1
