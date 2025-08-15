@@ -8,26 +8,21 @@ environment:
     ros__parameters:
       subsystem_namespace: /environment
       required_subsystem_nodes: ['']
-      unmanaged_required_nodes:
-        - /hardware_interface/velodyne_lidar_driver_wrapper_node
+      unmanaged_required_nodes: ['']
       full_subsystem_required: true
 
 hardware_interface:
   drivers_controller:
     ros__parameters:
+      startup_duration: 30
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       subsystem_namespace: /hardware_interface
       required_subsystem_nodes: ['']
       unmanaged_required_nodes: ['']
-      excluded_namespace_nodes:
-        - /hardware_interface/carla_lidar_driver
-        - /hardware_interface/carla_gnss_driver
-      ros1_required_drivers:
-        - /hardware_interface/carla_driver
-      ros1_camera_drivers:
-        - /hardware_interface/carla_camera_driver
+      excluded_namespace_nodes: ['']
+      ros1_ssc_driver_name: ''
       full_subsystem_required: false
-      startup_duration: 60
-      required_driver_timeout: 30000.0 #ROS1 bridge dropping message depending on computer
 
 message:
   v2x_controller:
@@ -81,12 +76,12 @@ localization:
   localization_controller:
     ros__parameters:
       subsystem_namespace: /localization
+      service_timeout_ms: 500
+      call_timeout_ms: 5000
       required_subsystem_nodes: ['']
       unmanaged_required_nodes: ['']
       full_subsystem_required: true
-      sensor_nodes:
-        - /hardware_interface/velodyne_lidar_driver_wrapper_node
-      # TODO update the fault map once ros2 gps is integrated
+      sensor_nodes: ['']
       sensor_fault_map: '
         {
           "sensor_fault_map":
