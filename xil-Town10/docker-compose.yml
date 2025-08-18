@@ -21,7 +21,7 @@ services:
       # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install_ros2/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       # - ./carma/plugins.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/plugins.launch.py
       - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
-    command: bash -c 'export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    command: bash -c 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
                       && source /opt/carma/install/setup.bash 
                       && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
@@ -37,7 +37,7 @@ services:
     volumes:
       - /home/cy/carma_ws/src/carma-carla-integration/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py:/home/carma/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py
     command: >
-      bash -c "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
       && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=127.0.0.1
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
