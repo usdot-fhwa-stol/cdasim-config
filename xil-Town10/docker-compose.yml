@@ -32,6 +32,8 @@ services:
     environment:
       RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     network_mode: host
+    volumes:
+      - /home/cy/carma_ws/src/carma-carla-integration/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py:/home/carma/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
