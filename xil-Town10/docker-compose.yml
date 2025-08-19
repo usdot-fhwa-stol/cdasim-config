@@ -7,7 +7,11 @@ services:
     volumes_from:
       - container:carma-config:ro
     network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
     volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
       - /opt/carma/logs/carma_1:/opt/carma/logs
       - /opt/carma/.ros:/home/carma/.ros
       - /opt/carma/vehicle/calibration:/opt/carma/vehicle/calibration
@@ -21,6 +25,11 @@ services:
       # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install_ros2/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       # - ./carma/plugins.launch.py:/opt/carma/install_ros2/carma/share/carma/launch/plugins.launch.py
       - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
     command: bash -c 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
                       && source /opt/carma/install/setup.bash 
                       && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
@@ -36,6 +45,7 @@ services:
     network_mode: host
     volumes:
       - /home/cy/carma_ws/src/carma-carla-integration/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py:/home/carma/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py
+
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
@@ -45,4 +55,4 @@ services:
       host:='127.0.0.1'
       selected_route:='Town10_route'
       start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
-      spawn_point:='-44.4,87.2,0,0,0,90'"
+      spawn_point:='-44.7,108.5,0,0,0,90'"
