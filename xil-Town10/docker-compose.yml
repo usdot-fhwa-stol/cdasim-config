@@ -52,6 +52,5 @@ services:
       role_name:='carma_1'
       host:='127.0.0.1'
       selected_route:='Town10_route'
-      synchronous_mode:=true
       start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
       spawn_point:='-44.7,108.5,0,0,0,270'"
