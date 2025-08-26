@@ -26837,7 +26837,7 @@
   </way>
   <way id="7306" action="modify" visible="true" version="1">
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="solid"/>
+    <tag k="subtype" v="dashed"/>
     <nd ref="7194"/>
     <nd ref="7195"/>
     <nd ref="7196"/>
@@ -27123,7 +27123,7 @@
   </way>
   <way id="7528" action="modify" visible="true" version="1">
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="solid"/>
+    <tag k="subtype" v="dashed"/>
     <nd ref="7475"/>
     <nd ref="7476"/>
     <nd ref="7477"/>
@@ -39451,7 +39451,7 @@
   </way>
   <way id="19343" action="modify" visible="true" version="1">
     <tag k="type" v="line_thin"/>
-    <tag k="subtype" v="solid"/>
+    <tag k="subtype" v="dashed"/>
     <nd ref="7304"/>
     <nd ref="19278"/>
     <nd ref="19279"/>
