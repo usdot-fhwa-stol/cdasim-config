@@ -24,6 +24,9 @@ services:
 
 ############################################################################
 # carma vehicle 1
+  carma-sim-vehicle-config:
+    image: ${DOCKER_ORG}/carma-config:${DOCKER_TAG}-basic-simulation-vehicle
+    container_name: carma-sim-vehicle-config
   roscore_1:
     image: usdotfhwastol/carma-base:carma-system-4.5.0
     networks:
@@ -31,7 +34,7 @@ services:
         ipv4_address: 172.3.0.2
     container_name: roscore_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     volumes:
       - /opt/carma/.ros:/home/carma/.ros
       - /opt/carma/logs/carma_1:/opt/carma/logs
@@ -48,7 +51,7 @@ services:
         ipv4_address: 172.3.0.3
     container_name: platform_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /opt/carma/logs/carma_1:/opt/carma/logs
@@ -81,7 +84,7 @@ services:
     environment:
       RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     volumes:
       - /opt/carma/logs/carma_1:/opt/carma/logs
       - /opt/carma/.ros:/home/carma/.ros
@@ -107,7 +110,7 @@ services:
         ipv4_address: 172.3.0.5
     container_name: ros1_bridge_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       ROS_IP: 172.3.0.5
       ROS_MASTER_URI: http://172.3.0.2:11311/
@@ -133,7 +136,7 @@ services:
         ipv4_address: 172.2.0.6
     container_name: carma-carla-integration_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       ROS_IP: 172.3.0.6
       ROS_MASTER_URI: http://172.3.0.2:11311/
@@ -162,7 +165,7 @@ services:
         ipv4_address: 172.2.0.7
     container_name: ns3_adapter_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       ROS_IP: 172.3.0.7
       ROS_MASTER_URI: http://172.3.0.2:11311/
@@ -189,7 +192,7 @@ services:
         ipv4_address: 172.7.0.2
     container_name: messenger_ros2_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     volumes:
@@ -210,7 +213,7 @@ services:
         ipv4_address: 172.7.0.3
     container_name: msger_roscore_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     volumes:
       - /opt/carma/.ros:/home/carma/.ros
       - /opt/carma/logs/msger_1:/opt/carma/logs
@@ -228,7 +231,7 @@ services:
         ipv4_address: 172.7.0.4
     container_name: msger_ros1_bridge_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       ROS_IP: 172.7.0.4
       ROS_MASTER_URI: http://172.7.0.3:11311/
@@ -277,7 +280,7 @@ services:
         ipv4_address: 172.2.0.10
     container_name: messenger_ns3_adapter_1
     volumes_from:
-      - container:carma-config:ro
+      - container:carma-sim-vehicle-config:ro
     environment:
       ROS_IP: 172.7.0.6
       ROS_MASTER_URI: http://172.7.0.3:11311/
