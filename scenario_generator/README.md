@@ -1,6 +1,6 @@
 # CDASim Scenario Generator
 
-The CDASim Scenario Generator automates Docker Compose deployments for CDASim, CARMA Streets, and vehicle services in simulation runs. The generate_scenario.py script reads a config.yaml file to create a sim_launch.sh bash script and .env files, streamlining setup.
+The CDASim Scenario Generator automates Docker Compose deployments for CDASim, CARMA Streets, and vehicle services in simulation runs. The scenario_generator.py script reads a config.yaml file to create a sim_launch.sh bash script and .env files, streamlining setup.
 Installation
 # Prerequisites
 * Python 3.x with required packages:
