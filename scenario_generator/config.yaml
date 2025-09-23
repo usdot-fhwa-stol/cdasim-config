@@ -14,11 +14,9 @@
 
 #  NOTE: This is a temporary file, further planning and implementation will be conducted in the following sprint
 
-cdasim_config_dir:  <path-to-cdasim-config>
-street_config_dir:  <path-to-street-config>
-carma_config_dir:   <path-to-carma-config>
-num_vehicles: 2
-num_streets: 2
+cdasim_config_dir: <path-to-carma-config>
+street_config_dir: <path-to-street-config>
+carma_config_dir: <path-to-carma-config>
 env_settings:
   cdasim:
     DOCKER_ORG: usdotfhwastol

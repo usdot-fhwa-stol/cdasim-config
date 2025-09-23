@@ -33,8 +33,6 @@ python3 -m pip install pyyaml jinja2
 cdasim_config_dir: /path/to/cdasim-config
 street_config_dir: /path/to/carma-street
 carma_config_dir: /path/to/carma-config/basic_sim_vehicle
-num_vehicles: 2
-num_streets: 2
 env_settings:
   cdasim:
     DOCKER_ORG: usdotfhwastol
@@ -59,7 +57,6 @@ env_settings:
 ```
 
 * Replace placeholder paths (e.g., /path/to/carma-config) with actual paths.
-* Adjust num_vehicles and num_streets as needed.
 
 # Usage
 

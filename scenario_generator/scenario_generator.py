@@ -36,8 +36,8 @@ def generate_bash_script(config, template_path='sim_launch_template.sh.j2'):
     
     # Render the template with config values
     bash_script = template.render(
-        num_vehicles=config['num_vehicles'],
-        num_streets=config['num_streets'],
+        num_vehicles=len(config['env_settings']['vehicles']),
+        num_streets=len(config['env_settings']['streets']),
         cdasim_config_dir=config['cdasim_config_dir'],
         street_config_dir=config['street_config_dir'],
         carma_config_dir=config['carma_config_dir']
