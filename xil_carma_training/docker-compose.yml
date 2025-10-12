@@ -2,7 +2,7 @@
 services:
   carma-simulation:
     privileged: true
-    image: usdotfhwastol/cdasim:develop
+    image: usdotfhwastol/cdasim:carma-system-4.9.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
@@ -18,6 +18,7 @@ services:
       - /opt/carma-simulation/logs:/opt/carma-simulation/logs
       - ./carla-recorder/:/app/scenario_runner/metrics/data/
       - ./cdasim/logback.xml:/opt/carma-simulation/etc/logback.xml
+      - ./carma_training/scenarios/Town04_carma_training:/opt/carma-simulation/scenarios/Town04_carma_training
     deploy:
       resources:
         reservations:
