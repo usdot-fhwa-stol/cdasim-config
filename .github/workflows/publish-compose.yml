@@ -66,19 +66,3 @@ jobs:
         run: |
           cd xil_carma_cloud
           docker compose publish --with-env --yes ${{ steps.meta_cloud.outputs.tags }}
-
-      - name: Extract metadata (xil_cloud_telematics)
-        id: meta_telematics
-        uses: docker/metadata-action@v5
-        with:
-          images: usdotfhwastoldev/xil-telematics-application
-          flavor: |
-            latest=false
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-
-      - name: Publish Docker Compose (xil_cloud_telematics)
-        run: |
-          cd xil_cloud_telematics
-          docker compose publish --with-env --yes ${{ steps.meta_telematics.outputs.tags }}
