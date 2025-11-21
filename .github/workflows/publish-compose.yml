@@ -37,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: usdotfhwastol/xil-messenger-application
+          images: usdotfhwastoldev/xil-messenger-application
           flavor: |
             latest=false
           tags: |
