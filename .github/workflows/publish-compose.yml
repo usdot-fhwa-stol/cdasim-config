@@ -1,5 +1,6 @@
 name: Publish Docker Compose
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -33,8 +34,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata for Docker
-        id: meta
+      - name: Extract metadata (Xil_Messenger)
+        id: meta_messenger
         uses: docker/metadata-action@v5
         with:
           images: usdotfhwastoldev/xil-messenger-application
@@ -44,7 +45,40 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
 
-      - name: Publish Docker Compose
+      - name: Publish Docker Compose (Xil_Messenger)
         run: |
           cd xil_carma_messenger
-          docker compose publish --with-env --yes ${{ steps.meta.outputs.tags }}
+          docker compose publish --with-env --yes ${{ steps.meta_messenger.outputs.tags }}
+
+
+      - name: Extract metadata (xil_carma_cloud)
+        id: meta_cloud
+        uses: docker/metadata-action@v5
+        with:
+          images: usdotfhwastoldev/xil-carma-cloud-application
+          flavor: |
+            latest=false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Publish Docker Compose (xil_carma_cloud)
+        run: |
+          cd xil_carma_cloud
+          docker compose publish --with-env --yes ${{ steps.meta_cloud.outputs.tags }}
+
+      - name: Extract metadata (xil_cloud_telematics)
+        id: meta_telematics
+        uses: docker/metadata-action@v5
+        with:
+          images: usdotfhwastoldev/xil-telematics-application
+          flavor: |
+            latest=false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Publish Docker Compose (xil_cloud_telematics)
+        run: |
+          cd xil_cloud_telematics
+          docker compose publish --with-env --yes ${{ steps.meta_telematics.outputs.tags }}
