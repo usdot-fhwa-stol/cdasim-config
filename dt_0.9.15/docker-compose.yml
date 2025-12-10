@@ -1,33 +1,6 @@
 
 services:
-  # carma-simulation:
-  #   privileged: true
-  #   image: usdotfhwastol/cdasim:carma-system-4.9.0
-  #   networks:
-  #     carma_sim_net:
-  #       ipv4_address: 172.2.0.2
-  #   container_name: carma-simulation
-  #   environment:
-  #     - __GLX_VENDOR_LIBRARY_NAME=nvidia
-  #     - LIBGL_ALWAYS_INDIRECT=0
-  #     - LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-  #     - DISPLAY=${DISPLAY}
-  #     - QT_X11_NO_MITSHM=1
-  #   volumes:
-  #     - /tmp/.X11-unix:/tmp/.X11-unix
-  #     - /opt/carma-simulation/logs:/opt/carma-simulation/logs
-  #     - ./carla-recorder/:/app/scenario_runner/metrics/data/
-  #     - ./cdasim/logback.xml:/opt/carma-simulation/etc/logback.xml
-  #     - ./carma_training/scenarios/Town04_carma_training:/opt/carma-simulation/scenarios/Town04_carma_training
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - capabilities: [gpu]
-  #   command: bash -c "./mosaic.sh -s Town04_carma_training"
 
-############################################################################
-# carma vehicle 1
   roscore_1:
     image: usdotfhwastol/carma-base:carma-system-4.5.0
     networks:
@@ -139,8 +112,6 @@ services:
     volumes_from:
       - container:carma-config:ro
     environment:
-      ROS_IP: 172.3.0.6
-      ROS_MASTER_URI: http://172.3.0.2:11311/
       PYTHONUNBUFFERED: 1
     # sleep is for carla simulator to become available
     # start_delay_in_seconds is carla game time seconds to adjust when to engage for the scenario
@@ -148,14 +119,19 @@ services:
     command: >
       bash -c "wait-for-it.sh 172.3.0.2:11311
       && export PYTHONPATH=$PYTHONPATH:~/PythonAPI/carla/dist/carla-0.9.15-py3.7-linux-x86_64.egg:/home/carma/carla-sensor-lib/src
-      && source ~/carma_carla_ws/devel/setup.bash
+      && export ROS_MASTER_URI=http://172.3.0.2:11311/
       && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
-      && roslaunch carma_carla_agent carma_carla_agent.launch
-      role_name:='carma_1'
-      host:='172.2.0.2'
-      selected_route:='carma_1_route'
-      start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
-      spawn_point:='151.2,-305.9,0,0,0,0'"
+      && source /opt/ros/noetic/setup.bash
+      && source ~/carma_carla_ws/devel/setup.bash
+      && export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
+      && echo $ROS_MASTER_URI
+      && tail -f /dev/null"
+    #  && roslaunch carma_carla_agent carma_carla_agent.launch
+    #  role_name:='carma_1'
+    #  host:='192.168.0.37'
+    #  selected_route:='carma_1_route'
+    #  start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
+    #  spawn_point:='151.2,-305.9,0,0,0,0'"
 
   ns3_adapter_1:
     image: usdotfhwastol/carma-ns3-adapter:carma-system-4.9.0
