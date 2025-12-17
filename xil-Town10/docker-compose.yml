@@ -1,20 +1,22 @@
 
 services:
-  carma-simulation:
+  cdasim:
     privileged: true
     image: ${DOCKER_ORG}/cdasim:${DOCKER_TAG}
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
-    container_name: carma-simulation
+    container_name: cdasim
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev:/dev
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /opt/carma-simulation/logs:/opt/carma-simulation/logs
-      - ./carla-recorder/:/app/scenario_runner/metrics/data/
-      - ./cdasim/logback.xml:/opt/carma-simulation/etc/logback.xml
     deploy:
       resources:
         reservations:
@@ -30,7 +32,11 @@ services:
         ipv4_address: 172.3.0.4
     container_name: platform_ros2_1
     environment:
-      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=0
+      - ROS_LOCALHOST_ONLY=0
     volumes_from:
       - container:carma-config:ro
     volumes:
@@ -61,20 +67,27 @@ services:
     container_name: carma-carla-integration_1
     volumes_from:
       - container:carma-config:ro
+    depends_on:
+      - cdasim
     environment:
-      PYTHONUNBUFFERED: 1
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
+      ROS_DOMAIN_ID: 0
+      ROS_LOCALHOST_ONLY: 0
     # sleep is for carla simulator to become available
     # start_delay_in_seconds is carla game time seconds to adjust when to engage for the scenario
     # and account for delay required for world model to fully update after route is selected
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
-      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=127.0.0.1
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=172.2.0.2
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
       host:='172.2.0.2'
+      synchronous_mode:=True
       selected_route:='Town10_route'
-      start_delay_in_seconds:=${VEHICLE_ENGAGE_DELAY}
+      start_delay_in_seconds:=90.0
+      fixed_delay_seconds:=0.1
+      passive:=True
       spawn_point:='58.6,134.5,0,0,0,180'"
 
   vehicle_registration_service:
@@ -102,15 +115,15 @@ services:
     command: command
     
   xml_rpc_server:
-    image: ${DOCKER_ORG}/xmlrpcserver:${DOCKER_TAG}
+    image: ${DOCKER_ORG}/xmlrpcserver:latest
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.12
     container_name: xml_rpc_server
     volumes_from:
       - container:carma-config:ro
-    command: >
-      bash -c "python3 /home/carma/src/carla_v0.10_xmlrpc_server.py"
+    command:
+      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug"]
 #############################################################################
 #############################################################################
 # carma messenger
