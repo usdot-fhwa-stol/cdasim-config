@@ -1,0 +1,101 @@
+services:
+
+  platform_ros2_1:
+    image: usdotfhwastol/carma-platform:carma-system-4.10.0
+    container_name: platform_ros2_1
+    volumes_from:
+      - container:carma-config:ro
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=0
+      - ROS_LOCALHOST_ONLY=0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /opt/carma/logs/carma_1:/opt/carma/logs
+      - /opt/carma/.ros:/home/carma/.ros
+      - /opt/carma/vehicle/calibration:/opt/carma/vehicle/calibration
+      - /opt/carma/maps:/opt/carma/maps
+      - /opt/carma/routes:/opt/carma/routes
+      - /opt/carma/yolo:/opt/carma/yolo
+      # ILC tuning for carma-cloud workzone (carma_2) is breaking k900 normal lanefolow regression testing, so using different tuning
+      - ./carma/inlanecruising_config/parameters.yaml:/opt/carma/install/inlanecruising_plugin/share/inlanecruising_plugin/config/parameters.yaml
+      # - ./carma/environment.launch.py:/opt/carma/install/carma/share/carma/launch/environment.launch.py
+      # - ./carma/light_controlled_intersection_tactical_plugin/parameters.yaml:/opt/carma/install/light_controlled_intersection_tactical_plugin/share/light_controlled_intersection_tactical_plugin/config/parameters.yaml
+      # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
+      # - ./carma/plugins.launch.py:/opt/carma/install/carma/share/carma/launch/plugins.launch.py
+      - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    command: bash -c 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+                      && source /opt/carma/install/setup.bash 
+                      && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
+
+  # ## ROS2
+  carma-carla-integration_1:
+    image: usdotfhwastol/carma-carla-integration:latest
+    container_name: carma-carla-integration_1
+    volumes_from:
+      - container:carma-config:ro
+    depends_on:
+      - cdasim
+    environment:
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
+      ROS_DOMAIN_ID: 0
+      ROS_LOCALHOST_ONLY: 0
+    network_mode: host
+    # volumes:
+    #   - /home/cy/carma_ws/src/carma-carla-integration/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py:/home/carma/carma-carla-integration/carma-carla-bridge/launch/carma_carla_bridge.launch.py
+    command: >
+      bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      && source /home/carma/carma-carla-integration/install/setup.bash
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=127.0.0.1
+      && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
+      role_name:='carma_1'
+      host:='127.0.0.1'
+      synchronous_mode:=True
+      selected_route:='Town10_route'
+      start_delay_in_seconds:=90.0
+      fixed_delay_seconds:=0.1
+      passive:=True
+      spawn_point:='58.6,134.5,0,0,0,180'"
+
+
+  # CDASim (MOSAIC + CARLA 0.10 + SUMO via docker-in-docker)
+  cdasim:
+    image: usdotfhwastol/cdasim:latest
+    container_name: cdasim
+    privileged: true
+    user: "carma"
+    # network_mode: host
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev:/dev
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /opt/carma-simulation/logs:/opt/carma-simulation/logs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    command: ["mosaic.sh", "-s", "Town10"]
+
+  xml-rpc-server:
+    image: usdotfhwastol/xml-rpc-server:latest
+    container_name: xml-rpc-server
+    network_mode: host
+    depends_on:
+      - cdasim
+    command:
+      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug"]
