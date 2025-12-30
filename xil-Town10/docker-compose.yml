@@ -112,7 +112,14 @@ services:
     container_name: v2x_ros_driver
     volumes_from:
       - container:carma-config:ro
-    command: command
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /opt/carma/install/setup.bash &&
+        ros2 launch v2x_ros_driver v2x_ros_driver.launch.py
+          log_level:=INFO
+          enable_v2x_driver_lifecycle:=True
+      "
 
   xml_rpc_server:
     image: ${DOCKER_ORG}/xmlrpcserver:latest
@@ -261,7 +268,7 @@ services:
         ipv4_address: 172.2.0.47
     container_name: carma-cloud
     depends_on:
-      - carma-simulation
+      - cdasim
     volumes:
       - ./carmacloudvol/logs:/opt/tomcat/logs
       - ./carmacloudvol/work:/opt/tomcat/work
