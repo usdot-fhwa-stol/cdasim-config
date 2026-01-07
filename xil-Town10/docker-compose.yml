@@ -2,7 +2,7 @@
 services:
   cdasim:
     privileged: true
-    image: ${DOCKER_ORG}/cdasim:${DOCKER_TAG}
+    image: usdotfhwastol/cdasim:latest
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
@@ -17,6 +17,8 @@ services:
       - /dev:/dev
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /opt/carma-simulation/logs:/opt/carma-simulation/logs
+    group_add:
+      - "998"
     deploy:
       resources:
         reservations:
@@ -79,10 +81,10 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
-      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=172.2.0.2
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=carla-server
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
-      host:='172.2.0.2'
+      host:='carla-server'
       synchronous_mode:=True
       selected_route:='Town10_route'
       start_delay_in_seconds:=90.0
@@ -92,7 +94,7 @@ services:
 
   vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: ${DOCKER_ORG}/carma-ns3-adapter:latest
+    image: usdotfhwastol/carma-ns3-adapter:latest
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.14
@@ -103,7 +105,7 @@ services:
       bash -c "python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py"
 
   v2x_ros_driver:
-    image: ${DOCKER_ORG}/v2x-ros-driver:carma-system-4.10.0
+    image: usdotfhwastol/v2x-ros-driver:carma-system-4.10.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.16
@@ -122,7 +124,7 @@ services:
       "
 
   xml_rpc_server:
-    image: ${DOCKER_ORG}/xmlrpcserver:latest
+    image: usdotfhwastol/xml-rpc-server:latest
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.12
@@ -130,7 +132,7 @@ services:
     volumes_from:
       - container:carma-config:ro
     command:
-      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug"]
+      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug", "--carla-host=carla-server", "--host=172.2.0.12"]
 #############################################################################
 #############################################################################
 # carma messenger
