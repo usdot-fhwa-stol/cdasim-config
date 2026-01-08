@@ -115,9 +115,9 @@ services:
     image: usdotfhwastol/v2x-ros-driver:carma-system-4.10.0
     networks:
       carma_sim_net:
-        ipv4_address: 172.2.0.16
+        ipv4_address: 172.2.0.7
       carma_net_1:
-        ipv4_address: 172.3.0.16
+        ipv4_address: 172.3.0.7
     container_name: v2x_ros_driver
     volumes_from:
       - container:carma-config:ro

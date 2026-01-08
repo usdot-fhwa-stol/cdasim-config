@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "Stopping CARLA"
+docker stop carla-server
 echo "Saving v2x log"
 docker logs v2xhub > v2xhub.log
 echo "Stopping simulation ..."
