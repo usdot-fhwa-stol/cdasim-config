@@ -112,23 +112,21 @@ services:
       bash -c "python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py"
 
   v2x_ros_driver:
-    image: usdotfhwastol/v2x-ros-driver:carma-system-4.10.0
+    image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.7
       carma_net_1:
         ipv4_address: 172.3.0.7
     container_name: v2x_ros_driver
+    volumes:
+      - /opt/carma/logs:/opt/carma/logs
+      - /opt/carma/.ros:/home/carma/.ros
+      - ./v2x_ros_driver/params.yaml:/home/carma/src/v2x_ros_driver/config/params.yaml
     volumes_from:
       - container:carma-config:ro
     command: >
-      bash -c "
-        source /opt/ros/humble/setup.bash &&
-        source /opt/carma/install/setup.bash &&
-        ros2 launch v2x_ros_driver v2x_ros_driver.launch.py
-          log_level:=INFO
-          enable_v2x_driver_lifecycle:=True
-      "
+      bash -c "source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
   xml_rpc_server:
     image: usdotfhwastol/xml-rpc-server:latest
@@ -418,7 +416,7 @@ services:
       - ./MAP:/home/carma-streets/intersection_model/MAP
 
   # carla-sensor-lib:
-  #   image: usdotfhwastol/carla-sensor-lib:carma-system-4.5.0
+  #   image: usdotfhwastol/carla-sensor-lib:latest
   #   networks:
   #     carma_sim_net:
   #       ipv4_address: 172.2.0.5
@@ -426,12 +424,12 @@ services:
   #   restart: always
   #   environment:
   #     - LOAD_CARLA_EGG=True
-  #     - CARLA_VERSION=0.9.10
+  #     - CARLA_VERSION=0.10.0
   #     - CARLA_EGG_DIR=/home/CarlaCDASimAdapter/
   #   volumes:
   #     - ./carla-sensor-lib/logs/:/home/CarlaCDASimAdapter/logs/
   #   command: bash -c "sleep 15;
-  #     python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host 172.2.0.2 --xmlrpc-server-host 172.2.0.5  --sensor-config-file ./config/simulated_sensor_config.yaml --noise-model-config-file ./config/noise_model_config.yaml"
+  #     python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host carla-server --xmlrpc-server-host 172.2.0.5  --sensor-config-file ./config/simulated_sensor_config.yaml --noise-model-config-file ./config/noise_model_config.yaml"
 
   tsc_service:
     image: usdotfhwastol/tsc_service:carma-system-4.5.1

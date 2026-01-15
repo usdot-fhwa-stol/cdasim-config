@@ -21,7 +21,8 @@ hardware_interface:
       call_timeout_ms: 50000
       subsystem_namespace: /hardware_interface
       required_subsystem_nodes: ['']
-      unmanaged_required_nodes: ['']
+      unmanaged_required_nodes:
+        - /hardware_interface/v2x_ros_driver_node
       excluded_namespace_nodes: ['']
       ros1_ssc_driver_name: ''
       full_subsystem_required: false
