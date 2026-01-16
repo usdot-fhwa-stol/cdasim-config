@@ -112,7 +112,7 @@ services:
       bash -c "python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py"
 
   v2x_ros_driver:
-    image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
+    image: usdotfhwastol/v2x-ros-driver:latest
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.7
@@ -122,7 +122,6 @@ services:
     volumes:
       - /opt/carma/logs:/opt/carma/logs
       - /opt/carma/.ros:/home/carma/.ros
-      - ./v2x_ros_driver/params.yaml:/home/carma/src/v2x_ros_driver/config/params.yaml
     volumes_from:
       - container:carma-config:ro
     command: >

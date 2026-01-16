@@ -26,7 +26,6 @@ from launch.actions import GroupAction
 from launch.actions import Shutdown
 from launch_ros.actions import PushRosNamespace
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 from carma_ros2_utils.launch.get_log_level import GetLogLevel
 import uuid
 
@@ -51,7 +50,7 @@ def generate_launch_description():
 
     drivers = LaunchConfiguration('drivers')
     declare_drivers_arg = DeclareLaunchArgument(
-        name = 'drivers', default_value = 'v2x_ros_driver velodyne_lidar_driver_wrapper carma_novatel_driver_wrapper', description = "Desired drivers to launch specified by package name."
+        name = 'drivers', default_value = 'v2x_ros_driver velodyne_lidar_driver_wrapper', description = "Desired drivers to launch specified by package name."
     )
 
     # Launch shutdown node which will ensure the launch file gets closed on system shutdown even if in a separate container
@@ -81,23 +80,6 @@ def generate_launch_description():
         ]
     )
 
-    ssc_group = GroupAction(
-        # Launch ssc
-        condition=IfCondition(PythonExpression(["'ssc_interface_wrapper_ros2' in '", drivers, "'.split()"])),
-        actions=[
-            PushRosNamespace(EnvironmentVariable('CARMA_INTR_NS', default_value='hardware_interface')),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([ FindPackageShare('ssc_interface_wrapper_ros2'), '/launch/ssc_pacmod_driver.launch.py']),
-                launch_arguments = {
-                    'log_level' : GetLogLevel('ssc_interface_wrapper_ros2', env_log_levels),
-                    'vehicle_calibration_dir' : vehicle_calibration_dir,
-                    'ssc_package_name' : 'ssc_pm_lexus',
-                    'vehicle_config_dir' : vehicle_config_dir
-                }.items()
-            ),
-        ]
-    )
-
     lidar_group = GroupAction(
         condition=IfCondition(PythonExpression(["'velodyne_lidar_driver_wrapper' in '", drivers, "'.split()"])),
         actions=[
@@ -121,7 +103,7 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource([ FindPackageShare('carma_novatel_driver_wrapper'), '/launch/carma-novatel-driver-wrapper-launch.py']),
                 launch_arguments = {
                     'log_level' : GetLogLevel('carma_novatel_driver_wrapper', env_log_levels),
-                    'ip_addr' : '192.168.74.10',
+                    'ip_addr' : '192.168.88.29',
                     'port' : '2000',
                     'vehicle_calibration_dir' : vehicle_calibration_dir,
                     }.items()
@@ -148,7 +130,6 @@ def generate_launch_description():
         declare_vehicle_config_dir_arg,
         driver_shutdown_group,
         v2x_driver_group,
-        ssc_group,
         lidar_group,
         gnss_ins_group,
         lightbar_driver_group
