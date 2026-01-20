@@ -1,5 +1,5 @@
 # Pure pursuit lookahead calibration params
-minimum_lookahead_distance:      6.0
+minimum_lookahead_distance:      2.0
 maximum_lookahead_distance:      100.0
 speed_to_lookahead_ratio:        2.0
 is_interpolate_lookahead_point:  true
@@ -15,3 +15,7 @@ integrator_max_pp:     0.0
 integrator_min_pp:     0.0
 Ki_pp:                 0.0
 is_integrator_enabled: false
+
+example_calibration_folder/vehicle/calibration/pure_pursuit/calibration.yaml
+
+/home/msc_lab/Desktop/WillVarner/cdasim-config/example_calibration_folder/vehicle/calibration/pure_pursuit/calibration.yaml

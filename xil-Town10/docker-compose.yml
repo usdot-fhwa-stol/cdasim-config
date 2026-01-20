@@ -1,5 +1,35 @@
 services:
+  cdasim:
+    # image: usdotfhwastol/cdasim:24293e22
+    # image: usdotfhwastol/cdasim:cdasim-phase3-integation-testing-SNAPSHOT
+    image: usdotfhwastol/cdasim:cdasim-phase3-integation-testing
+    container_name: cdasim
+    privileged: true
+    user: "carma"
+    # network_mode: host
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev:/dev
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /opt/carma-simulation/logs:/opt/carma-simulation/logs
+      - /home/msc_lab/Desktop/WillVarner/cdasim-config/xil-Town10/sensor_config.json:/opt/cdasim/sensor_config.json
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDusdotfhwastol/carma-config:carma-system-4.9.0-80-ge7df5f2-SNAPSHOT-xil-Town10IA_DRIVER_CAPABILITIES=graphics,utility,compute
+      - SENSOR_JSON_FILE=/opt/cdasim/sensor_config.json
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    command: ["mosaic.sh", "-s", "Town10"]
 
+ 
+
+############################################################################
   platform_ros2_1:
     image: usdotfhwastol/carma-platform:carma-system-4.10.0
     container_name: platform_ros2_1
@@ -21,12 +51,12 @@ services:
       - /opt/carma/routes:/opt/carma/routes
       - /opt/carma/yolo:/opt/carma/yolo
       # ILC tuning for carma-cloud workzone (carma_2) is breaking k900 normal lanefolow regression testing, so using different tuning
-      - ./carma/inlanecruising_config/parameters.yaml:/opt/carma/install/inlanecruising_plugin/share/inlanecruising_plugin/config/parameters.yaml
+      - ./cdasim_config/carma/inlanecruising_config/parameters.yaml:/opt/carma/install/inlanecruising_plugin/share/inlanecruising_plugin/config/parameters.yaml
       # - ./carma/environment.launch.py:/opt/carma/install/carma/share/carma/launch/environment.launch.py
       # - ./carma/light_controlled_intersection_tactical_plugin/parameters.yaml:/opt/carma/install/light_controlled_intersection_tactical_plugin/share/light_controlled_intersection_tactical_plugin/config/parameters.yaml
       # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       # - ./carma/plugins.launch.py:/opt/carma/install/carma/share/carma/launch/plugins.launch.py
-      - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
+      - ./cdasim_config/carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
     deploy:
       resources:
         reservations:
@@ -38,7 +68,9 @@ services:
 
   # ## ROS2
   carma-carla-integration_1:
-    image: usdotfhwastol/carma-carla-integration:latest
+    image: usdotfhwastol/carma-carla-integration:9446d33
+    # image: usdotfhwastol/carma-carla-integration:f1603f0-SNAPSHOT
+    # image: usdotfhwastoldev/carma-carla-integration:e38c678-SNAPSHOT
     container_name: carma-carla-integration_1
     volumes_from:
       - container:carma-config:ro
@@ -66,36 +98,48 @@ services:
       spawn_point:='58.6,134.5,0,0,0,180'"
 
 
-  # CDASim (MOSAIC + CARLA 0.10 + SUMO via docker-in-docker)
-  cdasim:
-    image: usdotfhwastol/cdasim:latest
-    container_name: cdasim
-    privileged: true
-    user: "carma"
-    # network_mode: host
+  carla-sensor-lib:
+    image: usdotfhwastol/carla-sensor-lib:619b970-SNAPSHOT
+    container_name: carla-sensor-lib
     network_mode: host
-    environment:
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute
+    restart: always
+    # environment:
+    #   - LOAD_CARLA_EGG=True
+    #   - CARLA_VERSION=0.9.10
+    #   - CARLA_EGG_DIR=/home/CarlaCDASimAdapter/
+    # volumes:
+    #   - ./carla-sensor-lib/logs/:/home/CarlaCDASimAdapter/logs/
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /dev:/dev
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /opt/carma-simulation/logs:/opt/carma-simulation/logs
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
-    command: ["mosaic.sh", "-s", "Town10"]
+      - ./sensor_config.json:/opt/cdasim/sensor_config.json
+      - ./carla-sensor-lib/logs/:/home/CarlaCDASimAdapter/logs/
+    environment:
+      - SENSOR_JSON_FILE=/opt/cdasim/sensor_config.json
+    # command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host 172.0.0.1 --xmlrpc-server-host 172.0.0.1 --sensor-config-file /config/simulated_sensor_config.yaml --noise-model-config-file ./config/noise_model_config.yaml"
+    command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py"
+    # command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/run_tests.py"
+
+  # CDASim (MOSAIC + CARLA 0.10 + SUMO via docker-in-docker)
+
 
   xml-rpc-server:
-    image: usdotfhwastol/xml-rpc-server:latest
+    #image: usdotfhwastol/xml-rpc-server:edce6f2b-SNAPSHOT
+    image: usdotfhwastol/xml-rpc-server:001f5054
     container_name: xml-rpc-server
     network_mode: host
+    # networks:
+    #   carma_sim_net:
+    #     ipv4_address: 172.2.0.12
     depends_on:
       - cdasim
     command:
-      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug"]
+      # ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--carla-host", "127.0.0.1", "--host", "172.2.0.12"]
+      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py"]
+
+
+# networks:
+#   carma_sim_net:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.2.0.0/16
+#           gateway: 172.2.0.1
