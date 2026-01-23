@@ -85,7 +85,7 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
-      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host 'carla-server'
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
       host:='carla-server'
