@@ -6,7 +6,6 @@ services:
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
-      # set carla ip in cdasim container: 172.2.0.3
     container_name: cdasim
     environment:
       - DISPLAY=${DISPLAY}
@@ -21,7 +20,7 @@ services:
     deploy:
       resources:
         reservations:
-          devices:cdasim-phase3-integration-testing
+          devices:
             - capabilities: [gpu]
     command: bash -c "./mosaic.sh -s Town10"
 
@@ -29,8 +28,6 @@ services:
   platform_ros2_1:
     image: usdotfhwastol/carma-platform:carma-system-4.10.0
     networks:
-      carma_sim_net:
-        ipv4_address: 172.2.0.48
       carma_net_1:
         ipv4_address: 172.3.0.4
     container_name: platform_ros2_1
@@ -66,7 +63,6 @@ services:
                       && source /opt/carma/install/setup.bash
                       && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
-
   carma-carla-integration_1:
     image: usdotfhwastol/carma-carla-integration:latest
     networks:
@@ -89,10 +85,10 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       && source /home/carma/carma-carla-integration/install/setup.bash
-      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py --carla-host=172.2.0.3
+      && python3 /home/carma/carma-carla-integration/carla-health-poll/src/wait_for_carla.py
       && ros2 launch carma_carla_bridge carma_carla_bridge.launch.py
       role_name:='carma_1'
-      host:='172.2.0.3'
+      host:='carla-server'
       synchronous_mode:=True
       selected_route:='Town10_route'
       start_delay_in_seconds:=90.0
@@ -137,7 +133,9 @@ services:
     volumes_from:
       - container:carma-config:ro
     command:
-      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--debug", "--carla-host=172.2.0.3", "--host=172.2.0.12"]
+      ["python3.10", "/home/carma/src/carla_v0.10_xmlrpc_server.py", "--host", "172.2.0.12", "--carla-host", "carla-server"]
+
+      
 #############################################################################
 #############################################################################
 # carma messenger
@@ -414,7 +412,7 @@ services:
       - ./intersection_model/manifest.json:/home/carma-streets/intersection_model/manifest.json
       - ./intersection_model/logs:/home/carma-streets/intersection_model/logs
       - ./MAP:/home/carma-streets/intersection_model/MAP
-
+      
   carla-sensor-lib:
     image: usdotfhwastol/carla-sensor-lib:latest
     container_name: carla-sensor-lib
@@ -422,19 +420,12 @@ services:
       carma_sim_net:
         ipv4_address: 172.2.0.5
     restart: always
-    # environment:
-    #   - LOAD_CARLA_EGG=True
-    #   - CARLA_VERSION=0.9.10
-    #   - CARLA_EGG_DIR=/home/CarlaCDASimAdapter/
-    # volumes:
-    #   - ./carla-sensor-lib/logs/:/home/CarlaCDASimAdapter/logs/
     volumes:
       - ./sensor_config.json:/opt/cdasim/sensor_config.json
       - ./carla-sensor-lib/logs/:/home/CarlaCDASimAdapter/logs/
     environment:
       - SENSOR_JSON_FILE=/opt/cdasim/sensor_config.json
-    # command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host 172.0.0.1 --xmlrpc-server-host 172.0.0.1 --sensor-config-file /config/simulated_sensor_config.yaml --noise-model-config-file ./config/noise_model_config.yaml"
-    command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host 172.2.0.3 --xmlrpc-server-host 172.2.0.5 --xmlrpc-server-port 8091"
+    command: bash -c "sleep 8; python3 -u /home/CarlaCDASimAdapter/src/CarlaCDASimAdapter.py --carla-host 'carla-server' --xmlrpc-server-host 172.2.0.5 --xmlrpc-server-port 8091"
 
   tsc_service:
     image: usdotfhwastol/tsc_service:carma-system-4.5.1
