@@ -1,0 +1,156 @@
+name: Docker Hub build
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - "release/*"
+    tags:
+      - "carma-system-*"
+
+permissions:
+  contents: read
+
+jobs:
+  determine_docker_org_and_tag:
+    runs-on: ubuntu-latest
+    outputs:
+      docker_organization: ${{ steps.docker-org-and-tag.outputs.docker_organization }}
+      docker_image_tag: ${{ steps.docker-org-and-tag.outputs.docker_image_tag }}
+    steps:
+      - id: docker-org-and-tag
+        uses: usdot-fhwa-stol/actions/docker-org-and-tag@main
+
+  docker:
+    needs: determine_docker_org_and_tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Docker Image Metadata
+        shell: bash
+        id: docker-image-metadata
+        run: |
+          echo "version=$(./docker/get-system-version.sh)" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "vcs_ref=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push carla_ground_truth_integration
+        uses: docker/build-push-action@v5
+        with:
+          context: ./carla_ground_truth_integration/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-carla-ground-truth-integration
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push development
+        uses: docker/build-push-action@v5
+        with:
+          context: ./development/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-development
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil-Town04
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil-Town04/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-town04
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil-Town05
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil-Town05/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-town05
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_carma_basic_lanefollow_scenario
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_carma_basic_lanefollow_scenario/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-carma-basic-lanefollow-scenario
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_carma_cloud
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_carma_cloud/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-carma-cloud
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_carma_messenger
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_carma_messenger/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-carma-messenger
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_carma_training
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_carma_training/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-carma-training
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_cloud_telematics
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_cloud_telematics/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-cloud-telematics
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
+
+      - name: Build and Push xil_vru_uc1_scenario
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil_vru_uc1_scenario/
+          push: true
+          tags: ${{ needs.determine_docker_org_and_tag.outputs.docker_organization }}/cdasim-config:${{ needs.determine_docker_org_and_tag.outputs.docker_image_tag }}-xil-vru-uc1-scenario
+          build-args: |
+            BUILD_DATE=${{ steps.docker-image-metadata.outputs.build_date }}
+            VCS_REF=${{ steps.docker-image-metadata.outputs.vcs_ref }}
+            VERSION=${{ steps.docker-image-metadata.outputs.version }}
