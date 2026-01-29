@@ -5,6 +5,10 @@ services:
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
+      carma_net_1:
+        ipv4_address: 172.3.0.3
+      carma_messenger_net_1:
+        ipv4_address: 172.7.0.3
     container_name: cdasim
     environment:
       - DISPLAY=${DISPLAY}
@@ -93,7 +97,7 @@ services:
       host:='carla-server'
       synchronous_mode:=True
       selected_route:='Town10_route'
-      start_delay_in_seconds:=90.0
+      start_delay_in_seconds:=30.0
       fixed_delay_seconds:=0.1
       passive:=True
       spawn_point:='58.6,134.5,0,0,0,180'"
@@ -102,29 +106,30 @@ services:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
     image: usdotfhwastol/carma-ns3-adapter:latest
     networks:
-      carma_sim_net:
-        ipv4_address: 172.2.0.14
+      carma_net_1:
+        ipv4_address: 172.3.0.14
     container_name: vehicle_registration_service
     volumes_from:
       - container:carma-config:ro
     command: >
-      bash -c "python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py"
+      bash -c 'python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py --vehicleId "carma_1" --roleId "carma_1" \
+               --rxMessageIpAddress 172.3.0.7 --rxMessagePort 2500 --rxTimeSyncPort 2501 --receiverPort 1515 --receiverIpAddress 172.3.0.3'
+
 
   v2x_ros_driver:
-    image: usdotfhwastol/v2x-ros-driver:platform
+    image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
     networks:
-      carma_sim_net:
-        ipv4_address: 172.2.0.7
       carma_net_1:
         ipv4_address: 172.3.0.7
     container_name: v2x_ros_driver
     volumes:
       - /opt/carma/logs:/opt/carma/logs
       - /opt/carma/.ros:/home/carma/.ros
+      - ./carma/v2x_ros_driver/params.yaml:/opt/carma/install/v2x_ros_driver/share/v2x_ros_driver/config/params.yaml
     volumes_from:
       - container:carma-config:ro
     command: >
-      bash -c "source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
+      bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
   xml_rpc_server:
     image: usdotfhwastol/xml-rpc-server:latest
@@ -158,13 +163,12 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install/setup.bash
       && echo $RMW_IMPLEMENTATION && ros2 launch /opt/carma/vehicle/config/carma-messenger-docker.launch.py"
+
   carma_messenger_bridge_1:
     image: usdotfhwastol/carma-messenger-bridge:carma-system-4.9.0
     networks:
       carma_messenger_net_1:
         ipv4_address: 172.7.0.5
-      carma_sim_net:
-        ipv4_address: 172.2.0.9
     volumes:
       - ./carma_messenger:/opt/mockns3
     environment:
@@ -176,37 +180,38 @@ services:
       && ros2 launch msger_mosaic_bridge mosaic_adapter_launch.py
       role_id:=msger_1
       messenger_ip_address:=172.7.0.2
-      cdasim_ip_address:=172.2.0.2
-      host_ip_address:=172.2.0.9'
+      cdasim_ip_address:=172.7.0.3
+      host_ip_address:=172.7.0.5'
 
   messenger_v2x_ros_driver:
-    image: usdotfhwastol/v2x-ros-driver:messenger
+    image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
     networks:
       carma_messenger_net_1:
         ipv4_address: 172.7.0.6
-      carma_sim_net:
-        ipv4_address: 172.2.0.10
     container_name: messenger_v2x_ros_driver
     volumes_from:
       - container:carma-config:ro
+    environment:
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION}
     volumes:
       - /opt/carma/logs:/opt/carma/logs
       - /opt/carma/.ros:/home/carma/.ros
+      - ./carma_messenger/v2x_ros_driver/params.yaml:/opt/carma/install/v2x_ros_driver/share/v2x_ros_driver/config/params.yaml
     command: >
-      bash -c "source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
+      bash -c "export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/msger_drivers.launch.py log_level:=DEBUG"
 
   messenger_vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
     image: usdotfhwastol/carma-ns3-adapter:latest
     networks:
-      carma_sim_net:
-        ipv4_address: 172.2.0.16
+      carma_messenger_net_1:
+        ipv4_address: 172.7.0.16
     container_name: messenger_vehicle_registration_service
     volumes_from:
       - container:carma-config:ro
     command: >
       bash -c 'python3 /opt/carma/vehicle-registration-module/src/vehicleRegistration.py --vehicleId "msger_1" --roleId "msger_1" \
-               --rxMessageIpAddress 172.2.0.10 --rxMessagePort 3501 --rxTimeSyncPort 3500 --receiverPort 3600 --receiverIpAddress 172.2.0.2'
+               --rxMessageIpAddress 172.7.0.6 --rxMessagePort 3501 --rxTimeSyncPort 3500 --receiverPort 3600 --receiverIpAddress 172.7.0.3'
 
   carma-messenger-vehicle-plugin_1:
     image: usdotfhwastol/cdasim:latest
