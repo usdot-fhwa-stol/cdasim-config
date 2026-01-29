@@ -74,7 +74,7 @@ def generate_launch_description():
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([ FindPackageShare('v2x_ros_driver'), '/launch/v2x_ros_driver.launch.py']),
                 launch_arguments = {
-                    'log_level' : GetLogLevel('v2x_ros_driver', env_log_levels),
+                    'log_level' : GetLogLevel('v2x_ros_driver', env_log_levels)
                     }.items()
             ),
         ]

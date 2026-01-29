@@ -10,7 +10,8 @@ environment:
       call_timeout_ms: 50000
       subsystem_namespace: /environment
       required_subsystem_nodes: ['']
-      unmanaged_required_nodes: ['']
+      unmanaged_required_nodes:
+        - /hardware_interface/v2x_ros_driver_node
       full_subsystem_required: true
 
 hardware_interface:
@@ -21,8 +22,7 @@ hardware_interface:
       call_timeout_ms: 50000
       subsystem_namespace: /hardware_interface
       required_subsystem_nodes: ['']
-      unmanaged_required_nodes:
-        - /hardware_interface/v2x_ros_driver_node
+      unmanaged_required_nodes: ['']
       excluded_namespace_nodes: ['']
       ros1_ssc_driver_name: ''
       full_subsystem_required: false
@@ -34,8 +34,8 @@ message:
       call_timeout_ms: 50000
       subsystem_namespace: /message
       required_subsystem_nodes: ['']
-      unmanaged_required_nodes:
-        - /hardware_interface/dsrc_driver_node
+      unmanaged_required_nodes: 
+        - /hardware_interface/v2x_ros_driver_node
       full_subsystem_required: true
 
 guidance:
