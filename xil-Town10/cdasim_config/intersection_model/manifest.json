@@ -4,7 +4,7 @@
     "configurations": [
         {
             "name": "osm_file_path",
-            "value": "../MAP/Town04_vector_map.osm",
+            "value": "../MAP/vector_map.osm",
             "description": "Path to lanelet2 osm map for a given intersection.",
             "type": "STRING"
         },
