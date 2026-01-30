@@ -47,6 +47,12 @@ jobs:
           context: ./xil-Town05/
           push: false
 
+      - name: Build xil-Town10
+        uses: docker/build-push-action@v5
+        with:
+          context: ./xil-Town10/
+          push: false
+
       - name: Build xil_carma_basic_lanefollow_scenario
         uses: docker/build-push-action@v5
         with:
