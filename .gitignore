@@ -1,1 +1,5 @@
-
+*.log
+*.gz
+*.txt
+logs/
+*.log
