@@ -6,7 +6,7 @@ This **CARMA Config** includes the docker-compose and configuration file setup f
 
 ## Scenario Description
 
-This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario which includes **CARLA**, **SUMO** , **NS3** (CV2X Model), a **Virtual Signal Controller**, **CARMA Streets**, **CARMA Cloud** and **CARMA Platform**. The scenario configured is meant to show base basic CDASim functionality along with the new developed **CARMA Messenger** integration. **CARMA Cloud** is a cloud application used to maintain and provide traffic controls for autonomous vehicles to use to update their local maps. The diagrams below illustrate the configured scenario including vehicle routes and infrastructure location.**CARMA Messenger** is a standalone research platform which is aimed to deploy on non-automated entities who participate in the transportation system, including first responders, transit vehicles, law enforcement vehicles, and pedestrians.
+This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario which includes **CARLA**, **SUMO** , **NS3** (CV2X Model), a **Virtual Signal Controller**, **CARMA Streets**, **CARMA Cloud** and **CARMA Platform**. The scenario configured is meant to show base basic CDASim functionality along with the new developed **CARMA Messenger** integration. **CARMA Cloud** is a cloud application used to maintain and provide traffic controls for autonomous vehicles to use to update their local maps. The diagrams below illustrate the configured scenario including vehicle routes and infrastructure location. **CARMA Messenger** is a standalone research platform which is aimed to deploy on non-automated entities who participate in the transportation system, including first responders, transit vehicles, law enforcement vehicles, and pedestrians.
 
 
 ![Alt text](docs/town04_diagram.png)
@@ -32,3 +32,36 @@ This CARMA Configuration Image creates a **XIL** (Anything-In-the-Loop) scenario
 7) Navigate to the `cdasim_config/` directory and run the `start_simulation` script
 8) To stop the simulation simply run the `stop_simulation` script in the same directory (ensure any kafka data from carma streets is collected before stopping simulation)
 9) This scenario can generate a lot of logged data, using the `clear_logs` script in the same directory will clear **CDASim**, **CARMA Streets**, **CARMA Platform Logs**, **CARMA Messenger** and **CARMA Cloud** logs.
+
+# EVC and V2X Hub Configuration
+
+## Econolite Virtual Controller (EVC) Configuration
+
+The Econolite Virtual Controller (EVC) is configured to communicate with V2X-Hub using UDP for SPaT broadcast and SNMP for controller communication.
+
+### SPAT Output Configuration
+
+| Configuration | Value |
+|--------------|--------|
+| SPAT IP | 172.4.0.2 |
+| SPAT Port | 6053 |
+| SNMP Port | 1515 |
+
+## V2X Hub Configuration
+
+The V2X-Hub instance is configured to receive SPaT from the EVC and publish it internally to CARMA components.
+
+### V2X Hub Enabled Plugins
+
+- SPAT Plugin
+
+### SPAT Plugin Configuration
+
+| Plugin | Configuration | Value |
+|--------|---------------|--------|
+| SPAT | Local_IP | 172.4.0.2 |
+| SPAT | Local_UDP_PORT | 6053 |
+| SPAT | TSC_IP | 172.4.0.4 |
+| SPAT | TSC_Remote_SNMP_Port | 1515 |
+
+
