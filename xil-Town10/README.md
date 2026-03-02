@@ -49,11 +49,10 @@ The Econolite Virtual Controller (EVC) is configured to communicate with V2X-Hub
 
 ## V2X Hub Configuration
 
-The V2X-Hub instance must be configured to receive SPaT from the EVC and publish it internally to CARMA components.
+The V2X-Hub instance is configured to receive SPaT from the EVC and publish it internally to CARMA components.
 
-### Enabled Plugins
+### V2X Hub Enabled Plugins
 
-The following plugins must be enabled in V2X Hub:
 - SPAT Plugin
 
 ### SPAT Plugin Configuration
