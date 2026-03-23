@@ -431,7 +431,7 @@ services:
       CONFIG_FILE_PATH: /home/carma-streets/sensor_data_sharing_service/manifest.json
       TIME_SYNC_TOPIC: ${TIME_SYNC_TOPIC}
       LOGS_DIRECTORY: /home/carma-streets/sensor_data_sharing_service/logs/
-      LANELET2_MAP: /home/carma-streets/MAP/Town04_vector_map.osm
+      LANELET2_MAP: /home/carma-streets/MAP/Town10_vector_map.osm
       INFRASTRUCTURE_ID: ${INFRASTRUCTURE_ID}
       SENSOR_JSON_FILE_PATH: /home/carma-streets/sensor_configurations/sensors.json
     volumes:
@@ -453,6 +453,7 @@ services:
         ipv4_address: 172.4.0.4
     environment:
       - DISPLAY=${DISPLAY}
+      - EVC_PORT_1=1515
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./evc_sumo/:/home/carma/src/resources/
