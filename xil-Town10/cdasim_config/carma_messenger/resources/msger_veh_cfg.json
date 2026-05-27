@@ -3,8 +3,7 @@
     [
         {
             "id": "msger_1",
-            "route": [  "17",
-                        "10"],
+            "route": [ "10"],
             "speed": 10,
             "departureTime": 5,
             "lcm" : 0,
