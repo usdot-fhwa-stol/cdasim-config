@@ -20,7 +20,6 @@ services:
       - /dev:/dev
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /opt/carma-simulation/logs:/opt/carma-simulation/logs
-      - ./cdasim/sumo/Town10.sumocfg:/opt/carma-simulation/scenarios/Town10/sumo/Town10.sumocfg
     group_add:
       - "998"
     deploy:
