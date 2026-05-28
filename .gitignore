@@ -1,6 +1,6 @@
-*.log
-*.gz
-*.txt
-logs/
-*.log
+**/*.log
+**/*.gz
+**/*.txt
+**/logs/
+**/*.log
 **/*.bundle
