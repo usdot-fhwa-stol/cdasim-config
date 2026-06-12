@@ -1,16 +1,34 @@
 #!/usr/bin/env python3
 
+import argparse
 import re
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
-ANALYSIS_LOG = f"Cdasim_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+DEFAULT_LOG_BASE = "/opt/carma-simulation/logs"
+ANALYSIS_OUTPUT_BASE = Path("cdasim_analysis_log")
+ANALYSIS_LOG = Path(f"Cdasim_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
 
 def write_analysis(message: str) -> None:
     with open(ANALYSIS_LOG, "a", encoding="utf-8") as out:
         out.write(message + "\n")
+
+
+def sanitize_path_part(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", value).strip("_") or "unknown"
+
+
+def build_analysis_log_path(log_dir: Path) -> Path:
+    today = datetime.now().strftime("%Y%m%d")
+    analyzed_folder = sanitize_path_part(log_dir.name)
+    parent_folder = sanitize_path_part(log_dir.parent.name)
+    output_folder = ANALYSIS_OUTPUT_BASE / f"{today}_{parent_folder}-{analyzed_folder}"
+
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    return output_folder / f"Cdasim_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
 
 def read_log_lines(log_file_path: str):
@@ -31,6 +49,15 @@ def parse_log_timestamp(line: str):
         return datetime.strptime(match.group(1), "%Y-%m-%d %H:%M:%S,%f")
     except ValueError:
         return None
+
+
+def count_lines(log_lines, phrase: str) -> int:
+    return sum(1 for line in log_lines if phrase in line)
+
+
+def count_matching_lines(log_lines, pattern: str) -> int:
+    regex = re.compile(pattern, re.IGNORECASE)
+    return sum(1 for line in log_lines if regex.search(line))
 
 
 def Check_Vehicle_Spawn(carla_log_lines, vehicle_name: str) -> bool:
@@ -72,7 +99,6 @@ def Count_Added_Vehicles_In_Carla_Log(carla_log_lines) -> int:
 
     write_analysis(f"total added vehicles reported in carla log: {total_added}")
     return total_added
-
 
 
 def Check_TimeSync_Sent(carma_log_lines, vehicle_name: str) -> bool:
@@ -132,25 +158,7 @@ def Check_Carma_Instance_Registered(carma_log_lines, vehicle_name: str) -> bool:
 
 
 def Check_V2X_Message_Id_Paired(carma_log_lines, vehicle_name: str) -> int:
-    processing_ids = set()
-    sending_ids = set()
-
-    processing_pattern = re.compile(
-        rf"Processing V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
-    )
-    sending_pattern = re.compile(
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
-    )
-
-    for line in carma_log_lines:
-        match = processing_pattern.search(line)
-        if match:
-            processing_ids.add(match.group(1))
-
-        match = sending_pattern.search(line)
-        if match:
-            sending_ids.add(match.group(1))
-
+    processing_ids, sending_ids = get_v2x_message_ids(carma_log_lines, vehicle_name)
     paired_ids = processing_ids & sending_ids
     processing_only = processing_ids - sending_ids
     sending_only = sending_ids - processing_ids
@@ -163,6 +171,18 @@ def Check_V2X_Message_Id_Paired(carma_log_lines, vehicle_name: str) -> int:
 
 
 def Write_V2X_Message_Id_Details(carma_log_lines, vehicle_name: str) -> None:
+    processing_ids, sending_ids = get_v2x_message_ids(carma_log_lines, vehicle_name)
+
+    paired_ids = sorted(processing_ids & sending_ids, key=int)
+    processing_only = sorted(processing_ids - sending_ids, key=int)
+    sending_only = sorted(sending_ids - processing_ids, key=int)
+
+    write_analysis(f"vehicle {vehicle_name} paired v2x msg ids: {paired_ids}")
+    write_analysis(f"vehicle {vehicle_name} processing-only v2x msg ids: {processing_only}")
+    write_analysis(f"vehicle {vehicle_name} sending-only v2x msg ids: {sending_only}")
+
+
+def get_v2x_message_ids(carma_log_lines, vehicle_name: str):
     processing_ids = set()
     sending_ids = set()
 
@@ -182,13 +202,7 @@ def Write_V2X_Message_Id_Details(carma_log_lines, vehicle_name: str) -> None:
         if match:
             sending_ids.add(match.group(1))
 
-    paired_ids = sorted(processing_ids & sending_ids, key=int)
-    processing_only = sorted(processing_ids - sending_ids, key=int)
-    sending_only = sorted(sending_ids - processing_ids, key=int)
-
-    write_analysis(f"vehicle {vehicle_name} paired v2x msg ids: {paired_ids}")
-    write_analysis(f"vehicle {vehicle_name} processing-only v2x msg ids: {processing_only}")
-    write_analysis(f"vehicle {vehicle_name} sending-only v2x msg ids: {sending_only}")
+    return processing_ids, sending_ids
 
 
 def Compare_Carma_And_Comm_Message_IDs(carma_log_lines, comm_log_lines, vehicle_name: str):
@@ -328,7 +342,6 @@ def Count_Added_Federates(mosaic_log_lines) -> int:
     return count
 
 
-
 def Count_Common_Instance_Registrations(mosaic_log_lines, vehicle_name: str) -> int:
     pattern = re.compile(
         rf"New Common instance '{re.escape(vehicle_name)}' received"
@@ -337,6 +350,154 @@ def Count_Common_Instance_Registrations(mosaic_log_lines, vehicle_name: str) -> 
 
     write_analysis(f"common registration count for {vehicle_name}: {count}")
     return count
+
+
+def Count_Carma_VehicleUpdates_Interactions(carla_log_lines) -> int:
+    count = count_matching_lines(carla_log_lines, r"Received VehicleUpdates interaction")
+    write_analysis(f"carla vehicleupdates interaction count: {count}")
+    return count
+
+
+def Count_XmlRpc_Status(carla_log_lines, status: bool) -> int:
+    target_phrase = (
+        f"Multi-XML-RPC manager actor connection status: {str(status).lower()}"
+    )
+    count = count_lines(carla_log_lines, target_phrase)
+    write_analysis(f"xml rpc {str(status).lower()} count: {count}")
+    return count
+
+
+def Check_XmlRpc_Recovered(carla_log_lines) -> bool:
+    saw_false = False
+    target_false = "Multi-XML-RPC manager actor connection status: false"
+    target_true = "Multi-XML-RPC manager actor connection status: true"
+
+    for line in carla_log_lines:
+        if target_false in line:
+            saw_false = True
+        elif saw_false and target_true in line:
+            write_analysis("xml rpc recovered after false status")
+            return True
+
+    write_analysis("xml rpc did not recover after false status")
+    return False
+
+
+def Count_TimeSync_Messages(carma_log_lines, vehicle_name: str) -> int:
+    pattern = (
+        rf"Sending Common instance\s+{re.escape(vehicle_name)}\b.*"
+        r"time sync message for time"
+    )
+    count = count_matching_lines(carma_log_lines, pattern)
+    write_analysis(f"vehicle {vehicle_name} time sync message count: {count}")
+    return count
+
+
+def Count_V2X_Messages(carma_log_lines, vehicle_name: str) -> int:
+    pattern = (
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\b"
+    )
+    count = count_matching_lines(carma_log_lines, pattern)
+    write_analysis(f"vehicle {vehicle_name} v2x message count: {count}")
+    return count
+
+
+def Count_Duplicate_Registrations(carma_log_lines, vehicle_name: str) -> int:
+    pattern = rf"(duplicate|already registered).*{re.escape(vehicle_name)}"
+    count = count_matching_lines(carma_log_lines, pattern)
+    write_analysis(f"duplicate registration count for {vehicle_name}: {count}")
+    return count
+
+
+def Count_Comm_InsertV2X(comm_log_lines) -> int:
+    count = count_matching_lines(comm_log_lines, r"insertV2XMessage:\s+id=\d+")
+    write_analysis(f"communicationdetails inserted v2x count: {count}")
+    return count
+
+
+def Count_Comm_SendV2X(comm_log_lines) -> int:
+    count = count_matching_lines(comm_log_lines, r"(sendV2X|ns-?3.*send|send.*ns-?3)")
+    write_analysis(f"communicationdetails ns3 send v2x count: {count}")
+    return count
+
+
+def Count_Actor_Not_Connected(carla_log_lines) -> int:
+    count = count_matching_lines(carla_log_lines, r"actor.*not connected|not connected.*actor")
+    write_analysis(f"actor server not connected warning count: {count}")
+    return count
+
+
+def Count_Sumo_To_Carla_Sync_Starts(carla_log_lines) -> int:
+    count = count_matching_lines(carla_log_lines, r"sync.*sumo.*carla|sumo.*carla.*sync")
+    write_analysis(f"sumo->carla sync start count: {count}")
+    return count
+
+
+def Count_Successful_Actor_Updates(carla_log_lines) -> int:
+    count = count_matching_lines(carla_log_lines, r"success.*actor.*update|updated.*actor")
+    write_analysis(f"successful actor update count: {count}")
+    return count
+
+
+def Count_Existing_Actor_Mapping_Skips(carla_log_lines) -> int:
+    count = count_matching_lines(carla_log_lines, r"existing.*actor.*mapping|actor.*mapping.*exist")
+    write_analysis(f"existing actor mapping skip count: {count}")
+    return count
+
+
+def Count_Simulation_Unit_Warnings(application_log_lines, action: str) -> int:
+    count = count_matching_lines(
+        application_log_lines,
+        rf"{action}.*without.*simulation unit|without.*simulation unit.*{action}",
+    )
+    write_analysis(f"{action} vehicle without simulation unit count: {count}")
+    return count
+
+
+def Check_Sumo_Connected(traffic_log_lines) -> bool:
+    found = any(
+        phrase in line
+        for line in traffic_log_lines
+        for phrase in ("TraCI connection established", "Connected to SUMO", "connection to SUMO established")
+    )
+    write_analysis(f"sumo connection result: {'pass' if found else 'fail'}")
+    return found
+
+
+def Count_Sumo_Retries(traffic_log_lines) -> int:
+    count = count_matching_lines(traffic_log_lines, r"retry|trying again")
+    write_analysis(f"sumo connection retry warning count: {count}")
+    return count
+
+
+def Check_Sumo_Api_Logged(traffic_log_lines) -> bool:
+    found = any(
+        phrase in line
+        for line in traffic_log_lines
+        for phrase in ("TraCI API version", "SUMO API version")
+    )
+    write_analysis(f"sumo api version logged: {'yes' if found else 'no'}")
+    return found
+
+
+def Count_Sumo_Ignored_External(traffic_log_lines, pattern: str | None = None) -> int:
+    ignored_lines = [
+        line for line in traffic_log_lines
+        if re.search(r"ignor.*external vehicle", line, re.IGNORECASE)
+    ]
+    if pattern:
+        regex = re.compile(pattern, re.IGNORECASE)
+        ignored_lines = [line for line in ignored_lines if regex.search(line)]
+    return len(ignored_lines)
+
+
+def Check_No_Mapping_Spawners(mosaic_log_lines) -> bool:
+    found = count_matching_lines(
+        mosaic_log_lines,
+        r"mapping.*no spawner|no spawner|spawners?\s*[:=]\s*\[\s*\]",
+    ) > 0
+    write_analysis(f"mapping config has no spawners: {'yes' if found else 'no'}")
+    return found
 
 
 def Count_V2X_Receiver_Starts(mosaic_log_lines) -> int:
@@ -547,12 +708,53 @@ def get_latest_log_dir(base_path="/opt/carma-simulation/logs") -> Path:
     return latest_dir
 
 
-if __name__ == "__main__":
-    vehicle_name = "carma_1"
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Analyze CDASim logs from a chosen log directory."
+    )
+    parser.add_argument(
+        "log_dir",
+        nargs="?",
+        type=Path,
+        help=(
+            "Directory containing Carla.log, Application.log, Carma.log, "
+            "CommunicationDetails.log, Traffic.log, and Mosaic.log. "
+            "If omitted, the newest directory under --log-base is used."
+        ),
+    )
+    parser.add_argument(
+        "--log-base",
+        default=DEFAULT_LOG_BASE,
+        help="Base directory to search for the newest log directory when log_dir is omitted.",
+    )
+    parser.add_argument(
+        "--vehicle-name",
+        default="carma_1",
+        help="Vehicle name to check in the analysis.",
+    )
+    return parser.parse_args()
 
-    log_dir = get_latest_log_dir()
 
-    write_analysis(f"using log directory: {log_dir}")
+def resolve_log_dir(args) -> Path:
+    if args.log_dir:
+        log_dir = args.log_dir.expanduser()
+        if not log_dir.exists():
+            raise FileNotFoundError(f"Log directory not found: {log_dir}")
+        if not log_dir.is_dir():
+            raise NotADirectoryError(f"Log path is not a directory: {log_dir}")
+        return log_dir
+
+    return get_latest_log_dir(args.log_base)
+
+
+def main() -> None:
+    global ANALYSIS_LOG
+
+    args = parse_args()
+    vehicle_name = args.vehicle_name
+
+    log_dir = resolve_log_dir(args)
+    ANALYSIS_LOG = build_analysis_log_path(log_dir)
 
     carla_log_path = log_dir / "Carla.log"
     application_log_path = log_dir / "Application.log"
@@ -564,21 +766,41 @@ if __name__ == "__main__":
     with open(ANALYSIS_LOG, "w", encoding="utf-8") as out:
         out.write("Combined CARLA / Application / CARMA / CommunicationDetails / SUMO / MOSAIC log analysis\n")
 
+    write_analysis(f"using log directory: {log_dir}")
+
     carla_log_lines = read_log_lines(carla_log_path)
     application_log_lines = read_log_lines(application_log_path)
     carma_log_lines = read_log_lines(carma_log_path)
     comm_log_lines = read_log_lines(comm_log_path)
     traffic_log_lines = read_log_lines(traffic_log_path)
     mosaic_log_lines = read_log_lines(mosaic_log_path)
+
     spawn_ok = Check_Vehicle_Spawn(carla_log_lines, vehicle_name)
     xmlrpc_ok = CheckXmlRpcServer(carla_log_lines)
+    xmlrpc_false_count = Count_XmlRpc_Status(carla_log_lines, False)
+    xmlrpc_true_count = Count_XmlRpc_Status(carla_log_lines, True)
+    xmlrpc_recovered = Check_XmlRpc_Recovered(carla_log_lines)
+    actor_not_connected_count = Count_Actor_Not_Connected(carla_log_lines)
+    vehicleupdates_count = Count_Carma_VehicleUpdates_Interactions(carla_log_lines)
     total_added_vehicles = Count_Added_Vehicles_In_Carla_Log(carla_log_lines)
+    sync_start_count = Count_Sumo_To_Carla_Sync_Starts(carla_log_lines)
+    successful_actor_updates = Count_Successful_Actor_Updates(carla_log_lines)
+    existing_mapping_skips = Count_Existing_Actor_Mapping_Skips(carla_log_lines)
+    add_without_sim_count = Count_Simulation_Unit_Warnings(application_log_lines, "add")
+    update_without_sim_count = Count_Simulation_Unit_Warnings(application_log_lines, "update")
+    sim_unit_problem = add_without_sim_count > 0 or update_without_sim_count > 0
     carma_registered = Check_Carma_Instance_Registered(carma_log_lines, vehicle_name)
     time_sync_ok = Check_TimeSync_Sent(carma_log_lines, vehicle_name)
+    time_sync_count = Count_TimeSync_Messages(carma_log_lines, vehicle_name)
     v2x_ok = Check_V2X_Message_Sent(carma_log_lines, vehicle_name)
-    common_registration_found = Check_Common_Instance_Registration(mosaic_log_lines, vehicle_name)
+    v2x_count = Count_V2X_Messages(carma_log_lines, vehicle_name)
+    duplicate_registration_count = Count_Duplicate_Registrations(carma_log_lines, vehicle_name)
+    Check_Common_Instance_Registration(mosaic_log_lines, vehicle_name)
     v2x_paired_count = Check_V2X_Message_Id_Paired(carma_log_lines, vehicle_name)
     Write_V2X_Message_Id_Details(carma_log_lines, vehicle_name)
+    comm_insert_count = Count_Comm_InsertV2X(comm_log_lines)
+    comm_send_count = Count_Comm_SendV2X(comm_log_lines)
+    comm_v2x_healthy = comm_insert_count > 0 and comm_send_count > 0
     matched_comm_ids = Compare_Carma_And_Comm_Message_IDs(
         carma_log_lines,
         comm_log_lines,
@@ -590,34 +812,81 @@ if __name__ == "__main__":
         vehicle_name,
         delay_threshold_sec=0.1
     )
+    comm_non_simulated_count = count_matching_lines(comm_log_lines, r"non-?simulated")
+    write_analysis(f"communicationdetails non-simulated node warnings: {comm_non_simulated_count}")
+    comm_duplicate_vehicle_count = count_matching_lines(comm_log_lines, r"duplicate.*vehicle|vehicle.*duplicate")
+    write_analysis(f"communicationdetails duplicate vehicle warnings: {comm_duplicate_vehicle_count}")
+    sumo_connected = Check_Sumo_Connected(traffic_log_lines)
+    sumo_retry_count = Count_Sumo_Retries(traffic_log_lines)
+    sumo_api_logged = Check_Sumo_Api_Logged(traffic_log_lines)
     sumo_sim_started = Check_Sumo_Simulation_Time_Started(traffic_log_lines)
     sumo_vehicleupdates_count = Count_Sumo_VehicleUpdates_Interactions(traffic_log_lines)
     sumo_assignment_count = Count_Sumo_VehicleFederateAssignment_Interactions(traffic_log_lines)
+    sumo_ignored_external_count = Count_Sumo_Ignored_External(traffic_log_lines)
+    sumo_ignored_carma1_count = Count_Sumo_Ignored_External(traffic_log_lines, vehicle_name)
+    sumo_ignored_carma_source_count = Count_Sumo_Ignored_External(traffic_log_lines, "carma")
+    sumo_ignored_msger_source_count = Count_Sumo_Ignored_External(
+        traffic_log_lines,
+        "carma-messenger|msger",
+    )
+    sumo_missing_assignment_issue = (
+        sumo_ignored_external_count > 0 and sumo_assignment_count == 0
+    )
     federation_started = Check_Federation_Started(mosaic_log_lines)
     initialized_federates = Count_Initialized_Federates(mosaic_log_lines)
     added_federates = Count_Added_Federates(mosaic_log_lines)
+    no_mapping_spawners = Check_No_Mapping_Spawners(mosaic_log_lines)
     common_registration_count = Count_Common_Instance_Registrations(mosaic_log_lines, vehicle_name)
+    common_registration_spam = common_registration_count > 1
     v2x_receiver_count = Count_V2X_Receiver_Starts(mosaic_log_lines)
 
     Write_Summary(
         vehicle_name,
         spawn_ok,
         xmlrpc_ok,
+        xmlrpc_false_count,
+        xmlrpc_true_count,
+        xmlrpc_recovered,
+        actor_not_connected_count,
+        vehicleupdates_count,
         total_added_vehicles,
+        sync_start_count,
+        successful_actor_updates,
+        existing_mapping_skips,
+        add_without_sim_count,
+        update_without_sim_count,
+        sim_unit_problem,
         carma_registered,
         time_sync_ok,
+        time_sync_count,
         v2x_ok,
-        common_registration_found,
+        v2x_count,
+        duplicate_registration_count,
         v2x_paired_count,
+        comm_insert_count,
+        comm_send_count,
+        comm_v2x_healthy,
         len(matched_comm_ids),
         delayed_v2x_count,
+        comm_non_simulated_count,
+        comm_duplicate_vehicle_count,
+        sumo_connected,
+        sumo_retry_count,
+        sumo_api_logged,
         sumo_sim_started,
         sumo_vehicleupdates_count,
         sumo_assignment_count,
+        sumo_ignored_external_count,
+        sumo_ignored_carma1_count,
+        sumo_ignored_carma_source_count,
+        sumo_ignored_msger_source_count,
+        sumo_missing_assignment_issue,
         federation_started,
         initialized_federates,
         added_federates,
+        no_mapping_spawners,
         common_registration_count,
+        common_registration_spam,
         v2x_receiver_count,
     )
 
@@ -625,9 +894,30 @@ if __name__ == "__main__":
         vehicle_name,
         spawn_ok,
         xmlrpc_ok,
+        xmlrpc_recovered,
+        actor_not_connected_count,
+        sim_unit_problem,
+        add_without_sim_count,
+        update_without_sim_count,
+        sync_start_count,
+        successful_actor_updates,
         time_sync_ok,
         v2x_ok,
-        common_registration_found,
+        duplicate_registration_count,
+        comm_v2x_healthy,
+        sumo_retry_count,
+        sumo_connected,
+        sumo_missing_assignment_issue,
+        sumo_ignored_carma1_count,
+        sumo_ignored_msger_source_count,
+        no_mapping_spawners,
+        common_registration_spam,
         initialized_federates,
         added_federates,
     )
+
+    print(f"Analysis written to: {ANALYSIS_LOG}")
+
+
+if __name__ == "__main__":
+    main()
