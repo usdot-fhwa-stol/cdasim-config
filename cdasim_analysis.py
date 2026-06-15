@@ -718,7 +718,7 @@ def parse_args():
         type=Path,
         help=(
             "Directory containing Carla.log, Application.log, Carma.log, "
-            "CommunicationDetails.log, Traffic.log, and Mosaic.log. "
+            "CommunicationDetails.log, Traffic.log, and MOSAIC.log. "
             "If omitted, the newest directory under --log-base is used."
         ),
     )
@@ -747,6 +747,22 @@ def resolve_log_dir(args) -> Path:
     return get_latest_log_dir(args.log_base)
 
 
+def resolve_log_file(log_dir: Path, filename: str) -> Path:
+    exact_path = log_dir / filename
+    if exact_path.exists():
+        return exact_path
+
+    matches = [
+        path
+        for path in log_dir.iterdir()
+        if path.is_file() and path.name.lower() == filename.lower()
+    ]
+    if matches:
+        return sorted(matches, key=lambda path: path.name)[0]
+
+    return exact_path
+
+
 def main() -> None:
     global ANALYSIS_LOG
 
@@ -756,12 +772,12 @@ def main() -> None:
     log_dir = resolve_log_dir(args)
     ANALYSIS_LOG = build_analysis_log_path(log_dir)
 
-    carla_log_path = log_dir / "Carla.log"
-    application_log_path = log_dir / "Application.log"
-    carma_log_path = log_dir / "Carma.log"
-    comm_log_path = log_dir / "CommunicationDetails.log"
-    traffic_log_path = log_dir / "Traffic.log"
-    mosaic_log_path = log_dir / "Mosaic.log"
+    carla_log_path = resolve_log_file(log_dir, "Carla.log")
+    application_log_path = resolve_log_file(log_dir, "Application.log")
+    carma_log_path = resolve_log_file(log_dir, "Carma.log")
+    comm_log_path = resolve_log_file(log_dir, "CommunicationDetails.log")
+    traffic_log_path = resolve_log_file(log_dir, "Traffic.log")
+    mosaic_log_path = resolve_log_file(log_dir, "MOSAIC.log")
 
     with open(ANALYSIS_LOG, "w", encoding="utf-8") as out:
         out.write("Combined CARLA / Application / CARMA / CommunicationDetails / SUMO / MOSAIC log analysis\n")
