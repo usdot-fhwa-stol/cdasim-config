@@ -39,9 +39,9 @@ services_1_to_2:
 
   - service: /ns3_adapter/bind
     type: cav_srvs/Bind
-  
+
   - service: /ns3_adapter/get_driver_api
     type: cav_srvs::GetDriverApiRequest
-  
+
   - service: /ns3_adapter/get_status
     type: cav_srvs::GetDriverStatusRequest
