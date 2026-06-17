@@ -146,7 +146,8 @@ def generate_launch_description():
             'arealist_path' : arealist_path,
             'vector_map_file' : vector_map_file,
             'use_sim_time' : use_sim_time,
-            'is_cp_mot_enabled': is_cp_mot_enabled
+            'is_cp_mot_enabled': is_cp_mot_enabled,
+            'use_foxglove': 'True',
             }.items()
     )
 

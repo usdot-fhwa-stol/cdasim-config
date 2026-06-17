@@ -41,7 +41,7 @@ Configurations
 """
 
 WALKING_PERSON_SPEED_IN_MS = 1.0
-WALKING_PERSON_TRIGGER_WALKING_DISTANCE_IN_METERS = 50.0
+WALKING_PERSON_TRIGGER_WALKING_DISTANCE_IN_METERS = 0.1
 
 class VulnerableRoadUserCollision(BasicScenario):
     def __init__(
