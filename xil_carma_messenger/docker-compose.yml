@@ -2,24 +2,37 @@
 services:
   carma-simulation:
     privileged: true
-    image: ${DOCKER_ORG}/cdasim:${DOCKER_TAG}
+    image: usdotfhwastol/cdasim:latest
+    container_name: carma-simulation
+    user: carma
+
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
-    container_name: carma-simulation
+
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=:1
       - QT_X11_NO_MITSHM=1
+      - MOSAIC_DOCKER_NETWORK=container:carma-simulation
+
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/carma-simulation/tmp:/opt/carma-simulation/tmp
+      - /dev:/dev
       - /opt/carma-simulation/logs:/opt/carma-simulation/logs
       - ./carla-recorder/:/app/scenario_runner/metrics/data/
       - ./cdasim/logback.xml:/opt/carma-simulation/etc/logback.xml
+
+    ports:
+      - "3000-3002:3000-3002"
+
     deploy:
       resources:
         reservations:
           devices:
             - capabilities: [gpu]
+
     command: bash -c "./mosaic.sh -s Town04_carma_messenger"
 
 ############################################################################
@@ -533,27 +546,27 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
 
-  econolite-virtual-controller:
-    image: usdotfhwastol/econolite-virtual-controller:latest
-    container_name: evc
-    restart: always
-    networks:
-      carma_sim_net:
-        ipv4_address: 172.2.0.4
-      carma_streets_net_1:
-        ipv4_address: 172.4.0.4
-    environment:
-      - DISPLAY=${DISPLAY}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./evc_sumo/:/home/carma/src/resources/
-    depends_on:
-      - carma-simulation
-    command: >
-      bash -c "sleep 10
-      && x-terminal-emulator -e python3.8 evc_sumo_bridge.py
-      --asc3app-path '../evcfile/asc3app-application.zip'
-      --traci-ip 172.2.0.2"
+  # econolite-virtual-controller:
+  #   image: usdotfhwastol/econolite-virtual-controller:latest
+  #   container_name: evc
+  #   restart: always
+  #   networks:
+  #     carma_sim_net:
+  #       ipv4_address: 172.2.0.4
+  #     carma_streets_net_1:
+  #       ipv4_address: 172.4.0.4
+  #   environment:
+  #     - DISPLAY=${DISPLAY}
+  #   volumes:
+  #     - /tmp/.X11-unix:/tmp/.X11-unix
+  #     - ./evc_sumo/:/home/carma/src/resources/
+  #   depends_on:
+  #     - carma-simulation
+  #   command: >
+  #     bash -c "sleep 10
+  #     && x-terminal-emulator -e python3.8 evc_sumo_bridge.py
+  #     --asc3app-path '../evcfile/asc3app-application.zip'
+  #     --traci-ip 172.2.0.2"
 
 
 networks:

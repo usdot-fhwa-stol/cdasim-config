@@ -1,4 +1,19 @@
 #!/bin/bash
+set -e
+
+# Make sure required host directories exist before starting CDASim
+sudo mkdir -p /opt/carma-simulation/tmp
+sudo mkdir -p /opt/carma-simulation/logs
+
+# Optional but useful: make sure the carma user/container can write to them
+sudo chmod -R 777 /opt/carma-simulation/tmp
+sudo chmod -R 777 /opt/carma-simulation/logs
+
 carma stop all
-docker volume rm carma_kafka-datavolume carma_zookeeper-datavolume carma_mysql-datavolume
+
+docker volume rm \
+  carma_kafka-datavolume \
+  carma_zookeeper-datavolume \
+  carma_mysql-datavolume || true
+
 carma start all
