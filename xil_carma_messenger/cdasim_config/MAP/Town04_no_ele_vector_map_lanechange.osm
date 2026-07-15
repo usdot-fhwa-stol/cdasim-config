@@ -328709,7 +328709,7 @@
     <nd ref='45443' />
     <nd ref='45444' />
     <nd ref='45445' />
-    <tag k='subtype' v='solid' />
+    <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
   <way id='46094' action='modify' visible='true' version='1'>
@@ -337820,7 +337820,7 @@
     <nd ref='54307' />
     <nd ref='54308' />
     <nd ref='39291' />
-    <tag k='subtype' v='solid' />
+    <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
   <way id='54352' action='modify' visible='true' version='1'>
