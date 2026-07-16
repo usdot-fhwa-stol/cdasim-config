@@ -1,0 +1,1382 @@
+Installing plugin /usr/local/plugins/CARMACloudPlugin.zip
+{
+    "name": "CARMACloud",
+    "description": "CARMA cloud plugin for making websocket connection with CARMA cloud .",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/CARMACloudPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "CARMA",
+            "description": "CARMA message suite"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "1000",
+            "description": "The frequency to send the TIM in milliseconds."
+        },
+        {
+            "key": "Instance",
+            "default": "0",
+            "description": "The instance of this plugin."
+        },
+        {
+            "key": "WebServiceIP",
+            "default": "0.0.0.0",
+            "description": "Server IP address for V2X hub"
+        },
+        {
+            "key": "WebServicePort",
+            "default": "22222",
+            "description": "Server Port for V2X hub to receive TCM messages"
+        },
+        {
+            "key": "CARMACloudIP",
+            "default": "http:\/\/127.0.0.1",
+            "description": "Server IP address of carma-cloud"
+        },
+        {
+            "key": "CARMACloudPort",
+            "default": "33333",
+            "description": "Server Port for V2X hub to send TCR messages to carma-cloud"
+        },
+        {
+            "key": "fetchTime",
+            "default": "15",
+            "description": "Time from while the TCMs are requested, in days"
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "MobilityOperationStrategies",
+            "default": "carma3\/Geofence_Acknowledgement",
+            "description": "A comma separated list of strategies of MobilityOperation messages from CARMA vehicles."
+        },
+        {
+            "key": "TCMRepeatedlyBroadcastTimeOut",
+            "default": "1000",
+            "description": "After it receives TCM from carma cloud, it repeatedly broadcasts TCM until TCMRepeatTimeOut milliseconds."
+        },
+        {
+            "key": "TCMRepeatedlyBroadcastSleep",
+            "default": "100",
+            "description": "The repeatedly broadcast thread should sleep for number of milliseconds."
+        },
+        {
+            "key": "TCMRepeatedlyBroadCastTotalTimes",
+            "default": "1",
+            "description": "The number of times TCMs with the same request id should be repeatedly broadcast within the time out period."
+        },
+        {
+            "key": "TCMNOAcknowledgementDescription",
+            "default": "No response received from CMV after repeatedly broadcast TCMs.",
+            "description": "If the plugin does not receives any aknowledgement from CMV within the configured seconds that match the original TCM, the plugin will create an NO ACK message and display it on UI."
+        },
+        {
+            "key": "listTCM",
+            "default": "true",
+            "description": "Indicator to determine if v2xhub receives a list of TCMs from carma-cloud. Default to true, returning a list of TCM. If false, return one TCM at a time. Indicator value can only be either true or false."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/CARMAStreetsPlugin.zip
+{
+    "name": "CARMAStreetsPlugin",
+    "description": "Plugin to communicate with CARMA Streets via Apache Kafka",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/CARMAStreetsPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "TMSG03-P",
+            "description": "Mobility Operation Message"
+        },
+        {
+            "type": "J2735",
+            "subtype": "TMSG02-P",
+            "description": "Mobility Path Message"
+        },
+        {
+            "type": "J2735",
+            "subtype": "BSM",
+            "description": "Basic Safety Message"
+        },
+        {
+            "type": "J2735",
+            "subtype": "MAP-P",
+            "description": "Full geometric layout of the intersection."
+        },
+        {
+            "type": "J2735",
+            "subtype": "SRM",
+            "description": "Signal request message for intersection"
+        },
+        {
+            "type": "J2735",
+            "subtype": "SPAT-P",
+            "description": "Signal Phase and Timing (SPAT) status for the signalized intersection."
+        },
+        {
+            "type": "Application",
+            "subtype": "SensorDetectedObject",
+            "description": "Sensor detected object for cooperative perception."
+        },
+        {
+            "type": "J2735",
+            "subtype": "SensorDataSharingMessage",
+            "description": "Message to share detected object data."
+        }
+    ],
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "IntersectionId",
+            "default": "9945",
+            "description": "The id of intersection."
+        },
+        {
+            "key": "KafkaBrokerIp",
+            "default": "127.0.0.1",
+            "description": "IP of Apache Kafka broker."
+        },
+        {
+            "key": "KafkaBrokerPort",
+            "default": "9092",
+            "description": "Port of Apache Kafka broker."
+        },
+        {
+            "key": "MobilityOperationStrategies",
+            "default": "Carma\/stop_controlled_intersection,Carma\/signalized_intersection",
+            "description": "A comma separated list of strategies of MobilityOperation messages to send to CARMA Streets"
+        },
+        {
+            "key": "MobilityOperationTopic",
+            "default": "v2xhub_mobility_operation_in",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "SRMTopic",
+            "default": "v2xhub_srm_in",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "MobilityPathTopic",
+            "default": "v2xhub_mobility_path_in",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "BsmTopic",
+            "default": "v2xhub_bsm_in",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "MapTopic",
+            "default": "v2xhub_map_msg_in",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "SchedulingPlanTopic",
+            "default": "v2xhub_scheduling_plan_sub",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "SpatTopic",
+            "default": "modified_spat",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "SsmTopic",
+            "default": "v2xhub_ssm_sub",
+            "description": "Apache Kafka topic plugin will transmit message to."
+        },
+        {
+            "key": "SimSensorDetectedObjTopic",
+            "default": "v2xhub_sim_sensor_detected_object",
+            "description": "Apache Kafka topic plugin will transmit simulated sensor detected object to."
+        },
+        {
+            "key": "SdsmSubscribeTopic",
+            "default": "v2xhub_sdsm_sub",
+            "description": "Apache Kafka topic plugin that will subscribe to SDSM streams."
+        },
+        {
+            "key": "SdsmTransmitTopic",
+            "default": "v2xhub_sdsm_tra",
+            "description": "Apache Kafka topic plugin that will transmit SDSMs."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/CDASimAdapter.zip
+{
+    "name": "CDASimAdapter",
+    "description": "CDASim Adapter is the V2X-Hub plugin that facilitates the connection between the CDASim simulation environment and V2X-Hub and CARMA Streets.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/CDASimAdapter",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "X",
+            "default": "0.0",
+            "description": "Cartesian X coordinate in simulated map (in meters)."
+        },
+        {
+            "key": "Y",
+            "default": "0.0",
+            "description": "Cartesian Y coordinate in simulated map (in meters)."
+        },
+        {
+            "key": "Z",
+            "default": "0.0",
+            "description": "Cartesian Z coordinate in simulated map (in meters)."
+        },
+        {
+            "key": "MaxConnectionAttempts",
+            "default": "10",
+            "description": "Number of connection attempts CDASimAdapter plugin will execute before failing. Valid values are any integers greater than or equal to 1. Any value less than 1 will result in unlimited connection attemtps."
+        },
+        {
+            "key": "ConnectionSleepTime",
+            "default": "4",
+            "description": "Number of seconds to wait after a failed CDASim connection attempt, before retrying to establish connection. Valid values are equal or greater than 1. Any value less than 1 will be treated as 1."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/CommandPlugin.zip
+{
+    "name": "CommandPlugin",
+    "description": "Listens for websocket connections from the TMX admin portal and processes commands",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/CommandPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "configuration": [
+        {
+            "key": "SleepMS",
+            "default": "100",
+            "description": "The length of milliseconds to sleep between processing all messages."
+        },
+        {
+            "key": "SSLEnabled",
+            "default": "true",
+            "description": "Enable secure connection using SSL."
+        },
+        {
+            "key": "SSLPath",
+            "default": "\/var\/www\/plugins\/.ssl",
+            "description": "The path to the directory containing the SSL key and certificate files."
+        },
+        {
+            "key": "EventRowLimit",
+            "default": "50",
+            "description": "The maximum number of rows returned for the initial Event Log query."
+        },
+        {
+            "key": "DownloadPath",
+            "default": "\/var\/www\/download",
+            "description": "The path to the directory where downloaded files will be saved."
+        },
+        {
+            "key": "LogLevel",
+            "default": "ERROR",
+            "description": "The log level for this plugin"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/CswPlugin.zip
+{
+    "name": "CSW",
+    "description": "Provides Curve Speed Warning (CSW).",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/CswPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "TIM",
+            "description": "Travelor Information Message with up to 2 approaches for a curve.  Each approach has 4 regions."
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "1000",
+            "description": "The frequency to send the TIM in milliseconds."
+        },
+        {
+            "key": "MapFile",
+            "default": "IVP_GF_CSW.xml",
+            "description": ""
+        },
+        {
+            "key": "Snap Interval",
+            "default": "300",
+            "description": "The interval in milliseconds to keep a vehicle within a zone before allowing it to transition out of all zones."
+        },
+        {
+            "key": "Vehicle Timeout",
+            "default": "2000",
+            "description": "Timeout in milliseconds when a vehicle is removed from all zones if a BSM has not been received."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/DmsPlugin.zip
+{
+    "name": "DynamicMessageSign",
+    "description": "Provides communication to a dynamic message sign.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/DmsPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "DMS IP Address",
+            "default": "192.168.25.30",
+            "description": "The IP address of the NTCIP Dynamic Message Sign."
+        },
+        {
+            "key": "DMS Port",
+            "default": "9090",
+            "description": "The port of the NTCIP Dynamic Message Sign."
+        },
+        {
+            "key": "Enable DMS",
+            "default": "True",
+            "description": "If true all messages are sent to the Dynamic Message Sign using NTCIP 1203."
+        },
+        {
+            "key": "Enable Sign Simulator",
+            "default": "True",
+            "description": "If true all messages are sent to the Sign Simulator using UDP."
+        },
+        {
+            "key": "Force Message ID",
+            "default": "-1",
+            "description": "Immediately activates the message ID specified, then resets back to -1."
+        },
+        {
+            "key": "Message 01",
+            "default": "",
+            "description": "The text to display on the sign for ID 01 with any formatting (see NTCIP 1203)."
+        },
+        {
+            "key": "Message 02",
+            "default": "[jl3][pt15o0]25[np]MPH",
+            "description": "The text to display on the sign for ID 02 with any formatting (see NTCIP 1203)."
+        },
+        {
+            "key": "Message 03",
+            "default": "[jl3][pt15o0]SLOW[np]DOWN",
+            "description": "The text to display on the sign for ID 03 with any formatting (see NTCIP 1203)."
+        },
+        {
+            "key": "Message 04",
+            "default": "[jl3][pt15o0]CRVE[np]AHED",
+            "description": "The text to display on the sign for ID 04 with any formatting (see NTCIP 1203)."
+        },
+        {
+            "key": "Sign Sim IP Address",
+            "default": "192.168.25.31",
+            "description": "The IP address of the Sign Simulator that is the receipient of UDP messages."
+        },
+        {
+            "key": "Sign Sim Port",
+            "default": "9090",
+            "description": "The UDP port of the Sign Simulator that is the receipient of UDP messages."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/ERVCloudForwardingPlugin.zip
+{
+    "name": "ERVCloudForwarding",
+    "description": "ERV (Emergency Response Vehicle) cloud plugin for making websocket connection with CARMA cloud, and forward ERV BSM to CARMA cloud.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/ERVCloudForwardingPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "CARMA",
+            "description": "CARMA message suite"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "WebServiceIP",
+            "default": "127.0.0.1",
+            "description": "Server IP address for V2X hub to receive BSM"
+        },
+        {
+            "key": "WebServicePort",
+            "default": "44444",
+            "description": "Server port for V2X hub to receive BSM"
+        },
+        {
+            "key": "RSUIp",
+            "default": "192.168.XX.XX",
+            "description": "An IP address of the RSU the V2X hub is connected to."
+        },
+        {
+            "key": "RSUName",
+            "default": "WestIntersectionRSU",
+            "description": "A short description for the RSU the V2X hub is connected to."
+        },
+        {
+            "key": "SNMPPort",
+            "default": "161",
+            "description": "The SNMP port for sending message or command."
+        },
+        {
+            "key": "AuthPassPhrase",
+            "default": "dummy",
+            "description": "SNMP v3 authentication passphrase"
+        },
+        {
+            "key": "SecurityUser",
+            "default": "authOnlyUser",
+            "description": "SNMP Security Name"
+        },
+        {
+            "key": "GPSOID",
+            "default": "1.0.15628.4.1.8.5.0",
+            "description": "OID (Object Identifier) uniquely identify managed objects in a MIB database."
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/ImmediateForwardPlugin.zip
+{
+    "name": "ImmediateForward",
+    "description": "Plugin that listens for TMX messages and forwards them to the V2X Radio (i.e. the RSU).",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/ImmediateForwardPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "Messages_Destination_1",
+            "default": "{ \"Messages\": [ { \"TmxType\": \"SPAT-P\", \"SendType\": \"SPAT\", \"PSID\": \"0x8002\", \"Channel\": \"183\" }, { \"TmxType\": \"MAP-P\", \"SendType\": \"MAP\", \"PSID\": \"0x8002\", \"Channel\": \"183\" }, { \"TmxType\": \"PSM-P\", \"SendType\": \"PSM\", \"PSID\": \"0x27\", \"Channel\": \"183\" } ,{ \"TmxType\": \"TMSG07-P\", \"SendType\": \"TMSG07\", \"PSID\": \"0x8002\", \"Channel\": \"183\" },{ \"TmxType\": \"TMSG03-P\", \"SendType\": \"TMSG03\", \"PSID\": \"0xBFEE\", \"Channel\": \"183\" },{ \"TmxType\": \"TMSG05-P\", \"SendType\": \"TMSG05\", \"PSID\": \"0x8003\", \"Channel\": \"183\" }, { \"TmxType\": \"SSM-P\", \"SendType\": \"SSM\", \"PSID\": \"0x8002\", \"Channel\": \"183\" },{ \"TmxType\": \"SDSM\", \"SendType\": \"SensorDataSharingMessage\", \"PSID\": \"0x8010\", \"Channel\": \"183\" }] }",
+            "description": "JSON data defining the message types, PSIDs, and channel number for messages forwarded to the V2X radio at destination 1."
+        },
+        {
+            "key": "Messages_Destination_2",
+            "default": "{ \"Messages\": [ ] }",
+            "description": "JSON data defining the message types, PSIDs, and channel number for messages forwarded to the V2X radio at destination 2."
+        },
+        {
+            "key": "Messages_Destination_3",
+            "default": "{ \"Messages\": [ ] }",
+            "description": "JSON data defining the message types, PSIDs, and channel number for messages forwarded to the V2X radio at destination 3."
+        },
+        {
+            "key": "Messages_Destination_4",
+            "default": "{ \"Messages\": [ ] }",
+            "description": "JSON data defining the message types, PSIDs, and channel number for messages forwarded to the V2X radio at destination 4."
+        },
+        {
+            "key": "Destination_1",
+            "default": "127.0.0.1:1516",
+            "description": "The destination UDP server(s) and port number(s) on the V2X radio for all messages specified by Messages_Destination_1."
+        },
+        {
+            "key": "Destination_2",
+            "default": "0",
+            "description": "The destination UDP server(s) and port number(s) on the V2X radio for all messages specified by Messages_Destination_2."
+        },
+        {
+            "key": "Destination_3",
+            "default": "0",
+            "description": "The destination UDP server(s) and port number(s) on the V2X radio for all messages specified by Messages_Destination_3."
+        },
+        {
+            "key": "Destination_4",
+            "default": "0",
+            "description": "The destination UDP server(s) and port number(s) on the V2X radio for all messages specified by Messages_Destination_4."
+        },
+        {
+            "key": "signMessage",
+            "default": "0",
+            "description": "0 if False and 1 if True indicating whether should sign outgoing J2735 messages."
+        },
+        {
+            "key": "HSMurl",
+            "default": "http:\/\/<softHSM IP>:3000\/v1\/scms\/",
+            "description": "REST API endpoint url needed to make HSM calls"
+        },
+        {
+            "key": "MuteDsrcRadio",
+            "default": "0",
+            "description": "If true (1) then do not send packets to the radio for broadcast"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/LocationPlugin.zip
+{
+    "name": "Location",
+    "description": "Plugin used to send out Location Messages using data from GPSD",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/LocationPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "Decoded",
+            "subtype": "Location",
+            "description": "Location information gathered from the GPS"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "500",
+            "description": "Rate to send Location Message in milliseconds"
+        },
+        {
+            "key": "LatchHeadingSpeed",
+            "default": "2.5",
+            "description": "Speed at which the heading parameter should be latched, in mph.  Set to 0 to disable latching."
+        },
+        {
+            "key": "GPSSource",
+            "default": "localhost",
+            "description": "Host where the GPSd is running"
+        },
+        {
+            "key": "SendRawNMEA",
+            "default": "true",
+            "description": "Route the raw NMEA strings from GPSd through TMX"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/MapPlugin.zip
+{
+    "name": "MAP",
+    "description": "Plugin that reads intersection geometry from a configuration file and publishes a J2735 MAP message.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/MapPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "MAP-P",
+            "description": "Full geometric layout of the intersection."
+        },
+        {
+            "type": "Application",
+            "subtype": "TimeSync",
+            "description": "Time synchronization message."
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "1000",
+            "description": "The frequency to send the MAP message in milliseconds."
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "Map Plugin Log Level controls which log statements are printed to the terminal."
+        },
+        {
+            "key": "MAP_Files",
+            "default": "{ \"MapFiles\": [ {\"Action\":0, \"FilePath\":\"\/var\/www\/plugins\/MAP\/MAP_9709_UPER.txt\"}] }",
+            "description": "JSON data defining a list of map files.  One map file for each action set specified by the TSC."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/MessageLoggerPlugin.zip
+{
+    "name": "MessageLoggerPlugin",
+    "description": "Listens for J2735 messages and logs them in a file in JSON format.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/MessageLoggerPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "File Size In MB",
+            "default": "100",
+            "description": "Maximum size of the log file in MB."
+        },
+        {
+            "key": "Filename",
+            "default": "logTx",
+            "description": "Default name of the log file."
+        },
+        {
+            "key": "File Location",
+            "default": "\/var\/log\/tmx",
+            "description": "The location where the log files are stored. DO NOT edit while using docker deployment of V2X-Hub!"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/MessageReceiverPlugin.zip
+{
+    "name": "MessageReceiver",
+    "description": "Plugin to receive messages from an external V2X radio or other source",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/MessageReceiverPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "messageid",
+            "default": "0012,0013,0014,001D,00F0,00F1,00F2,00F3,00F4,00F5,00F6,00F7",
+            "description": "Comma separated list of SAE J2735 message ID values."
+        },
+        {
+            "key": "IP",
+            "default": "127.0.0.1",
+            "description": "IP address for the incoming message network connection."
+        },
+        {
+            "key": "Port",
+            "default": "26789",
+            "description": "Port for the incoming message network connection."
+        },
+        {
+            "key": "RouteJ2735",
+            "default": "false",
+            "description": "Set the flag to route\/broadcast a received J2735 message to TMX Core."
+        },
+        {
+            "key": "EnableSimulatedBSM",
+            "default": "true",
+            "description": "Accept and route incoming BSM messages from a V2X Hub simulator."
+        },
+        {
+            "key": "EnableSimulatedSRM",
+            "default": "true",
+            "description": "Accept and route incoming SRM messages from a V2X Hub simulator."
+        },
+        {
+            "key": "EnableSimulatedLocation",
+            "default": "true",
+            "description": "Accept and route incoming GPS location messages from a V2X Hub simulator."
+        },
+        {
+            "key": "EnableVerification",
+            "default": "0",
+            "description": "If enabled, security HSM features are enabled and MessageReceiver Plugin will try to verify incoming message."
+        },
+        {
+            "key": "HSMurl",
+            "default": "http:\/\/<SoftHSM IP>:3000\/v1\/scms\/",
+            "description": "REST API endpoint url needed to make HSM calls"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/ODEForwardPlugin.zip
+{
+    "name": "ODEForwardPlugin",
+    "description": "Listens for J2735 messages and realtime forwards them to ODE.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/ODEForwardPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "instance",
+            "default": "1",
+            "description": "Instance of the application"
+        },
+        {
+            "key": "schedule_frequency",
+            "default": "1",
+            "description": "Sample of incoming messages to forward (1 = forward every message)"
+        },
+        {
+            "key": "ForwardMSG",
+            "default": "1",
+            "description": "Enable forwarding of messages"
+        },
+        {
+            "key": "BSMKafkaTopic",
+            "default": "topic.OdeRawEncodedBSMJson",
+            "description": "(Cond: ForwardMSG == True) Topic to use for forwarding BSM"
+        },
+        {
+            "key": "SPaTKafkaTopic",
+            "default": "topic.OdeRawEncodedSPATJson",
+            "description": "(Cond: ForwardMSG == True) Topic to use for forwarding SPaT"
+        },
+        {
+            "key": "KafkaBrokerIp",
+            "default": "172.31.55.238",
+            "description": "IP address to be used for KAFKA broker"
+        },
+        {
+            "key": "KafkaBrokerPort",
+            "default": "9092",
+            "description": "Port number to be used for KAFKA broker"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/PedestrianPlugin.zip
+{
+    "name": "Pedestrian",
+    "description": "Pedestrian plugin for the IVP system.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/PedestrianPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "PSM",
+            "description": "Pedestrian Safety Message"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "1000",
+            "description": "The frequency to send the PSM in milliseconds."
+        },
+        {
+            "key": "Instance",
+            "default": "0",
+            "description": "The instance of Pedestrian plugin."
+        },
+        {
+            "key": "WebServiceIP",
+            "default": "127.0.0.1",
+            "description": "IP address at which the web service exists"
+        },
+        {
+            "key": "WebServicePort",
+            "default": "9000",
+            "description": "Port at which Web service exists"
+        },
+        {
+            "key": "DataProvider",
+            "default": "FLIR",
+            "description": "Possible data providers we handle - FLIR (websocket) or PSM (REST request)"
+        },
+        {
+            "key": "WebSocketHost",
+            "default": "192.168.55.183",
+            "description": "IP address of the camera to connect to for data"
+        },
+        {
+            "key": "WebSocketPort",
+            "default": "80",
+            "description": "Extension\/port for FLIR camera subscription"
+        },
+        {
+            "key": "HostString",
+            "default": "\/api\/subscriptions",
+            "description": "Host HTTP header during the WebSocket handshake"
+        },
+        {
+            "key": "FLIRCameraRotation",
+            "default": "16.13",
+            "description": "Measured camera rotation from true north (in degrees) used for heading conversion"
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/PortDrayagePlugin.zip
+{
+    "name": "PortDrayagePlugin",
+    "description": "PortDrayagePlugin for sending freight trucks automated actions in a port.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/PortDrayagePlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "TMSG03-P",
+            "description": "MobilityOperation message is a prototyping message with a configurable payload."
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Database_IP",
+            "default": "127.0.0.1",
+            "description": "IP address of database"
+        },
+        {
+            "key": "Database_Port",
+            "default": "3306",
+            "description": "Port of database"
+        },
+        {
+            "key": "Database_Username",
+            "default": "root",
+            "description": "Username for database"
+        },
+        {
+            "key": "Database_Password",
+            "default": "ivp",
+            "description": "Password for database"
+        },
+        {
+            "key": "Database_Name",
+            "default": "PORT_DRAYAGE",
+            "description": "Name of database."
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "Webservice_Host",
+            "default": "127.0.0.1",
+            "description": "PortDrayage Webservice Host Address"
+        },
+        {
+            "key": "Webservice_Port",
+            "default": "8090",
+            "description": "PortDrayage WebService Port"
+        },
+        {
+            "key": "Webservice_Secure",
+            "default": "false",
+            "description": "Boolean flag set to true for HTTPS communication"
+        },
+        {
+            "key": "Webservice_Polling_Frequency",
+            "default": "5",
+            "description": "Polling Frequency for PortDrayage Webservice action status in seconds"
+        },
+        {
+            "key": "Holding_Lat",
+            "default": "45.45",
+            "description": "Latitude Coordinate for Holding Area GPS Location in Degrees(-90,90)."
+        },
+        {
+            "key": "Holding_Lon",
+            "default": "-45.45",
+            "description": "Longitude Coordinate for Holding Area GPS Location in Degrees(-180,180)."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/PreemptionPlugin.zip
+{
+    "name": "Preemption",
+    "description": "Preemption plugin for the IVP system.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/PreemptionPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "configuration": [
+        {
+            "key": "Instance",
+            "default": "0",
+            "description": "The instance of Preemption plugin."
+        },
+        {
+            "key": "BasePreemptionOid",
+            "default": ".1.3.6.1.4.1.1206.4.2.1.6.3.1.2.",
+            "description": "The BasePreemptionOid of Preemption plugin."
+        },
+        {
+            "key": "ipwithport",
+            "default": "<ip for signal controller>:<port used for signal controller>",
+            "description": "The ipwithport of Preemption plugin."
+        },
+        {
+            "key": "snmp_community",
+            "default": "public",
+            "description": "The snmp_community of Preemption plugin."
+        },
+        {
+            "key": "map_path",
+            "default": "\/geo.json",
+            "description": "The map_path for Preemption plugin."
+        },
+        {
+            "key": "allowedList",
+            "default": "{\"validVehicles\":[\"292710445\",\"123456789\",\"2345678\"]}",
+            "description": "List of vehicles BSM id that are allowed"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/RSUHealthMonitorPlugin.zip
+{
+    "name": "RSUHealthMonitor",
+    "description": "Monitor RSU health status",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/RSUHealthMonitorPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "Interval",
+            "default": "1",
+            "description": "Sending RSU SNMP GET request at every configured interval. Default every 1 second. Unit of measure: second."
+        },
+        {
+            "key": "RSUConfigurationList",
+            "default": "{ \"RSUS\": [ { \"RSUIp\": \"192.168.XX.XX\", \"SecurityLevel\":\"authPriv\", \"SNMPPort\": \"161\", \"AuthPassPhrase\": \"dummy\", \"User\": \"authOnlyUser\", \"RSUMIBVersion\": \"RSU4.1\" },{ \"RSUIp\": \"192.168.00.XX\", \"SecurityLevel\":\"authPriv\", \"SNMPPort\": \"162\", \"AuthPassPhrase\": \"tester\", \"User\": \"authPrivUser\", \"RSUMIBVersion\": \"RSU4.1\" }] }",
+            "description": "Configurations of the RSUs the V2X hub is connected to."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/RtcmPlugin.zip
+{
+    "name": "RTCM",
+    "description": "Plugin to listen for RTCM messages from an NTRIP caster and route those messages over a V2X radio",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/RtcmPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "RTCM",
+            "subtype": "2.3"
+        },
+        {
+            "type": "J2735",
+            "subtype": "RTCM"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Endpoint IP",
+            "default": "156.63.133.118",
+            "description": "NTRIP caster endpoint IP address"
+        },
+        {
+            "key": "Endpoint Port",
+            "default": "2101",
+            "description": "NTRIP caster endpoint port"
+        },
+        {
+            "key": "Username",
+            "default": "username",
+            "description": "NTRIP caster authentication username"
+        },
+        {
+            "key": "Password",
+            "default": "password",
+            "description": "NTRIP caster authentication password"
+        },
+        {
+            "key": "Mountpoint",
+            "default": "ODOT_RTCM23",
+            "description": "NTRIP caster mountpoint"
+        },
+        {
+            "key": "RTCM Version",
+            "default": "Unknown",
+            "description": "Specify the expected RTCM message version (2.3 or 3.3) coming from the caster.  Use Unknown to auto detect the version, which is done using trial and error, thus may be slow."
+        },
+        {
+            "key": "Route RTCM",
+            "default": "false",
+            "description": "Route the RTCM messages created from NTRIP internally for use by other plugins."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/SpatPlugin.zip
+{
+    "name": "SPAT",
+    "description": "Plugin that reads PTLM data from a configuration file, receives live data from the signal controller, and publishes a J2735 SPAT message.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/SpatPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "SPAT-P",
+            "description": "Signal Phase and Timing (SPAT) status for the signalized intersection."
+        },
+        {
+            "type": "SIGCONT",
+            "subtype": "ACT",
+            "description": "Current signal controller action"
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Intersection_Id",
+            "default": "1",
+            "description": "The intersection id for SPAT generated by this plugin."
+        },
+        {
+            "key": "Intersection_Name",
+            "default": "Intersection",
+            "description": "The intersection name for SPAT generated by this plugin."
+        },
+        {
+            "key": "SignalGroupMapping",
+            "default": "{\"SignalGroups\":[{\"SignalGroupId\":1,\"Phase\":1,\"Type\":\"vehicle\"},{\"SignalGroupId\":2,\"Phase\":2,\"Type\":\"vehicle\"},{\"SignalGroupId\":3,\"Phase\":3,\"Type\":\"vehicle\"},{\"SignalGroupId\":4,\"Phase\":4,\"Type\":\"vehicle\"},{\"SignalGroupId\":5,\"Phase\":5,\"Type\":\"vehicle\"},{\"SignalGroupId\":6,\"Phase\":6,\"Type\":\"vehicle\"},{\"SignalGroupId\":7,\"Phase\":7,\"Type\":\"vehicle\"},{\"SignalGroupId\":8,\"Phase\":8,\"Type\":\"vehicle\"},{\"SignalGroupId\":22,\"Phase\":2,\"Type\":\"pedestrian\"},{\"SignalGroupId\":24,\"Phase\":4,\"Type\":\"pedestrian\"},{\"SignalGroupId\":26,\"Phase\":6,\"Type\":\"pedestrian\"},{\"SignalGroupId\":28,\"Phase\":8,\"Type\":\"pedestrian\"}]}",
+            "description": "JSON data defining a list of SignalGroups and phases."
+        },
+        {
+            "key": "Local_IP",
+            "default": "<local ip address>",
+            "description": "The IPv4 address of the local computer for receiving Traffic Signal Controller Broadcast Messages."
+        },
+        {
+            "key": "Local_UDP_Port",
+            "default": "local port",
+            "description": "The local UDP port for reception of Traffic Signal Controller Broadcast Messages from the TSC."
+        },
+        {
+            "key": "TSC_IP",
+            "default": "<ip address of signal controller>",
+            "description": "The IPv4 address of the destination Traffic Signal Controller (TSC)."
+        },
+        {
+            "key": "TSC_Remote_SNMP_Port",
+            "default": "<snmp port used in signal controller>",
+            "description": "The destination port on the Traffic Signal Controller (TSC) for SNMP NTCIP communication."
+        },
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "SPAT Plugin Log Level controls which log statements are printed to the terminal."
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/TelematicBridgePlugin.zip
+{
+    "name": "TelematicBridge",
+    "description": "Plugin that listens for TMX messages and forward them to the Telematic cloud services.",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/TelematicBridgePlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": "",
+    "configuration": [
+        {
+            "key": "LogLevel",
+            "default": "INFO",
+            "description": "The log level for this plugin"
+        },
+        {
+            "key": "NATSUrl",
+            "default": "nats:\/\/127.0.0.1:4222",
+            "description": "The NATS connection URL"
+        },
+        {
+            "key": "MessageExclusionList",
+            "default": "System_KeepAlive_CommandPlugin,System_KeepAlive_CARMAStreetsPlugin,System_KeepAlive_CDASimAdapter,System_KeepAlive_MessageReceiver",
+            "description": "The list of messages are excluded from the available message list. Message name is a combination of message type, subtype and source separated by underscore. E.G: type_subtype_source"
+        }
+    ]
+}
+Installing plugin /usr/local/plugins/TimPlugin.zip
+{
+    "name": "TIM",
+    "description": "Provides Traveller Information Message (TIM).",
+    "version": "7.6.0",
+    "exeLocation": "\/bin\/TimPlugin",
+    "coreIpAddr": "127.0.0.1",
+    "corePort": "24601",
+    "messageTypes": [
+        {
+            "type": "J2735",
+            "subtype": "TIM",
+            "description": "Travelor Information Message indicating the active Work Zone information."
+        }
+    ],
+    "configuration": [
+        {
+            "key": "Frequency",
+            "default": "1000",
+            "description": "The frequency to send the TIM in milliseconds."
+        },
+        {
+            "key": "MapFile",
+            "default": "\/var\/www\/plugins\/MAP\/IVP_GF_TIM.xml",
+            "description": ""
+        },
+        {
+            "key": "WebServiceIP",
+            "default": "127.0.0.1",
+            "description": "IP address at which the web service exists"
+        },
+        {
+            "key": "WebServicePort",
+            "default": "10000",
+            "description": "Port at which Web service exists"
+        },
+        {
+            "key": "LogLevel",
+            "default": "DEBUG",
+            "description": "TIM Plugin Log Level controls which log statements are printed to the terminal."
+        }
+    ]
+}
+Enabling CDASim Adapter for Simulation Integration!
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+Added group: 20
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+Added group: 20
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+Added group: 20
+[2025-07-28 04:38:42.955] n/src/CARMACloudPlugin.cpp (496) - DEBUG  : Setting CARMA Cloud URL to http://172.2.0.47:8080
+
+[2025-07-28 04:38:42.955] Utils/src/PluginClient.cpp (162) - INFO   : Config Changed. WebServiceIP: 172.2.0.8
+[2025-07-28 04:38:42.955] n/src/CARMACloudPlugin.cpp (496) - DEBUG  : Setting CARMA Cloud URL to http://172.2.0.47:8080
+
+[2025-07-28 04:38:42.955] n/src/CARMACloudPlugin.cpp (496) - DEBUG  : Setting CARMA Cloud URL to http://172.2.0.47:8080
+
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+Added group: 20
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:42.912016	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMACloud' --> Plugin registered
+2025-07-28 04:38:42.935947	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMACloud> Setting plugin status: Running
+Added group: 20
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:42.912016	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMACloud' --> Plugin registered
+2025-07-28 04:38:42.935947	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMACloud> Setting plugin status: Running
+Added group: 20
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:42.912016	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMACloud' --> Plugin registered
+2025-07-28 04:38:42.935947	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMACloud> Setting plugin status: Running
+2025-07-28 04:38:43.965836	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMAStreetsPlugin' --> Plugin registered
+2025-07-28 04:38:43.989349	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMAStreetsPlugin> Setting plugin status: Running
+Added group: 20
+[2025-07-28 04:38:44.920] apter/src/CDASimAdapter.cpp (21) - INFO   : Location of Simulated V2X-Hub updated to : {0, 0, 0}.
+
+[2025-07-28 04:38:44.921] Utils/src/PluginClient.cpp (162) - INFO   : Config Changed. X: 700.0
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (21) - INFO   : Location of Simulated V2X-Hub updated to : {700, 0, 0}.
+
+[2025-07-28 04:38:44.921] Utils/src/PluginClient.cpp (162) - INFO   : Config Changed. Y: 650.0
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (21) - INFO   : Location of Simulated V2X-Hub updated to : {700, 650, 0}.
+
+[2025-07-28 04:38:44.921] mxUtils/src/PluginClient.h (334) - DEBUG1 : New Status. Start Time: 2025-07-28 04:38:42.818
+[2025-07-28 04:38:44.921] Utils/src/PluginClient.cpp (319) - DEBUG1 : State Changed: Registered
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (21) - INFO   : Location of Simulated V2X-Hub updated to : {700, 650, 0}.
+
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (48) - INFO   : Attempting CDASim connection 0/10 ...
+
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (99) - INFO   : Simulation and local IP successfully initialized!
+
+[2025-07-28 04:38:44.921] pter/src/CDASimAdapter.cpp (111) - INFO   : CDASim connecting 172.2.0.2
+Using Registration Port : 1615 Time Sync Port: 7575 and V2X Port: 8686
+
+[2025-07-28 04:38:44.921] er/src/CDASimConnection.cpp (13) - DEBUG  : CARMA-Simulation connection initialized.
+
+[2025-07-28 04:38:44.921] r/src/CDASimConnection.cpp (229) - DEBUG  : Sending UDP msg {
+   "infrastructureId" : "rsu_1234",
+   "location" : {
+      "x" : 700.0,
+      "y" : 650.0,
+      "z" : 0.0
+   },
+   "rxMessageIpAddress" : "172.2.0.8",
+   "rxMessagePort" : 8686,
+   "sensors" : [
+      {
+         "location" : {
+            "x" : 263.79998799999998,
+            "y" : 178.050003,
+            "z" : 10.0
+         },
+         "orientation" : {
+            "pitch" : 0.0,
+            "roll" : 0.0,
+            "yaw" : 0.0
+         },
+         "sensorId" : "IntersectionLidar",
+         "type" : "SemanticLidar"
+      }
+   ],
+   "simulatedInteractionPort" : 7576,
+   "timeSyncPort" : 7575
+}
+ to host 172.2.0.2:1615.
+
+[2025-07-28 04:38:44.921] r/src/CDASimConnection.cpp (110) - DEBUG  : Creating UDPServer for Time Sync Messages: 172.2.0.8:7575
+Creating UDPServer for Simulated External Object detection: 172.2.0.8:7576
+Creating UDPServer for CDA V2X message forwarding: 172.2.0.8:8686
+Creating UDPClient for CDA V2X message forwarding:  172.2.0.2:1517
+Creating UDPServer for Immediate Forward 172.2.0.8:5678
+Creating UDPClient for Message Receiver 172.2.0.8:8765
+
+[2025-07-28 04:38:44.921] r/src/CDASimConnection.cpp (127) - INFO   : UDP Connection to CDASim setup Successfully!
+
+[2025-07-28 04:38:44.921] er/src/CDASimConnection.cpp (32) - INFO   : CARMA-Simulation connection is successful!
+
+[2025-07-28 04:38:44.921] apter/src/CDASimAdapter.cpp (51) - INFO   : Connection to CDASim established!
+
+[2025-07-28 04:38:44.921] pter/src/CDASimAdapter.cpp (228) - DEBUG  : Creating Thread Timer for time sync
+
+[2025-07-28 04:38:44.921] pter/src/CDASimAdapter.cpp (183) - DEBUG  : Creating Thread Timer for simulated external object
+
+[2025-07-28 04:38:44.921] pter/src/CDASimAdapter.cpp (191) - DEBUG1 : Listening for Sensor Detected Message from CDASim.
+
+[2025-07-28 04:38:44.921] pter/src/CDASimAdapter.cpp (233) - DEBUG1 : Listening for time sync messages from CDASim.
+
+[2025-07-28 04:38:46.915] ImmediateForwardPlugin.cpp (115) - INFO   : Updating configuration settings.
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SPAT-P, SendType: SPAT, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: MAP-P, SendType: MAP, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: PSM-P, SendType: PSM, PSID: 0x27, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG07-P, SendType: TMSG07, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG03-P, SendType: TMSG03, PSID: 0xBFEE, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG05-P, SendType: TMSG05, PSID: 0x8003, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SSM-P, SendType: SSM, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SDSM, SendType: SensorDataSharingMessage, PSID: 0x8010, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (198) - INFO   : Creating UDP Client 1 - Radio IP: 172.2.0.8, Port: 5678
+[2025-07-28 04:38:46.916] Utils/src/PluginClient.cpp (162) - INFO   : Config Changed. Messages_Destination_1: { "Messages": [ { "TmxType": "SPAT-P", "SendType": "SPAT", "PSID": "0x8002", "Channel": "183" }, { "TmxType": "MAP-P", "SendType": "MAP", "PSID": "0x8002", "Channel": "183" }, { "TmxType": "PSM", "SendType": "PSM", "PSID": "0x8002", "Channel": "183" } ,{ "TmxType": "TMSG07", "SendType": "TMSG07", "PSID": "0x8002", "Channel": "183" },{ "TmxType": "TMSG03-P", "SendType": "TMSG03-P", "PSID": "0xBFEE", "Channel": "183" },{ "TmxType": "TMSG05-P", "SendType": "TMSG05-P", "PSID": "0x8003", "Channel": "183" },{ "TmxType": "SDSM", "SendType": "SDSM", "PSID": "0x90", "Channel": "183" }] }
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (115) - INFO   : Updating configuration settings.
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SPAT-P, SendType: SPAT, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: MAP-P, SendType: MAP, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: PSM, SendType: PSM, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG07, SendType: TMSG07, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG03-P, SendType: TMSG03-P, PSID: 0xBFEE, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG05-P, SendType: TMSG05-P, PSID: 0x8003, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SDSM, SendType: SDSM, PSID: 0x90, Channel: 183
+[2025-07-28 04:38:46.916] ImmediateForwardPlugin.cpp (198) - INFO   : Creating UDP Client 1 - Radio IP: 172.2.0.8, Port: 5678
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (115) - INFO   : Updating configuration settings.
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SPAT-P, SendType: SPAT, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: MAP-P, SendType: MAP, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: PSM, SendType: PSM, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG07, SendType: TMSG07, PSID: 0x8002, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG03-P, SendType: TMSG03-P, PSID: 0xBFEE, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: TMSG05-P, SendType: TMSG05-P, PSID: 0x8003, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (263) - INFO   : Message Config - Client: 1, TmxType: SDSM, SendType: SDSM, PSID: 0x90, Channel: 183
+[2025-07-28 04:38:46.917] ImmediateForwardPlugin.cpp (198) - INFO   : Creating UDP Client 1 - Radio IP: 172.2.0.8, Port: 5678
+2025-07-28 04:38:25.695688	DEBUG	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 127	Adding event log from '--------' --> ------------------------
+2025-07-28 04:38:25.711217	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'Ivp Core' --> IVP Core Starting
+2025-07-28 04:38:26.824086	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin registered
+2025-07-28 04:38:26.834905	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:26.858452	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Delayed Start...
+2025-07-28 04:38:26.934625	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.MessageProfiler' --> Plugin registered
+2025-07-28 04:38:26.952939	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.MessageProfiler> Setting plugin status: Running
+2025-07-28 04:38:27.022844	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.HistoryManager' --> Plugin registered
+2025-07-28 04:38:27.036658	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.HistoryManager> Setting plugin status: Running
+2025-07-28 04:38:36.865533	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ivpcore.PluginMonitor> Setting plugin status: Running
+2025-07-28 04:38:42.912016	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMACloud' --> Plugin registered
+2025-07-28 04:38:42.935947	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMACloud> Setting plugin status: Running
+2025-07-28 04:38:43.965836	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CARMAStreetsPlugin' --> Plugin registered
+2025-07-28 04:38:43.989349	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CARMAStreetsPlugin> Setting plugin status: Running
+2025-07-28 04:38:44.869875	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CDASimAdapter' --> Plugin registered
+2025-07-28 04:38:44.900485	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CDASimAdapter> Setting plugin status: Running
+2025-07-28 04:38:45.865176	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'CommandPlugin' --> Plugin registered
+2025-07-28 04:38:45.883898	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<CommandPlugin> Setting plugin status: Running
+2025-07-28 04:38:46.877570	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ImmediateForward' --> Plugin registered
+2025-07-28 04:38:46.893790	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<ImmediateForward> Setting plugin status: Running
+2025-07-28 04:38:47.858608	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'MAP' --> Plugin registered
+2025-07-28 04:38:47.875802	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<MAP> Setting plugin status: Running
+2025-07-28 04:38:48.798448	WARNING	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 157	<Unknown> Unable to set plugin status items, plugin is not registered
+2025-07-28 04:38:48.798753	WARNING	/home/V2X-Hub/src/tmx/TmxCore/src/PluginConnection.cpp, 508	Unable to set plugin status items, plugin is not registered
+2025-07-28 04:38:48.879931	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'MessageReceiver' --> Plugin registered
+2025-07-28 04:38:48.896082	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/Plugin.cpp, 141	<MessageReceiver> Setting plugin status: Running
+2025-07-28 04:38:49.425976	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin 'CARMACloud' (id: 1) startup time: 783 milliseconds
+2025-07-28 04:38:49.440980	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger.cpp, 114	Adding event log from 'ivpcore.PluginMonitor' --> Plugin 'CARMAStreetsPlugin' (id: 2) startup time: 1548 milliseconds
+2025-07-28 04:38:49.455409	INFO	/home/V2X-Hub/src/tmx/TmxCore/src/logger[2025-07-28 04:38:52.818] ils/src/PluginKeepAlive.cpp (79) - DEBUG1 : No message sent from CDASimAdapter in last 468000 ms.
