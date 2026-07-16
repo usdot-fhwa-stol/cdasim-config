@@ -1,7 +1,7 @@
 services:
   cdasim:
     privileged: true
-    image: usdotfhwastolcandidate/cdasim:vantage
+    image: usdotfhwastol/cdasim:carma-system-4.13.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
@@ -71,7 +71,7 @@ services:
 
 
   carma-carla-integration_1:
-    image: usdotfhwastolcandidate/carma-carla-integration:vantage
+    image: usdotfhwastol/carma-carla-integration:carma-system-4.13.0
     networks:
       carma_net_1:
         ipv4_address: 172.3.0.6
@@ -106,8 +106,7 @@ services:
 
   vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: usdotfhwastolcandidate/carma-ns3-adapter:vantage
-    networks:
+    image: usdotfhwastol/carma-ns3-adapter:carma-system-4.13.0
       carma_net_1:
         ipv4_address: 172.3.0.14
     container_name: vehicle_registration_service
@@ -134,7 +133,7 @@ services:
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
   xml_rpc_server:
-    image: usdotfhwastol/xml-rpc-server:latest
+    image: usdotfhwastol/xml-rpc-server:carma-system-4.13.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.12
@@ -204,7 +203,7 @@ services:
 
   messenger_vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: usdotfhwastolcandidate/carma-ns3-adapter:vantage
+    image: usdotfhwastol/carma-ns3-adapter:carma-system-4.13.0
     networks:
       carma_messenger_net_1:
         ipv4_address: 172.7.0.16
@@ -216,7 +215,7 @@ services:
                --rxMessageIpAddress 172.7.0.6 --rxMessagePort 3501 --rxTimeSyncPort 3500 --receiverPort 3600 --receiverIpAddress 172.7.0.3'
 
   carma-messenger-vehicle-plugin_1:
-    image: usdotfhwastolcandidate/cdasim:vantage
+    image: usdotfhwastol/cdasim:carma-system-4.13.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.11
@@ -377,7 +376,7 @@ services:
       - ./MAP:/home/carma-streets/intersection_model/MAP
 
   carla-sensor-lib:
-    image: usdotfhwastolcandidate/carla-sensor-lib:vantage
+    image: usdotfhwastol/carla-sensor-lib:carma-system-4.13.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.5
