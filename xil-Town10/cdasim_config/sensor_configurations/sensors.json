@@ -3,8 +3,8 @@
     "sensorId": "IntersectionLidar",
     "type": "SemanticLidar",
     "location": {
-      "x": 263.799988,
-      "y": 178.050003,
+      "x": -41,
+      "y": 61,
       "z": 10.0
      },
      "orientation": {
