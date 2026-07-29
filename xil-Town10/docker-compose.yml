@@ -1,7 +1,7 @@
 services:
   cdasim:
     privileged: true
-    image: usdotfhwastol/cdasim:latest
+    image: usdotfhwastoldev/cdasim:develop
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.2
@@ -59,6 +59,7 @@ services:
       # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
       # - ./carma/plugins.launch.py:/opt/carma/install/carma/share/carma/launch/plugins.launch.py
       - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
+      - ./carma/cooperative_lanechange/parameters.yaml:/opt/carma/install/cooperative_lanechange/share/cooperative_lanechange/config/parameters.yaml
     deploy:
       resources:
         reservations:
@@ -70,7 +71,7 @@ services:
 
 
   carma-carla-integration_1:
-    image: usdotfhwastol/carma-carla-integration:latest
+    image: usdotfhwastoldev/carma-carla-integration:develop
     networks:
       carma_net_1:
         ipv4_address: 172.3.0.6
@@ -96,16 +97,17 @@ services:
       role_name:='carma_1'
       host:='carla-server'
       synchronous_mode:=True
-      selected_route:='Town10_route'
+      selected_route:='Town10_loop_official'
+      selected_plugins:='/guidance/plugins/route_following_plugin,/guidance/plugins/cooperative_lanechange,/guidance/plugins/inlanecruising_plugin,/guidance/plugins/stop_and_wait_plugin,/guidance/plugins/pure_pursuit_wrapper'
       start_delay_in_seconds:=30.0
       fixed_delay_seconds:=0.1
       passive:=True
-      spawn_point:='58.6,134.5,0,0,0,180'"
+      spawn_point:='58.6,133.5,0,0,0,180'"
 
   vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: usdotfhwastol/carma-ns3-adapter:latest
-    networks:
+    image: usdotfhwastol/carma-ns3-adapter:develop
+    networks:  
       carma_net_1:
         ipv4_address: 172.3.0.14
     container_name: vehicle_registration_service
@@ -132,7 +134,7 @@ services:
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
   xml_rpc_server:
-    image: usdotfhwastol/xml-rpc-server:latest
+    image: usdotfhwastoldev/xml-rpc-server:develop
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.12
@@ -159,7 +161,7 @@ services:
       - /opt/carma-messenger/messenger_1/.ros:/home/carma/.ros
       - /opt/carma-messenger/messenger_1/routes:/opt/carma/routes
       - ./carma_messenger/vehicle/calibration:/opt/carma/vehicle/calibration
-      - ./carma_messenger/traffic_incident/config:/opt/carma/install_ros2/traffic_incident/share/traffic_incident/config
+      - ./carma_messenger/traffic_incident/config:/opt/carma/install/traffic_incident/share/traffic_incident/config
     command: >
       bash -c "export RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION} && source /opt/carma/install/setup.bash
       && echo $RMW_IMPLEMENTATION && ros2 launch /opt/carma/vehicle/config/carma-messenger-docker.launch.py"
@@ -202,8 +204,7 @@ services:
 
   messenger_vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: usdotfhwastol/carma-ns3-adapter:latest
-    networks:
+    image: usdotfhwastoldev/carma-ns3-adapter:develop
       carma_messenger_net_1:
         ipv4_address: 172.7.0.16
     container_name: messenger_vehicle_registration_service
@@ -214,7 +215,7 @@ services:
                --rxMessageIpAddress 172.7.0.6 --rxMessagePort 3501 --rxTimeSyncPort 3500 --receiverPort 3600 --receiverIpAddress 172.7.0.3'
 
   carma-messenger-vehicle-plugin_1:
-    image: usdotfhwastol/cdasim:latest
+    image: usdotfhwastoldev/cdasim:develop
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.11
@@ -375,7 +376,7 @@ services:
       - ./MAP:/home/carma-streets/intersection_model/MAP
 
   carla-sensor-lib:
-    image: usdotfhwastol/carla-sensor-lib:latest
+    image: usdotfhwastol/carla-sensor-lib:carma-system-4.13.0
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.5
@@ -463,7 +464,7 @@ services:
       - cdasim
     # The socat command is for addressing Jira Bug TT-182 with the EVC
     command: >
-      bash -c "socat UDP-LISTEN:${EVC_PORT_1},fork UDP:127.0.0.1:${EVC_PORT_1} & \
+      bash -c "socat UDP-LISTEN:1515,fork UDP:127.0.0.1:1515 & \
                cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
 
 
