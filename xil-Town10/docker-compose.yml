@@ -205,6 +205,7 @@ services:
   messenger_vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
     image: usdotfhwastoldev/carma-ns3-adapter:develop
+    networks:
       carma_messenger_net_1:
         ipv4_address: 172.7.0.16
     container_name: messenger_vehicle_registration_service
