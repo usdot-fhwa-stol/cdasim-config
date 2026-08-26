@@ -45,7 +45,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./xil-Town04/
-          push: false
+          push: true
 
       - name: Build xil-Town05
         uses: docker/build-push-action@v5
