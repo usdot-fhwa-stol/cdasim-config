@@ -44,7 +44,7 @@ jobs:
       - name: Build basic_cdasim_config_image
         uses: docker/build-push-action@v5
         with:
-          context: ./xil-Town04/
+          context: ./basic_cdasim_config_image/
           push: true
 
       - name: Build xil-Town05
