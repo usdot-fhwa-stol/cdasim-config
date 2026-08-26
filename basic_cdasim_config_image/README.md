@@ -5,6 +5,7 @@ for the CDASim portion of an XIL scenario.
 
 The Compose project contains only these services:
 
+- `cdasim-tmp-init` (one-shot initialization for the shared MOSAIC temporary directory)
 - `cdasim`
 - `carla-sensor-lib`
 - `xml_rpc_server`
