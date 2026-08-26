@@ -7,7 +7,7 @@ services:
     command:
       - >-
         mkdir -p /opt/carma-simulation/tmp &&
-        chown -R carma:carma /opt/carma-simulation/tmp
+        chown -R carma:carma /opt/carma-simulation/
     volumes:
       - /opt/carma-simulation/tmp:/opt/carma-simulation/tmp
 
