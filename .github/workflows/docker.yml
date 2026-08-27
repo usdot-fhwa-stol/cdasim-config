@@ -40,6 +40,12 @@ jobs:
         with:
           context: ./xil-Town04/
           push: false
+          
+      - name: Build basic_cdasim_config_image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./basic_cdasim_config_image/
+          push: false
 
       - name: Build xil-Town05
         uses: docker/build-push-action@v5
