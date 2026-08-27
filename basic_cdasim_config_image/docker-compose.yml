@@ -1,23 +1,8 @@
 services:
-  cdasim-tmp-init:
-    image: "${CDASIM_IMAGE}"
-    user: "0:0"
-    network_mode: none
-    entrypoint: ["/bin/bash", "-c"]
-    command:
-      - >-
-        mkdir -p /opt/carma-simulation/tmp &&
-        chown -R carma:carma /opt/carma-simulation/
-    volumes:
-      - /opt/carma-simulation/tmp:/opt/carma-simulation/tmp
-
   cdasim:
     image: "${CDASIM_IMAGE}"
     container_name: cdasim
     privileged: true
-    depends_on:
-      cdasim-tmp-init:
-        condition: service_completed_successfully
     networks:
       - carma_sim_net
     environment:
