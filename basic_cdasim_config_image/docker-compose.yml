@@ -56,9 +56,9 @@ services:
       --xmlrpc-server-host 0.0.0.0
       --xmlrpc-server-port 8091"
 
-  xml_rpc_server:
+  xml-rpc-server:
     image: "${XML_RPC_SERVER_IMAGE:-usdotfhwastoldev/xml-rpc-server:develop}"
-    container_name: xml_rpc_server
+    container_name: xml-rpc-server
     networks:
       - carma_sim_net
     command:

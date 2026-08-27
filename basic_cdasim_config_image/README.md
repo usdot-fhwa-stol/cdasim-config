@@ -8,7 +8,7 @@ The Compose project contains only these services:
 - `cdasim-tmp-init` (one-shot initialization for the shared MOSAIC temporary directory)
 - `cdasim`
 - `carla-sensor-lib`
-- `xml_rpc_server`
+- `xml-rpc-server`
 
 Vehicle, CARMA Street, and CARMA Cloud services are configured by their own
 components and are intentionally not included here.

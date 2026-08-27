@@ -133,12 +133,12 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
-  xml_rpc_server:
+  xml-rpc-server:
     image: usdotfhwastoldev/xml-rpc-server:develop
     networks:
       carma_sim_net:
         ipv4_address: 172.2.0.12
-    container_name: xml_rpc_server
+    container_name: xml-rpc-server
     volumes_from:
       - container:carma-config:ro
     command:
