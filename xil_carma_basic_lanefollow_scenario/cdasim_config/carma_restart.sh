@@ -1,20 +1,51 @@
 #!/usr/bin/env bash
 
-set -e
+# ============================================================
+# CARMA Test Runner
+#
+# Usage:
+#   ./carma_test.sh 5
+#
+# If no number is provided, defaults to 1 run.
+# ============================================================
 
-# =========================
+set -u
+
+# -------------------------
 # Configuration
-# =========================
+# -------------------------
 
-RUN_COUNT=5
 WAIT_SECONDS=35
+DEFAULT_RUN_COUNT=1
 
-# =========================
-# Functions
-# =========================
+# -------------------------
+# Get run count
+# -------------------------
+
+if [[ $# -ge 1 ]]; then
+    RUN_COUNT="$1"
+else
+    RUN_COUNT="$DEFAULT_RUN_COUNT"
+fi
+
+# Make sure RUN_COUNT is a positive integer
+if ! [[ "$RUN_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+    echo "ERROR: Number of runs must be a positive integer."
+    echo
+    echo "Usage:"
+    echo "  $0 <number_of_runs>"
+    echo
+    echo "Example:"
+    echo "  $0 10"
+    exit 1
+fi
+
+# -------------------------
+# CARLA cleanup
+# -------------------------
 
 cleanup_carla() {
-    echo "=== Cleaning up existing carma_1 actors ==="
+    echo "Cleaning up carma_1 actors..."
 
     python3 - <<'PY'
 import carla
@@ -28,72 +59,124 @@ try:
     actors = world.get_actors()
 
     targets = [
-        actor for actor in actors
+        actor
+        for actor in actors
         if actor.attributes.get("role_name", "") == "carma_1"
     ]
 
     if targets:
-        print(f"Found {len(targets)} carma_1 actor(s). Destroying...")
+        print(f"Found {len(targets)} carma_1 actor(s).")
 
         for actor in targets:
-            print(f"Destroying {actor.type_id} ({actor.id})")
+            print(f"Destroying {actor.type_id} (ID: {actor.id})")
             actor.destroy()
+
+        print("Cleanup complete.")
     else:
-        print("No existing carma_1 actors found.")
+        print("No carma_1 actors found.")
 
 except Exception as e:
-    print(f"Could not clean up CARLA actors: {e}")
+    print(f"CARLA cleanup failed: {e}")
     sys.exit(1)
 PY
 }
 
-# =========================
-# Main loop
-# =========================
+# -------------------------
+# Start CARMA silently
+# -------------------------
+
+start_carma() {
+    echo "Starting CARMA..."
+
+    # Redirect stdout and stderr so Docker/CARMA
+    # output does not appear in the terminal.
+    carma start all >/dev/null 2>&1
+
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR: carma start all failed."
+        return 1
+    fi
+
+    echo "CARMA started."
+}
+
+# -------------------------
+# Stop CARMA silently
+# -------------------------
+
+stop_carma() {
+    echo "Stopping CARMA..."
+
+    # Redirect stdout and stderr so Docker/CARMA
+    # output does not appear in the terminal.
+    carma stop all >/dev/null 2>&1
+
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR: carma stop all failed."
+        return 1
+    fi
+
+    echo "CARMA stopped."
+}
+
+# -------------------------
+# Main
+# -------------------------
 
 completed_runs=0
 
-echo "========================================"
-echo "CARMA Test Runner"
-echo "Runs requested: $RUN_COUNT"
-echo "Wait time: ${WAIT_SECONDS}s"
-echo "========================================"
+echo
+echo "=========================================="
+echo "        CARMA AUTOMATED TEST RUNNER"
+echo "=========================================="
+echo "Requested runs : $RUN_COUNT"
+echo "Wait time      : ${WAIT_SECONDS}s"
+echo "=========================================="
+echo
 
 for ((run=1; run<=RUN_COUNT; run++)); do
 
-    echo
-    echo "========================================"
-    echo "Starting run $run / $RUN_COUNT"
-    echo "========================================"
+    echo "------------------------------------------"
+    echo "Run $run / $RUN_COUNT"
+    echo "------------------------------------------"
 
-    cleanup_carla
+    # Remove any old carma_1 actor BEFORE starting
+    # the next CARMA instance.
+    if ! cleanup_carla; then
+        echo "ERROR: CARLA cleanup failed."
+        echo "Aborting test."
+        exit 1
+    fi
 
-    echo
-    echo "=== Starting CARMA ==="
-    carma start all
+    # Start CARMA
+    if ! start_carma; then
+        echo "ERROR: Failed to start CARMA."
+        echo "Aborting test."
+        exit 1
+    fi
 
-    echo
-    echo "=== CARMA started ==="
     echo "Waiting ${WAIT_SECONDS} seconds..."
-
     sleep "$WAIT_SECONDS"
 
-    echo
-    echo "=== Stopping CARMA ==="
-    carma stop all
+    # Stop CARMA
+    if ! stop_carma; then
+        echo "ERROR: Failed to stop CARMA."
+        echo "Aborting test."
+        exit 1
+    fi
 
     completed_runs=$((completed_runs + 1))
 
     echo
-    echo "=== Run $run completed ==="
-    echo "Completed: $completed_runs / $RUN_COUNT"
+    echo "Run $run complete."
+    echo "Progress: $completed_runs / $RUN_COUNT"
+    echo
 
 done
 
-echo
-echo "========================================"
-echo "CARMA TEST COMPLETE"
-echo "========================================"
-echo "Runs completed: $completed_runs"
-echo "Runs requested: $RUN_COUNT"
-echo "========================================"
+echo "=========================================="
+echo "          CARMA TEST COMPLETE"
+echo "=========================================="
+echo "Runs requested : $RUN_COUNT"
+echo "Runs completed : $completed_runs"
+echo "=========================================="
