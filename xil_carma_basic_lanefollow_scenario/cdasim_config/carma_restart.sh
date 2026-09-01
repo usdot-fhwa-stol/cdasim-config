@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 # ============================================================
-# CARMA Test Runner
+# CARMA Automated Test Runner
 #
 # Usage:
-#   ./carma_test.sh 5
+#   ./carma_restart.sh 50
 #
-# If no number is provided, defaults to 1 run.
 # ============================================================
 
 set -u
@@ -16,10 +15,15 @@ set -u
 # -------------------------
 
 WAIT_SECONDS=60
-DEFAULT_RUN_COUNT=1
+STARTUP_WAIT_SECONDS=10
+DEFAULT_RUN_COUNT=50
+
+LOG_DIR="./carma_test_logs"
+
+mkdir -p "$LOG_DIR"
 
 # -------------------------
-# Get run count
+# Get number of runs
 # -------------------------
 
 if [[ $# -ge 1 ]]; then
@@ -28,15 +32,11 @@ else
     RUN_COUNT="$DEFAULT_RUN_COUNT"
 fi
 
-# Make sure RUN_COUNT is a positive integer
 if ! [[ "$RUN_COUNT" =~ ^[1-9][0-9]*$ ]]; then
     echo "ERROR: Number of runs must be a positive integer."
     echo
     echo "Usage:"
     echo "  $0 <number_of_runs>"
-    echo
-    echo "Example:"
-    echo "  $0 10"
     exit 1
 fi
 
@@ -82,41 +82,76 @@ PY
 }
 
 # -------------------------
-# Start CARMA silently
+# Start CARMA
 # -------------------------
 
 start_carma() {
+    local log_file="$LOG_DIR/run_${CURRENT_RUN}_start.log"
+
     echo "Starting CARMA..."
+    echo "CARMA output -> $log_file"
 
-    # Redirect stdout and stderr so Docker/CARMA
-    # output does not appear in the terminal.
-    carma start all >/dev/null 2>&1
+    # Run CARMA in the background.
+    # Output goes to a log instead of the terminal.
+    carma start all >"$log_file" 2>&1 &
 
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: carma start all failed."
+    CARMA_PID=$!
+
+    echo "CARMA start process: PID $CARMA_PID"
+
+    # Give CARMA a chance to start.
+    echo "Waiting ${STARTUP_WAIT_SECONDS}s for CARMA startup..."
+    sleep "$STARTUP_WAIT_SECONDS"
+
+    # Check whether the carma command itself died.
+    if ! kill -0 "$CARMA_PID" 2>/dev/null; then
+        echo "ERROR: carma start all exited unexpectedly."
+        echo
+        echo "Last 20 lines of CARMA startup log:"
+        tail -20 "$log_file"
         return 1
     fi
 
-    echo "CARMA started."
+    echo "CARMA startup process is running."
 }
 
 # -------------------------
-# Stop CARMA silently
+# Stop CARMA
 # -------------------------
 
 stop_carma() {
+    local log_file="$LOG_DIR/run_${CURRENT_RUN}_stop.log"
+
     echo "Stopping CARMA..."
 
-    # Redirect stdout and stderr so Docker/CARMA
-    # output does not appear in the terminal.
-    carma stop all >/dev/null 2>&1
+    carma stop all >"$log_file" 2>&1
 
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: carma stop all failed."
-        return 1
+    local result=$?
+
+    if [[ $result -ne 0 ]]; then
+        echo "WARNING: carma stop all returned exit code $result"
+        echo "See: $log_file"
+    else
+        echo "CARMA stopped."
     fi
 
-    echo "CARMA stopped."
+    # If carma start all left a process running,
+    # wait briefly for it to exit.
+    if [[ -n "${CARMA_PID:-}" ]]; then
+        if kill -0 "$CARMA_PID" 2>/dev/null; then
+            echo "Waiting for CARMA start process to exit..."
+
+            for ((i=1; i<=10; i++)); do
+                if ! kill -0 "$CARMA_PID" 2>/dev/null; then
+                    break
+                fi
+
+                sleep 1
+            done
+        fi
+    fi
+
+    return 0
 }
 
 # -------------------------
@@ -131,39 +166,56 @@ echo "        CARMA AUTOMATED TEST RUNNER"
 echo "=========================================="
 echo "Requested runs : $RUN_COUNT"
 echo "Wait time      : ${WAIT_SECONDS}s"
+echo "Startup wait   : ${STARTUP_WAIT_SECONDS}s"
+echo "Logs           : $LOG_DIR"
 echo "=========================================="
 echo
 
 for ((run=1; run<=RUN_COUNT; run++)); do
 
+    CURRENT_RUN="$run"
+
     echo "------------------------------------------"
     echo "Run $run / $RUN_COUNT"
     echo "------------------------------------------"
 
-    # Remove any old carma_1 actor BEFORE starting
-    # the next CARMA instance.
+    # Reset PID
+    CARMA_PID=""
+
+    # -------------------------
+    # Cleanup
+    # -------------------------
+
     if ! cleanup_carla; then
         echo "ERROR: CARLA cleanup failed."
-        echo "Aborting test."
+        echo "Aborting."
         exit 1
     fi
 
+    # -------------------------
     # Start CARMA
+    # -------------------------
+
     if ! start_carma; then
         echo "ERROR: Failed to start CARMA."
-        echo "Aborting test."
+        echo "Aborting."
         exit 1
     fi
 
-    echo "Waiting ${WAIT_SECONDS} seconds..."
+    # -------------------------
+    # Run test
+    # -------------------------
+
+    echo "CARMA is running."
+    echo "Waiting ${WAIT_SECONDS}s..."
+
     sleep "$WAIT_SECONDS"
 
+    # -------------------------
     # Stop CARMA
-    if ! stop_carma; then
-        echo "ERROR: Failed to stop CARMA."
-        echo "Aborting test."
-        exit 1
-    fi
+    # -------------------------
+
+    stop_carma
 
     completed_runs=$((completed_runs + 1))
 
@@ -180,3 +232,6 @@ echo "=========================================="
 echo "Runs requested : $RUN_COUNT"
 echo "Runs completed : $completed_runs"
 echo "=========================================="
+echo
+echo "Logs saved in:"
+echo "  $LOG_DIR"
