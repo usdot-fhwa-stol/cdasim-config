@@ -15,7 +15,7 @@ set -u
 # Configuration
 # -------------------------
 
-WAIT_SECONDS=35
+WAIT_SECONDS=60
 DEFAULT_RUN_COUNT=1
 
 # -------------------------
