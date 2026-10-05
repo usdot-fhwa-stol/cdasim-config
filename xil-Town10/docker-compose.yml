@@ -97,16 +97,16 @@ services:
       role_name:='carma_1'
       host:='carla-server'
       synchronous_mode:=True
-      selected_route:='Town10_loop_official'
+      selected_route:='Town10_3way_route'
       selected_plugins:='/guidance/plugins/route_following_plugin,/guidance/plugins/cooperative_lanechange,/guidance/plugins/inlanecruising_plugin,/guidance/plugins/stop_and_wait_plugin,/guidance/plugins/pure_pursuit_wrapper'
       start_delay_in_seconds:=30.0
       fixed_delay_seconds:=0.1
       passive:=True
-      spawn_point:='58.6,133.5,0,0,0,180'"
+      spawn_point:='98.44,119.20,0,0,0,180'"
 
   vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
-    image: usdotfhwastol/carma-ns3-adapter:develop
+    image: usdotfhwastoldev/carma-ns3-adapter:develop
     networks:  
       carma_net_1:
         ipv4_address: 172.3.0.14
@@ -467,6 +467,28 @@ services:
     command: >
       bash -c "socat UDP-LISTEN:1515,fork UDP:127.0.0.1:1515 & \
                cd /home/carma/docker && ./start_evc.sh --traci-ip 172.2.0.2"
+
+  scenario-runner:
+    image: ${DOCKER_ORG}/scenario-runner:${DOCKER_TAG}
+    container_name: scenario-runner
+    networks:
+      - carma_sim_net
+    depends_on:
+      - cdasim
+    environment:
+      SIMULATION_SCENARIO: ${SIMULATION_SCENARIO}
+    volumes:
+      - ./scenario-runner/trb_2027.py:/app/scenario_runner/srunner/scenarios/trb_2027.py
+      - ./scenario-runner/trb_2027.xml:/app/scenario_runner/srunner/examples/trb_2027.xml
+      - ./carla-recorder/:/app/scenario_runner/metrics/data/
+    # sleep is for mainly carma-platform's components to
+    # activate and be ready before scenario starts
+    entrypoint: >
+      bash -c "sleep 30
+      && python3 scenario_runner.py
+      --scenario ${SIMULATION_SCENARIO}
+      --record metrics/data/
+      --host 172.2.0.2"
 
 
 networks:
