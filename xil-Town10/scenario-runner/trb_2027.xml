@@ -24,6 +24,6 @@ limitations under the License.
         <!-- Coordinates obtained by manually driving to the yellow dot location
              in Town10 and reading off the CARLA transform. yaw left at 0.0
              (default heading) since the fire truck is a static prop. -->
-        <other_actor x="110.10" y="47.32" z="0.03" yaw="0.0" model="vehicle.carlamotors.firetruck" rolename="fire_truck"/>
+        <other_actor x="110.10" y="47.32" z="0.03" yaw="270.0" model="vehicle.carlamotors.firetruck" rolename="fire_truck"/>
     </scenario>
 </scenarios>
