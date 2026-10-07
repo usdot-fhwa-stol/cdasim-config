@@ -600,7 +600,7 @@ def evaluate_cdas_13(
     bag_path: Path,
     storage_id: str,
     topic: str,
-    vehicle_name: str,
+    vehicle_name: Optional[str],
     max_messages: Optional[int],
     csv_dir: Optional[Path],
 ) -> MetricResult:
@@ -624,32 +624,41 @@ def evaluate_cdas_13(
 
     details.append(f"topic type: {topic_type}")
     details.append(f"rosout message count read: {len(entries)}")
-    details.append(f"vehicle name: {vehicle_name}")
+    details.append(f"vehicle name: {vehicle_name or 'any vehicle'}")
 
     spawn_point_pattern = re.compile(r"\[Spawner\]\s+Received spawn_point parameter:", re.IGNORECASE)
     spawned_vehicle_pattern = re.compile(
-        r"\[Spawner\]\s+Spawned vehicle\s+'?" + re.escape(vehicle_name) + r"'?",
+        r"\[Spawner\]\s+Spawned vehicle\s+'?(?P<vehicle>[^'\s]+)'?",
         re.IGNORECASE,
     )
 
     spawn_point_count = 0
-    spawned_vehicle_count = 0
+    spawned_vehicle_names: List[str] = []
 
     for entry in entries:
         if spawn_point_pattern.search(entry.msg):
             spawn_point_count += 1
-        if spawned_vehicle_pattern.search(entry.msg):
-            spawned_vehicle_count += 1
+        spawned_match = spawned_vehicle_pattern.search(entry.msg)
+        if spawned_match:
+            spawned_name = spawned_match.group("vehicle")
+            if vehicle_name is None or spawned_name == vehicle_name:
+                spawned_vehicle_names.append(spawned_name)
+
+    spawned_vehicle_count = len(spawned_vehicle_names)
 
     details.append(f"spawner spawn_point parameter count: {spawn_point_count}")
-    details.append(f"spawner spawned vehicle count for {vehicle_name}: {spawned_vehicle_count}")
+    details.append(
+        f"spawner spawned vehicle count for {vehicle_name or 'any vehicle'}: {spawned_vehicle_count}"
+    )
+    if spawned_vehicle_names:
+        details.append(f"spawned vehicle names: {sorted(set(spawned_vehicle_names))}")
 
     if spawn_point_count == 0 or spawned_vehicle_count == 0:
         missing_parts = []
         if spawn_point_count == 0:
             missing_parts.append("spawn_point parameter")
         if spawned_vehicle_count == 0:
-            missing_parts.append(f"spawned vehicle {vehicle_name}")
+            missing_parts.append(f"spawned vehicle {vehicle_name or 'any vehicle'}")
         return MetricResult(
             metric_id,
             topic,
@@ -662,7 +671,7 @@ def evaluate_cdas_13(
         metric_id,
         topic,
         "PASS",
-        f"Spawner received spawn_point parameter and spawned {vehicle_name}.",
+        f"Spawner received spawn_point parameter and spawned {vehicle_name or 'a vehicle'}.",
         details,
     )
 
@@ -837,8 +846,11 @@ def parse_args():
     )
     parser.add_argument(
         "--vehicle-name",
-        default="carma_1",
-        help="Vehicle name for CDAS-13. Default: carma_1",
+        default=None,
+        help=(
+            "Optional vehicle name for CDAS-13. If omitted, any vehicle spawned "
+            "by the CARLA spawner satisfies the check."
+        ),
     )
     parser.add_argument(
         "--rosout-topic",

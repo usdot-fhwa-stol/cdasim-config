@@ -10,13 +10,26 @@ DEFAULT_LOG_BASE = "/opt/carma-simulation/logs"
 ANALYSIS_OUTPUT_BASE = Path("cdasim_analysis_log")
 ANALYSIS_LOG = Path(f"Cdasim_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
-# V2X node names as they appear in CommunicationDetails.log.
-# The RSU referred to as "rsu_1" is logged as "rsu_1234"; adjust if a run uses different ids.
-NODE_MSGER = "msger_1"
-NODE_CARMA = "carma_1"
-NODE_RSU = "rsu_1234"
-
 CDAS_PASS_RATE = 0.95
+CDAS_EVENT_PREFIX = "CDAS_EVENT"
+
+
+def is_cdas_event(line: str, event_name: str) -> bool:
+    """Return True when line contains the named structured CDAS event."""
+    return re.search(
+        rf"\b{CDAS_EVENT_PREFIX}\s+event={re.escape(event_name)}(?:\s|$)",
+        line,
+    ) is not None
+
+
+def cdas_event_field(line: str, field_name: str):
+    """Read a whitespace-delimited scalar field from a structured CDAS event."""
+    match = re.search(rf"\b{re.escape(field_name)}=(?P<value>\S+)", line)
+    return match.group("value") if match else None
+
+
+def count_cdas_events(log_lines, event_name: str) -> int:
+    return sum(1 for line in log_lines if is_cdas_event(line, event_name))
 
 
 def write_analysis(message: str) -> None:
@@ -72,12 +85,23 @@ def count_matching_lines(log_lines, pattern: str) -> int:
 
 
 def Check_Vehicle_Spawn(carla_log_lines, vehicle_name: str) -> bool:
-    pattern = re.compile(
+    structured_spawn_pattern = re.compile(
+        rf"\bCDAS_EVENT\s+event=(?:carla_sumo_vehicle_spawned|carla_external_vehicle_added)\b.*?"
+        rf"(?:vehicle_id|actor_id)={re.escape(vehicle_name)}(?:\s|$)"
+    )
+    sumo_spawn_pattern = re.compile(
         rf"Successfully spawned CARLA actor for SUMO vehicle\s+'{re.escape(vehicle_name)}'"
+    )
+    external_vehicle_pattern = re.compile(
+        rf"EXTERNAL VEHICLE ADDED:\s+Actor ID={re.escape(vehicle_name)}(?:,|\b)"
     )
 
     for line in carla_log_lines:
-        if pattern.search(line):
+        if (
+            structured_spawn_pattern.search(line)
+            or sumo_spawn_pattern.search(line)
+            or external_vehicle_pattern.search(line)
+        ):
             write_analysis(f"vehicle {vehicle_name} spawn successful")
             return True
 
@@ -89,7 +113,13 @@ def CheckXmlRpcServer(carla_log_lines) -> bool:
     target_phrase = "Multi-XML-RPC manager actor connection status: true"
 
     for line in carla_log_lines:
-        if target_phrase in line:
+        if (
+            target_phrase in line
+            or (
+                is_cdas_event(line, "carla_actor_connection_status")
+                and cdas_event_field(line, "connected") == "true"
+            )
+        ):
             write_analysis("xml rpc server connect successful")
             return True
 
@@ -98,15 +128,19 @@ def CheckXmlRpcServer(carla_log_lines) -> bool:
 
 
 def Count_Added_Vehicles_In_Carla_Log(carla_log_lines) -> int:
-    pattern = re.compile(
+    legacy_pattern = re.compile(
         r"Received VehicleUpdates interaction.*added=(\d+), updated=(\d+), removed=(\d+)"
     )
     total_added = 0
 
     for line in carla_log_lines:
-        match = pattern.search(line)
+        match = legacy_pattern.search(line)
         if match:
             total_added += int(match.group(1))
+        elif is_cdas_event(line, "carla_vehicle_updates_received"):
+            added = cdas_event_field(line, "added")
+            if added is not None:
+                total_added += int(added)
 
     write_analysis(f"total added vehicles reported in carla log: {total_added}")
     return total_added
@@ -128,7 +162,15 @@ def Parse_Carla_Spawn_Actor_Calls(carla_log_lines):
     XML-RPC spawn_actor result line. This provides CDAS-2 evidence for the
     vehicle properties CARLA was asked to use at actor creation time.
     """
-    call_pattern = re.compile(
+    structured_call_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_spawn_request\s+"
+        r"actor_type=(?P<type>\S+)\s+"
+        r"actor_id=(?P<id>\S+)\s+"
+        r"location=\[(?P<location>[^\]]*)\]\s+"
+        r"rotation=\[(?P<rotation>[^\]]*)\]\s+"
+        r"attributes=(?P<attributes>.*)$"
+    )
+    legacy_call_pattern = re.compile(
         r"XML-RPC spawn_actor call:\s+"
         r"type=(?P<type>[^,]+),\s+"
         r"id=(?P<id>[^,]+),\s+"
@@ -136,7 +178,12 @@ def Parse_Carla_Spawn_Actor_Calls(carla_log_lines):
         r"rotation=\[(?P<rotation>[^\]]*)\],\s+"
         r"attributes=(?P<attributes>.*)$"
     )
-    result_pattern = re.compile(
+    structured_result_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_spawn_result\s+"
+        r"actor_id=(?P<actor_id>\S+)\s+"
+        r"carla_id=(?P<carla_id>\S+).*?\baccepted=true(?:\s|$)"
+    )
+    legacy_result_pattern = re.compile(
         r"XML-RPC spawn_actor result:\s+CARLA ID=(?P<carla_id>[^\s]+)"
     )
 
@@ -144,7 +191,7 @@ def Parse_Carla_Spawn_Actor_Calls(carla_log_lines):
     pending_spawn = None
 
     for line in carla_log_lines:
-        call_match = call_pattern.search(line)
+        call_match = structured_call_pattern.search(line) or legacy_call_pattern.search(line)
         if call_match:
             pending_spawn = {
                 "type": call_match.group("type").strip(),
@@ -159,9 +206,26 @@ def Parse_Carla_Spawn_Actor_Calls(carla_log_lines):
             spawn_calls.append(pending_spawn)
             continue
 
-        result_match = result_pattern.search(line)
-        if result_match and pending_spawn is not None and pending_spawn["carla_id"] is None:
-            pending_spawn["carla_id"] = result_match.group("carla_id").strip()
+        structured_result_match = structured_result_pattern.search(line)
+        if structured_result_match:
+            actor_id = structured_result_match.group("actor_id").strip()
+            matching_spawn = next(
+                (
+                    item for item in reversed(spawn_calls)
+                    if item["id"] == actor_id and item["carla_id"] is None
+                ),
+                None,
+            )
+            if matching_spawn is not None:
+                matching_spawn["carla_id"] = structured_result_match.group("carla_id").strip()
+                matching_spawn["result_line"] = line.strip()
+                if matching_spawn is pending_spawn:
+                    pending_spawn = None
+            continue
+
+        legacy_result_match = legacy_result_pattern.search(line)
+        if legacy_result_match and pending_spawn is not None and pending_spawn["carla_id"] is None:
+            pending_spawn["carla_id"] = legacy_result_match.group("carla_id").strip()
             pending_spawn["result_line"] = line.strip()
             pending_spawn = None
 
@@ -173,9 +237,10 @@ def Evaluate_CDAS_2_Carla_Vehicle_Configuration(carla_log_lines, vehicle_name: s
     CDAS-2: CARLA vehicles are configured with correct properties prior to
     simulation scenario start.
 
-    This log-only implementation verifies that Carla.log contains an
-    XML-RPC spawn_actor call for the requested vehicle and that CARLA returned
-    an actor ID. It records the configured type/location/rotation/attributes.
+    This log-only implementation supports both vehicle creation paths:
+      * SUMO-managed vehicles created through an XML-RPC spawn_actor call.
+      * External CARMA vehicles created by carma-carla-integration and then
+        discovered by the CARLA ambassador.
 
     Note: full correctness requires comparing these parsed values with the
     expected scenario configuration. This function gives log-evidence pass/fail.
@@ -183,11 +248,27 @@ def Evaluate_CDAS_2_Carla_Vehicle_Configuration(carla_log_lines, vehicle_name: s
     spawn_calls = Parse_Carla_Spawn_Actor_Calls(carla_log_lines)
     vehicle_spawn_calls = [item for item in spawn_calls if item["id"] == vehicle_name]
     accepted_spawn_calls = [item for item in vehicle_spawn_calls if item["carla_id"]]
+    detected_pattern = re.compile(
+        rf"(?:New actor detected:\s+{re.escape(vehicle_name)}(?:\s|$)|"
+        rf"CDAS_EVENT\s+event=carla_actor_detected\s+actor_id={re.escape(vehicle_name)}(?:\s|$))"
+    )
+    added_pattern = re.compile(
+        rf"(?:EXTERNAL VEHICLE ADDED:\s+Actor ID={re.escape(vehicle_name)}(?:,|\b)|"
+        rf"CDAS_EVENT\s+event=carla_external_vehicle_added\s+actor_id={re.escape(vehicle_name)}(?:\s|$))"
+    )
+    detected_external_count = sum(
+        1 for line in carla_log_lines if detected_pattern.search(line)
+    )
+    added_external_count = sum(
+        1 for line in carla_log_lines if added_pattern.search(line)
+    )
 
     write_analysis("----- CDAS-2 CARLA vehicle configuration evidence -----")
     write_analysis(f"cdas-2 spawn_actor call count: {len(spawn_calls)}")
     write_analysis(f"cdas-2 spawn_actor call count for {vehicle_name}: {len(vehicle_spawn_calls)}")
     write_analysis(f"cdas-2 accepted spawn_actor result count for {vehicle_name}: {len(accepted_spawn_calls)}")
+    write_analysis(f"cdas-2 external actor detection count for {vehicle_name}: {detected_external_count}")
+    write_analysis(f"cdas-2 external vehicle added count for {vehicle_name}: {added_external_count}")
 
     for index, item in enumerate(vehicle_spawn_calls, start=1):
         write_analysis(
@@ -204,6 +285,12 @@ def Evaluate_CDAS_2_Carla_Vehicle_Configuration(carla_log_lines, vehicle_name: s
         )
         return "pass"
 
+    if detected_external_count > 0 and added_external_count > 0:
+        write_analysis(
+            "cdas-2 result: pass - external CARMA vehicle was detected and added by the CARLA ambassador"
+        )
+        return "pass"
+
     if vehicle_spawn_calls:
         write_analysis(
             "cdas-2 result: fail - spawn_actor configuration found for the checked vehicle, "
@@ -212,7 +299,8 @@ def Evaluate_CDAS_2_Carla_Vehicle_Configuration(carla_log_lines, vehicle_name: s
         return "fail"
 
     write_analysis(
-        "cdas-2 result: fail - no XML-RPC spawn_actor configuration found for the checked vehicle"
+        "cdas-2 result: fail - no XML-RPC spawn_actor result or external CARMA vehicle addition "
+        "was found for the checked vehicle"
     )
     return "fail"
 
@@ -220,26 +308,36 @@ def Evaluate_CDAS_2_Carla_Vehicle_Configuration(carla_log_lines, vehicle_name: s
 def Parse_Carla_To_Sumo_VehicleUpdates_By_Timestep(carla_log_lines):
     """
     Group CARLA->SUMO VehicleUpdates publications by the following
-    'Next time step:' boundary.
+    `carla_next_timestep` boundary.
 
-    Example pattern:
-      CARLA->SUMO SYNC: Published VehicleUpdates to SUMO - added=1, updated=0, removed=0
-      Next time step: 100000000
+    Preferred event sequence:
+      CDAS_EVENT event=carla_vehicle_updates_published added=1 updated=0 removed=0
+      CDAS_EVENT event=carla_next_timestep time_ns=100000000
 
     The VehicleUpdates line does not have to be immediately before the boundary;
     all publications since the previous boundary are assigned to this timestep.
     """
-    vehicleupdates_pattern = re.compile(
+    structured_vehicleupdates_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_vehicle_updates_published\s+"
+        r"added=(?P<added>\d+)\s+updated=(?P<updated>\d+)\s+removed=(?P<removed>\d+)"
+    )
+    legacy_vehicleupdates_pattern = re.compile(
         r"CARLA->SUMO SYNC:\s+Published VehicleUpdates to SUMO\s+-\s+"
         r"added=(?P<added>\d+),\s+updated=(?P<updated>\d+),\s+removed=(?P<removed>\d+)"
     )
-    next_step_pattern = re.compile(r"Next time step:\s+(?P<time>\d+)")
+    structured_next_step_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_next_timestep\s+time_ns=(?P<time>\d+)"
+    )
+    legacy_next_step_pattern = re.compile(r"Next time step:\s+(?P<time>\d+)")
 
     timestep_blocks = []
     pending_vehicleupdates = []
 
     for line in carla_log_lines:
-        vu_match = vehicleupdates_pattern.search(line)
+        vu_match = (
+            structured_vehicleupdates_pattern.search(line)
+            or legacy_vehicleupdates_pattern.search(line)
+        )
         if vu_match:
             pending_vehicleupdates.append({
                 "added": int(vu_match.group("added")),
@@ -249,7 +347,7 @@ def Parse_Carla_To_Sumo_VehicleUpdates_By_Timestep(carla_log_lines):
             })
             continue
 
-        step_match = next_step_pattern.search(line)
+        step_match = structured_next_step_pattern.search(line) or legacy_next_step_pattern.search(line)
         if step_match:
             timestep_blocks.append({
                 "time": int(step_match.group("time")),
@@ -368,17 +466,20 @@ def Parse_Carla_Next_Time_Steps(carla_log_lines):
     """
     Parse CARLA timestep progression logs.
 
-    Example:
-      CarlaAmbassador:728 - Next time step: 100000000
+    Preferred event:
+      CDAS_EVENT event=carla_next_timestep time_ns=100000000
 
     These logs are used as CDAS-5 evidence that CARLA has completed the
     current simulation step and is proceeding only after timestep advancement.
     """
-    pattern = re.compile(r"Next time step:\s+(?P<time>\d+)")
+    structured_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_next_timestep\s+time_ns=(?P<time>\d+)"
+    )
+    legacy_pattern = re.compile(r"Next time step:\s+(?P<time>\d+)")
     steps = []
 
     for line in carla_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             steps.append({
                 "time": int(match.group("time")),
@@ -394,7 +495,7 @@ def Evaluate_CDAS_5_Carla_Timestep_Progression(carla_log_lines):
     required updates, CARLA waits for the next TimestepAdvanceGrant before
     proceeding.
 
-    The available CARLA log evidence is the repeated 'Next time step:' line.
+    The available CARLA log evidence is the repeated `carla_next_timestep` event.
     This function checks that those timestep values exist and strictly increase.
     A constant interval is treated as a stronger PASS; increasing but non-constant
     intervals are reported as PARTIAL because progression exists but the step size
@@ -463,10 +564,15 @@ def Parse_Carla_Received_VehicleUpdates(carla_log_lines):
     """
     Parse CARLA-side VehicleUpdates interactions received from CDASim.
 
-    Example:
-      Received VehicleUpdates interaction at time 6700000000: added=0, updated=2, removed=0
+    Preferred event:
+      CDAS_EVENT event=carla_vehicle_updates_received time_ns=6700000000 added=0 updated=2 removed=0
     """
-    pattern = re.compile(
+    structured_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_vehicle_updates_received\s+"
+        r"time_ns=(?P<time>\d+)\s+added=(?P<added>\d+)\s+"
+        r"updated=(?P<updated>\d+)\s+removed=(?P<removed>\d+)"
+    )
+    legacy_pattern = re.compile(
         r"Received VehicleUpdates interaction at time\s+(?P<time>\d+):\s+"
         r"added=(?P<added>\d+),\s+updated=(?P<updated>\d+),\s+removed=(?P<removed>\d+)"
     )
@@ -474,7 +580,7 @@ def Parse_Carla_Received_VehicleUpdates(carla_log_lines):
     updates = []
 
     for line in carla_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             updates.append({
                 "time": int(match.group("time")),
@@ -492,12 +598,13 @@ def Find_Carla_XmlRpc_Success_Line(carla_log_lines):
     Find the first log line where the CARLA XML-RPC client reports a successful
     connection to the CARLA XML-RPC server.
 
-    Example:
-      CarlaXmlRpcClient:194 - Successfully connected to CARLA XML-RPC server
+    Preferred event:
+      CDAS_EVENT event=carla_xmlrpc_connected connected=true
     """
     success_patterns = [
-        r"CarlaXmlRpcClient:194\s+-\s+Successfully connected to CARLA XML-RPC server",
+        r"CDAS_EVENT\s+event=carla_xmlrpc_connected\s+connected=true",
         r"Successfully connected to CARLA XML-RPC server",
+        r"CDAS_EVENT\s+event=carla_actor_connection_status\b.*\bconnected=true",
         r"Multi-XML-RPC manager actor connection status:\s*true",
     ]
 
@@ -517,7 +624,11 @@ def Count_Actor_Not_Connected_Before_After_XmlRpc_Success(carla_log_lines):
     not downgrade CDAS-6. Warnings after XML-RPC success suggest CARLA may still
     be unable to apply some VehicleUpdates.
     """
-    warning_pattern = re.compile(r"actor.*not connected|not connected.*actor", re.IGNORECASE)
+    warning_pattern = re.compile(
+        r"CDAS_EVENT\s+event=carla_vehicle_sync_skipped\b.*\breason=actor_server_disconnected|"
+        r"actor.*not connected|not connected.*actor",
+        re.IGNORECASE,
+    )
     success_index = Find_Carla_XmlRpc_Success_Line(carla_log_lines)
 
     before_count = 0
@@ -557,7 +668,7 @@ def Evaluate_CDAS_6_Carla_Consumes_VehicleUpdates(carla_log_lines):
 
     Important startup handling:
       actor-server-not-connected warnings before
-      "CarlaXmlRpcClient:194 - Successfully connected to CARLA XML-RPC server"
+      "CDAS_EVENT event=carla_xmlrpc_connected connected=true"
       are treated as initialization noise and do not downgrade the result.
 
       actor-server-not-connected warnings after that successful connection line
@@ -625,6 +736,7 @@ def Count_Carla_TrafficLightUpdates_Processed(carla_log_lines):
       Processing TrafficLightUpdates interaction - this should forward traffic light commands to CARLA
     """
     patterns = [
+        "CDAS_EVENT event=carla_traffic_light_updates_received",
         "Processing TrafficLightUpdates interaction",
         "TrafficLightUpdates interaction",
     ]
@@ -689,13 +801,17 @@ def Parse_Comm_Sent_By_Node(comm_log_lines, sender_node):
     Return {msg_id(int): {"send_time_ns": int, "wall": datetime|None}} for every
     V2X message inserted (sent) by sender_node. First occurrence of an id wins.
     """
-    pattern = re.compile(
+    structured_pattern = re.compile(
+        rf"CDAS_EVENT\s+event=v2x_message_inserted\s+message_id=(?P<id>\d+)\s+"
+        rf"sender={re.escape(sender_node)}(?:\s|$).*?\btime_ns=(?P<time>\d+)"
+    )
+    legacy_pattern = re.compile(
         rf"insertV2XMessage:\s+id=(?P<id>\d+)\s+from node ID\[int={re.escape(sender_node)}\s*,[^\]]*\].*?time=(?P<time>\d+)"
     )
 
     sent = {}
     for line in comm_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             msg_id = int(match.group("id"))
             if msg_id not in sent:
@@ -711,13 +827,17 @@ def Parse_Comm_Received_By_Node(comm_log_lines, receiver_node):
     Return {msg_id(int): {"recv_time_ns": int, "wall": datetime|None}} for every
     V2X message received by receiver_node. First reception of an id wins.
     """
-    pattern = re.compile(
+    structured_pattern = re.compile(
+        rf"CDAS_EVENT\s+event=v2x_message_received\s+message_id=(?P<id>\d+)\s+"
+        rf"receiver={re.escape(receiver_node)}(?:\s|$).*?\btime_ns=(?P<time>\d+)"
+    )
+    legacy_pattern = re.compile(
         rf"Receive V2XMessage : Id\((?P<id>\d+)\) on Node {re.escape(receiver_node)}\s+at Time=(?P<time>\d+)"
     )
 
     received = {}
     for line in comm_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             msg_id = int(match.group("id"))
             if msg_id not in received:
@@ -728,12 +848,47 @@ def Parse_Comm_Received_By_Node(comm_log_lines, receiver_node):
     return received
 
 
+def Parse_Comm_Node_Names(comm_log_lines):
+    """Return all V2X node names observed as senders, receivers, or added nodes."""
+    patterns = [
+        re.compile(r"CDAS_EVENT\s+event=v2x_message_inserted\s+.*?\bsender=(?P<node>\S+)"),
+        re.compile(r"CDAS_EVENT\s+event=v2x_message_received\s+.*?\breceiver=(?P<node>\S+)"),
+        re.compile(r"insertV2XMessage:.*?from node ID\[int=(?P<node>[^,\s]+)\s*,"),
+        re.compile(r"Receive V2XMessage : Id\(\d+\) on Node (?P<node>\S+)\s+at Time="),
+        re.compile(r"Adding (?:vehicle|infrastructure) ID\[int=(?P<node>[^,\s]+)\s*,"),
+    ]
+    nodes = set()
+    for line in comm_log_lines:
+        for pattern in patterns:
+            match = pattern.search(line)
+            if match:
+                nodes.add(match.group("node"))
+    return sorted(nodes)
+
+
+def _nodes_with_prefix(nodes, prefix):
+    return [node for node in nodes if node.startswith(prefix)]
+
+
+def _combine_delivery_results(results):
+    if not results:
+        return "not_applicable"
+    if "fail" in results:
+        return "fail"
+    if "partial" in results:
+        return "partial"
+    if all(result == "not_applicable" for result in results):
+        return "not_applicable"
+    return "pass"
+
+
 def Evaluate_Node_To_Node_Delivery(comm_log_lines, cdas_label, sender_node, receiver_nodes):
     """
     Count how many V2X messages sent by sender_node were received by each node in
     receiver_nodes, by matching the V2X message id in CommunicationDetails.log.
 
     Result:
+      not_applicable - no matching target nodes are present in this scenario
       fail    - sender sent nothing, or a target node received none of them
       partial - some messages were not received (beyond the sim-end tail)
       pass    - every target received all of sender's messages (sim-end tail excepted)
@@ -742,6 +897,12 @@ def Evaluate_Node_To_Node_Delivery(comm_log_lines, cdas_label, sender_node, rece
     received before the run terminates; those misses are reported separately and
     do not, by themselves, downgrade the result.
     """
+    if not receiver_nodes:
+        write_analysis(
+            f"{cdas_label} result: not applicable - no matching target nodes were present in CommunicationDetails.log"
+        )
+        return "not_applicable"
+
     sent = Parse_Comm_Sent_By_Node(comm_log_lines, sender_node)
     sent_ids = set(sent)
 
@@ -808,28 +969,76 @@ def Evaluate_Node_To_Node_Delivery(comm_log_lines, cdas_label, sender_node, rece
 
 def Evaluate_CDAS_15_Msger_To_Carma(comm_log_lines):
     """CDAS-15"""
-    return Evaluate_Node_To_Node_Delivery(comm_log_lines, "cdas-15", NODE_MSGER, [NODE_CARMA])
+    nodes = Parse_Comm_Node_Names(comm_log_lines)
+    messenger_nodes = _nodes_with_prefix(nodes, "msger_")
+    carma_nodes = _nodes_with_prefix(nodes, "carma_")
+
+    if not messenger_nodes:
+        write_analysis(
+            "cdas-15 result: not applicable - no CARMA Messenger node was present in CommunicationDetails.log"
+        )
+        return "not_applicable"
+
+    results = [
+        Evaluate_Node_To_Node_Delivery(
+            comm_log_lines,
+            f"cdas-15 ({messenger_node})",
+            messenger_node,
+            carma_nodes,
+        )
+        for messenger_node in messenger_nodes
+    ]
+    return _combine_delivery_results(results)
 
 
-def Evaluate_CDAS_16_Carma_To_Msger_And_Rsu(comm_log_lines):
+def Evaluate_CDAS_16_Carma_To_Msger_And_Rsu(comm_log_lines, vehicle_name):
     """CDAS-16"""
-    return Evaluate_Node_To_Node_Delivery(comm_log_lines, "cdas-16", NODE_CARMA, [NODE_MSGER, NODE_RSU])
+    nodes = Parse_Comm_Node_Names(comm_log_lines)
+    target_nodes = _nodes_with_prefix(nodes, "msger_") + _nodes_with_prefix(nodes, "rsu_")
+    return Evaluate_Node_To_Node_Delivery(
+        comm_log_lines,
+        "cdas-16",
+        vehicle_name,
+        target_nodes,
+    )
 
 
-def Evaluate_CDAS_17_Rsu_To_Carma(comm_log_lines):
+def Evaluate_CDAS_17_Rsu_To_Carma(comm_log_lines, vehicle_name):
     """CDAS-17"""
-    return Evaluate_Node_To_Node_Delivery(comm_log_lines, "cdas-17", NODE_RSU, [NODE_CARMA])
+    nodes = Parse_Comm_Node_Names(comm_log_lines)
+    rsu_nodes = _nodes_with_prefix(nodes, "rsu_")
+
+    if not rsu_nodes:
+        write_analysis(
+            "cdas-17 result: not applicable - no RSU node was present in CommunicationDetails.log"
+        )
+        return "not_applicable"
+
+    results = [
+        Evaluate_Node_To_Node_Delivery(
+            comm_log_lines,
+            f"cdas-17 ({rsu_node})",
+            rsu_node,
+            [vehicle_name],
+        )
+        for rsu_node in rsu_nodes
+    ]
+    return _combine_delivery_results(results)
 
 
 def Parse_Comm_All_Sent(comm_log_lines):
     """Return {msg_id(int): {"sender": str, "send_time_ns": int}} for all senders."""
-    pattern = re.compile(
+    structured_pattern = re.compile(
+        r"CDAS_EVENT\s+event=v2x_message_inserted\s+message_id=(?P<id>\d+)\s+"
+        r"sender=(?P<sender>\S+).*?\btime_ns=(?P<time>\d+)"
+    )
+    legacy_pattern = re.compile(
         r"insertV2XMessage:\s+id=(?P<id>\d+)\s+from node ID\[int=(?P<sender>[^,\s]+)\s*,[^\]]*\].*?time=(?P<time>\d+)"
     )
 
     sent = {}
     for line in comm_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             msg_id = int(match.group("id"))
             if msg_id not in sent:
@@ -842,13 +1051,17 @@ def Parse_Comm_All_Sent(comm_log_lines):
 
 def Parse_Comm_All_Received(comm_log_lines):
     """Return a list of {"id": int, "receiver": str, "recv_time_ns": int} reception events."""
-    pattern = re.compile(
+    structured_pattern = re.compile(
+        r"CDAS_EVENT\s+event=v2x_message_received\s+message_id=(?P<id>\d+)\s+"
+        r"receiver=(?P<receiver>\S+)\s+time_ns=(?P<time>\d+)"
+    )
+    legacy_pattern = re.compile(
         r"Receive V2XMessage : Id\((?P<id>\d+)\) on Node (?P<receiver>\S+)\s+at Time=(?P<time>\d+)"
     )
 
     received = []
     for line in comm_log_lines:
-        match = pattern.search(line)
+        match = structured_pattern.search(line) or legacy_pattern.search(line)
         if match:
             received.append({
                 "id": int(match.group("id")),
@@ -960,7 +1173,8 @@ def Evaluate_CDAS_18_V2X_Latency(comm_log_lines):
 
 def Check_TimeSync_Sent(carma_log_lines, vehicle_name: str) -> bool:
     pattern = re.compile(
-        rf"Sending Common instance\s+{re.escape(vehicle_name)}\b.*time sync message for time"
+        rf"(?:CDAS_EVENT\s+event=common_time_sync_sent\s+instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"Sending Common instance\s+{re.escape(vehicle_name)}\b.*time sync message for time)"
     )
 
     for line in carma_log_lines:
@@ -974,7 +1188,8 @@ def Check_TimeSync_Sent(carma_log_lines, vehicle_name: str) -> bool:
 
 def Check_V2X_Message_Sent(carma_log_lines, vehicle_name: str) -> bool:
     pattern = re.compile(
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\b"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_forwarded\s+receiver={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\b)"
     )
 
     for line in carma_log_lines:
@@ -988,7 +1203,8 @@ def Check_V2X_Message_Sent(carma_log_lines, vehicle_name: str) -> bool:
 
 def Check_Common_Instance_Registration(mosaic_log_lines, vehicle_name: str) -> bool:
     pattern = re.compile(
-        rf"New Common instance '{re.escape(vehicle_name)}' received"
+        rf"(?:CDAS_EVENT\s+event=common_instance_received\s+instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"New Common instance '{re.escape(vehicle_name)}' received)"
     )
 
     for line in mosaic_log_lines:
@@ -1002,7 +1218,8 @@ def Check_Common_Instance_Registration(mosaic_log_lines, vehicle_name: str) -> b
 
 def Check_Carma_Instance_Registered(carma_log_lines, vehicle_name: str) -> bool:
     pattern = re.compile(
-        rf"New CARMA instance\s+'{re.escape(vehicle_name)}'\s+registered with CARMA Instance Manager"
+        rf"(?:CDAS_EVENT\s+event=carma_instance_registered\s+instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"New CARMA instance\s+'{re.escape(vehicle_name)}'\s+registered with CARMA Instance Manager)"
     )
 
     for line in carma_log_lines:
@@ -1044,10 +1261,12 @@ def get_v2x_message_ids(carma_log_lines, vehicle_name: str):
     sending_ids = set()
 
     processing_pattern = re.compile(
-        rf"Processing V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_processing\s+receiver={re.escape(vehicle_name)}\s+message_id=|"
+        rf"Processing V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+)(\d+)"
     )
     sending_pattern = re.compile(
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_forwarded\s+receiver={re.escape(vehicle_name)}\s+message_id=|"
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+)(\d+)"
     )
 
     for line in carma_log_lines:
@@ -1067,9 +1286,12 @@ def Compare_Carma_And_Comm_Message_IDs(carma_log_lines, comm_log_lines, vehicle_
     comm_ids = set()
 
     carma_pattern = re.compile(
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_forwarded\s+receiver={re.escape(vehicle_name)}\s+message_id=|"
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+)(\d+)"
     )
-    comm_pattern = re.compile(r"insertV2XMessage:\s+id=(\d+)")
+    comm_pattern = re.compile(
+        r"(?:CDAS_EVENT\s+event=v2x_message_inserted\s+message_id=|insertV2XMessage:\s+id=)(\d+)"
+    )
 
     for line in carma_log_lines:
         match = carma_pattern.search(line)
@@ -1103,9 +1325,12 @@ def Compare_Carma_And_Comm_Message_ID_Delays(
     comm_id_to_time = {}
 
     carma_pattern = re.compile(
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+(\d+)"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_forwarded\s+receiver={re.escape(vehicle_name)}\s+message_id=|"
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\s+of msg id\s+)(\d+)"
     )
-    comm_pattern = re.compile(r"insertV2XMessage:\s+id=(\d+)")
+    comm_pattern = re.compile(
+        r"(?:CDAS_EVENT\s+event=v2x_message_inserted\s+message_id=|insertV2XMessage:\s+id=)(\d+)"
+    )
 
     for line in carma_log_lines:
         match = carma_pattern.search(line)
@@ -1147,22 +1372,40 @@ def Compare_Carma_And_Comm_Message_ID_Delays(
 
 
 def Count_Sumo_VehicleUpdates_Interactions(traffic_log_lines) -> int:
-    target_phrase = "Got new interaction VehicleUpdates with time"
-    count = sum(1 for line in traffic_log_lines if target_phrase in line)
+    count = sum(
+        1 for line in traffic_log_lines
+        if (
+            "Got new interaction VehicleUpdates with time" in line
+            or (
+                is_cdas_event(line, "sumo_interaction_received")
+                and cdas_event_field(line, "interaction_type") == "VehicleUpdates"
+            )
+        )
+    )
     write_analysis(f"sumo vehicleupdates interaction count: {count}")
     return count
 
 
 def Count_Sumo_VehicleFederateAssignment_Interactions(traffic_log_lines) -> int:
-    target_phrase = "Got new interaction VehicleFederateAssignment with time"
-    count = sum(1 for line in traffic_log_lines if target_phrase in line)
+    count = sum(
+        1 for line in traffic_log_lines
+        if (
+            "Got new interaction VehicleFederateAssignment with time" in line
+            or (
+                is_cdas_event(line, "sumo_interaction_received")
+                and cdas_event_field(line, "interaction_type") == "VehicleFederateAssignment"
+            )
+        )
+    )
     write_analysis(f"sumo vehiclefederateassignment interaction count: {count}")
     return count
 
 
 def Check_Sumo_Simulation_Time_Started(traffic_log_lines) -> bool:
-    target_phrase = "Simulation Time:"
-    found = any(target_phrase in line for line in traffic_log_lines)
+    found = any(
+        "Simulation Time:" in line or is_cdas_event(line, "sumo_simulation_time")
+        for line in traffic_log_lines
+    )
 
     if found:
         write_analysis("sumo simulation time started")
@@ -1173,18 +1416,22 @@ def Check_Sumo_Simulation_Time_Started(traffic_log_lines) -> bool:
 
 
 def Check_Federation_Started(mosaic_log_lines) -> bool:
-    target_phrase = "Start federation with id"
-    found = any(target_phrase in line for line in mosaic_log_lines)
+    found = any(
+        "Start federation with id" in line or is_cdas_event(line, "federation_started")
+        for line in mosaic_log_lines
+    )
 
     write_analysis(f"federation started: {'yes' if found else 'no'}")
     return found
 
 
 def Count_Initialized_Federates(mosaic_log_lines) -> int:
-    target_phrase = "Federate "
     count = sum(
         1 for line in mosaic_log_lines
-        if "is initializing" in line and target_phrase in line
+        if (
+            ("is initializing" in line and "Federate " in line)
+            or is_cdas_event(line, "federate_initializing")
+        )
     )
 
     write_analysis(f"initialized federate count: {count}")
@@ -1192,8 +1439,10 @@ def Count_Initialized_Federates(mosaic_log_lines) -> int:
 
 
 def Count_Added_Federates(mosaic_log_lines) -> int:
-    target_phrase = "Add ambassador/federate with id"
-    count = sum(1 for line in mosaic_log_lines if target_phrase in line)
+    count = sum(
+        1 for line in mosaic_log_lines
+        if "Add ambassador/federate with id" in line or is_cdas_event(line, "federate_added")
+    )
 
     write_analysis(f"added federate count: {count}")
     return count
@@ -1201,7 +1450,8 @@ def Count_Added_Federates(mosaic_log_lines) -> int:
 
 def Count_Common_Instance_Registrations(mosaic_log_lines, vehicle_name: str) -> int:
     pattern = re.compile(
-        rf"New Common instance '{re.escape(vehicle_name)}' received"
+        rf"(?:CDAS_EVENT\s+event=common_instance_received\s+instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"New Common instance '{re.escape(vehicle_name)}' received)"
     )
     count = sum(1 for line in mosaic_log_lines if pattern.search(line))
 
@@ -1210,7 +1460,11 @@ def Count_Common_Instance_Registrations(mosaic_log_lines, vehicle_name: str) -> 
 
 
 def Count_Carma_VehicleUpdates_Interactions(carla_log_lines) -> int:
-    count = count_matching_lines(carla_log_lines, r"Received VehicleUpdates interaction")
+    count = sum(
+        1 for line in carla_log_lines
+        if "Received VehicleUpdates interaction" in line
+        or is_cdas_event(line, "carla_vehicle_updates_received")
+    )
     write_analysis(f"carla vehicleupdates interaction count: {count}")
     return count
 
@@ -1219,20 +1473,39 @@ def Count_XmlRpc_Status(carla_log_lines, status: bool) -> int:
     target_phrase = (
         f"Multi-XML-RPC manager actor connection status: {str(status).lower()}"
     )
-    count = count_lines(carla_log_lines, target_phrase)
+    status_value = str(status).lower()
+    count = sum(
+        1 for line in carla_log_lines
+        if target_phrase in line
+        or (
+            is_cdas_event(line, "carla_actor_connection_status")
+            and cdas_event_field(line, "connected") == status_value
+        )
+    )
     write_analysis(f"xml rpc {str(status).lower()} count: {count}")
     return count
 
 
 def Check_XmlRpc_Recovered(carla_log_lines) -> bool:
     saw_false = False
-    target_false = "Multi-XML-RPC manager actor connection status: false"
-    target_true = "Multi-XML-RPC manager actor connection status: true"
-
     for line in carla_log_lines:
-        if target_false in line:
+        is_false = (
+            "Multi-XML-RPC manager actor connection status: false" in line
+            or (
+                is_cdas_event(line, "carla_actor_connection_status")
+                and cdas_event_field(line, "connected") == "false"
+            )
+        )
+        is_true = (
+            "Multi-XML-RPC manager actor connection status: true" in line
+            or (
+                is_cdas_event(line, "carla_actor_connection_status")
+                and cdas_event_field(line, "connected") == "true"
+            )
+        )
+        if is_false:
             saw_false = True
-        elif saw_false and target_true in line:
+        elif saw_false and is_true:
             write_analysis("xml rpc recovered after false status")
             return True
 
@@ -1242,8 +1515,8 @@ def Check_XmlRpc_Recovered(carla_log_lines) -> bool:
 
 def Count_TimeSync_Messages(carma_log_lines, vehicle_name: str) -> int:
     pattern = (
-        rf"Sending Common instance\s+{re.escape(vehicle_name)}\b.*"
-        r"time sync message for time"
+        rf"(?:CDAS_EVENT\s+event=common_time_sync_sent\s+instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"Sending Common instance\s+{re.escape(vehicle_name)}\b.*time sync message for time)"
     )
     count = count_matching_lines(carma_log_lines, pattern)
     write_analysis(f"vehicle {vehicle_name} time sync message count: {count}")
@@ -1252,7 +1525,8 @@ def Count_TimeSync_Messages(carma_log_lines, vehicle_name: str) -> int:
 
 def Count_V2X_Messages(carma_log_lines, vehicle_name: str) -> int:
     pattern = (
-        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\b"
+        rf"(?:CDAS_EVENT\s+event=v2x_reception_forwarded\s+receiver={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"Sending V2X message reception event for\s+{re.escape(vehicle_name)}\b)"
     )
     count = count_matching_lines(carma_log_lines, pattern)
     write_analysis(f"vehicle {vehicle_name} v2x message count: {count}")
@@ -1260,14 +1534,21 @@ def Count_V2X_Messages(carma_log_lines, vehicle_name: str) -> int:
 
 
 def Count_Duplicate_Registrations(carma_log_lines, vehicle_name: str) -> int:
-    pattern = rf"(duplicate|already registered).*{re.escape(vehicle_name)}"
+    pattern = (
+        rf"CDAS_EVENT\s+event=common_registration_duplicate\s+"
+        rf"instance_id={re.escape(vehicle_name)}(?:\s|$)|"
+        rf"(duplicate|already registered).*{re.escape(vehicle_name)}"
+    )
     count = count_matching_lines(carma_log_lines, pattern)
     write_analysis(f"duplicate registration count for {vehicle_name}: {count}")
     return count
 
 
 def Count_Comm_InsertV2X(comm_log_lines) -> int:
-    count = count_matching_lines(comm_log_lines, r"insertV2XMessage:\s+id=\d+")
+    count = count_matching_lines(
+        comm_log_lines,
+        r"CDAS_EVENT\s+event=v2x_message_inserted\s+message_id=\d+|insertV2XMessage:\s+id=\d+",
+    )
     write_analysis(f"communicationdetails inserted v2x count: {count}")
     return count
 
@@ -1279,25 +1560,39 @@ def Count_Comm_SendV2X(comm_log_lines) -> int:
 
 
 def Count_Actor_Not_Connected(carla_log_lines) -> int:
-    count = count_matching_lines(carla_log_lines, r"actor.*not connected|not connected.*actor")
+    count = count_matching_lines(
+        carla_log_lines,
+        r"CDAS_EVENT\s+event=carla_vehicle_sync_skipped\b.*reason=actor_server_disconnected|"
+        r"actor.*not connected|not connected.*actor",
+    )
     write_analysis(f"actor server not connected warning count: {count}")
     return count
 
 
 def Count_Sumo_To_Carla_Sync_Starts(carla_log_lines) -> int:
-    count = count_matching_lines(carla_log_lines, r"sync.*sumo.*carla|sumo.*carla.*sync")
+    count = count_matching_lines(
+        carla_log_lines,
+        r"CDAS_EVENT\s+event=carla_vehicle_sync_started|sync.*sumo.*carla|sumo.*carla.*sync",
+    )
     write_analysis(f"sumo->carla sync start count: {count}")
     return count
 
 
 def Count_Successful_Actor_Updates(carla_log_lines) -> int:
-    count = count_matching_lines(carla_log_lines, r"success.*actor.*update|updated.*actor")
+    count = count_matching_lines(
+        carla_log_lines,
+        r"CDAS_EVENT\s+event=carla_actor_updated|success.*actor.*update|updated.*actor",
+    )
     write_analysis(f"successful actor update count: {count}")
     return count
 
 
 def Count_Existing_Actor_Mapping_Skips(carla_log_lines) -> int:
-    count = count_matching_lines(carla_log_lines, r"existing.*actor.*mapping|actor.*mapping.*exist")
+    count = count_matching_lines(
+        carla_log_lines,
+        r"CDAS_EVENT\s+event=carla_spawn_skipped\b.*reason=existing_mapping|"
+        r"existing.*actor.*mapping|actor.*mapping.*exist",
+    )
     write_analysis(f"existing actor mapping skip count: {count}")
     return count
 
@@ -1305,7 +1600,9 @@ def Count_Existing_Actor_Mapping_Skips(carla_log_lines) -> int:
 def Count_Simulation_Unit_Warnings(application_log_lines, action: str) -> int:
     count = count_matching_lines(
         application_log_lines,
-        rf"{action}.*without.*simulation unit|without.*simulation unit.*{action}",
+        rf"CDAS_EVENT\s+event=application_vehicle_ignored\s+action={re.escape(action)}\s+"
+        rf"reason=missing_simulation_unit|{action}.*without.*simulation unit|"
+        rf"without.*simulation unit.*{action}",
     )
     write_analysis(f"{action} vehicle without simulation unit count: {count}")
     return count
@@ -1313,25 +1610,31 @@ def Count_Simulation_Unit_Warnings(application_log_lines, action: str) -> int:
 
 def Check_Sumo_Connected(traffic_log_lines) -> bool:
     found = any(
-        phrase in line
+        is_cdas_event(line, "sumo_connection_established")
+        or any(
+            phrase in line
+            for phrase in ("TraCI connection established", "Connected to SUMO", "connection to SUMO established")
+        )
         for line in traffic_log_lines
-        for phrase in ("TraCI connection established", "Connected to SUMO", "connection to SUMO established")
     )
     write_analysis(f"sumo connection result: {'pass' if found else 'fail'}")
     return found
 
 
 def Count_Sumo_Retries(traffic_log_lines) -> int:
-    count = count_matching_lines(traffic_log_lines, r"retry|trying again")
+    count = count_matching_lines(
+        traffic_log_lines,
+        r"CDAS_EVENT\s+event=sumo_connection_retry|retry|trying again",
+    )
     write_analysis(f"sumo connection retry warning count: {count}")
     return count
 
 
 def Check_Sumo_Api_Logged(traffic_log_lines) -> bool:
     found = any(
-        phrase in line
+        is_cdas_event(line, "sumo_api_version")
+        or any(phrase in line for phrase in ("TraCI API version", "SUMO API version"))
         for line in traffic_log_lines
-        for phrase in ("TraCI API version", "SUMO API version")
     )
     write_analysis(f"sumo api version logged: {'yes' if found else 'no'}")
     return found
@@ -1340,7 +1643,10 @@ def Check_Sumo_Api_Logged(traffic_log_lines) -> bool:
 def Count_Sumo_Ignored_External(traffic_log_lines, pattern: str | None = None) -> int:
     ignored_lines = [
         line for line in traffic_log_lines
-        if re.search(r"ignor.*external vehicle", line, re.IGNORECASE)
+        if (
+            is_cdas_event(line, "sumo_external_vehicle_ignored")
+            or re.search(r"ignor.*external vehicle", line, re.IGNORECASE)
+        )
     ]
     if pattern:
         regex = re.compile(pattern, re.IGNORECASE)
@@ -1351,15 +1657,19 @@ def Count_Sumo_Ignored_External(traffic_log_lines, pattern: str | None = None) -
 def Check_No_Mapping_Spawners(mosaic_log_lines) -> bool:
     found = count_matching_lines(
         mosaic_log_lines,
-        r"mapping.*no spawner|no spawner|spawners?\s*[:=]\s*\[\s*\]",
+        r"CDAS_EVENT\s+event=mapping_no_spawners|mapping.*no spawner|"
+        r"no spawner|spawners?\s*[:=]\s*\[\s*\]",
     ) > 0
     write_analysis(f"mapping config has no spawners: {'yes' if found else 'no'}")
     return found
 
 
 def Count_V2X_Receiver_Starts(mosaic_log_lines) -> int:
-    target_phrase = "CarmaV2xMessageReceiver started listening on UDP port"
-    count = sum(1 for line in mosaic_log_lines if target_phrase in line)
+    count = sum(
+        1 for line in mosaic_log_lines
+        if "CarmaV2xMessageReceiver started listening on UDP port" in line
+        or is_cdas_event(line, "v2x_receiver_started")
+    )
 
     write_analysis(f"v2x receiver start count: {count}")
     return count
@@ -1415,7 +1725,7 @@ def Write_Summary(
     sumo_vehicleupdates_count: int,
     sumo_assignment_count: int,
     sumo_ignored_external_count: int,
-    sumo_ignored_carma1_count: int,
+    sumo_ignored_vehicle_count: int,
     sumo_ignored_carma_source_count: int,
     sumo_ignored_msger_source_count: int,
     sumo_missing_assignment_issue: bool,
@@ -1476,7 +1786,7 @@ def Write_Summary(
     write_analysis(f"sumo vehicleupdates interaction count: {sumo_vehicleupdates_count}")
     write_analysis(f"sumo vehiclefederateassignment interaction count: {sumo_assignment_count}")
     write_analysis(f"sumo ignored external vehicle count: {sumo_ignored_external_count}")
-    write_analysis(f"sumo ignored external vehicle count for {vehicle_name}: {sumo_ignored_carma1_count}")
+    write_analysis(f"sumo ignored external vehicle count for {vehicle_name}: {sumo_ignored_vehicle_count}")
     write_analysis(f"sumo ignored external vehicle count from carma: {sumo_ignored_carma_source_count}")
     write_analysis(f"sumo ignored external vehicle count from carma-messenger: {sumo_ignored_msger_source_count}")
     write_analysis(f"sumo missing VehicleFederateAssignment issue: {'yes' if sumo_missing_assignment_issue else 'no'}")
@@ -1508,7 +1818,7 @@ def Write_Root_Cause_Hints(
     sumo_retry_count: int,
     sumo_connected: bool,
     sumo_missing_assignment_issue: bool,
-    sumo_ignored_carma1_count: int,
+    sumo_ignored_vehicle_count: int,
     sumo_ignored_msger_source_count: int,
     no_mapping_spawners: bool,
     common_registration_spam: bool,
@@ -1550,7 +1860,7 @@ def Write_Root_Cause_Hints(
     if sumo_missing_assignment_issue:
         write_analysis("possible issue: external vehicles are reaching SUMO before VehicleFederateAssignment is established")
 
-    if sumo_ignored_carma1_count > 0:
+    if sumo_ignored_vehicle_count > 0:
         write_analysis(f"possible issue: vehicle {vehicle_name} was ignored by SUMO because no prior VehicleFederateAssignment was seen")
 
     if sumo_ignored_msger_source_count > 0:
@@ -1605,8 +1915,8 @@ def parse_args():
     )
     parser.add_argument(
         "--vehicle-name",
-        default="carma_1",
-        help="Vehicle name to check in the analysis.",
+        required=True,
+        help="Vehicle name to check in the analysis (for example, carma_1).",
     )
     return parser.parse_args()
 
@@ -1665,8 +1975,8 @@ def main() -> None:
     cdas6_result = Evaluate_CDAS_6_Carla_Consumes_VehicleUpdates(carla_log_lines)
     cdas7_result = Evaluate_CDAS_7_Carla_TrafficLightUpdates(carla_log_lines)
     cdas15_result = Evaluate_CDAS_15_Msger_To_Carma(comm_log_lines)
-    cdas16_result = Evaluate_CDAS_16_Carma_To_Msger_And_Rsu(comm_log_lines)
-    cdas17_result = Evaluate_CDAS_17_Rsu_To_Carma(comm_log_lines)
+    cdas16_result = Evaluate_CDAS_16_Carma_To_Msger_And_Rsu(comm_log_lines, vehicle_name)
+    cdas17_result = Evaluate_CDAS_17_Rsu_To_Carma(comm_log_lines, vehicle_name)
     cdas18_result = Evaluate_CDAS_18_V2X_Latency(comm_log_lines)
     sync_start_count = Count_Sumo_To_Carla_Sync_Starts(carla_log_lines)
     successful_actor_updates = Count_Successful_Actor_Updates(carla_log_lines)
@@ -1708,7 +2018,7 @@ def main() -> None:
     sumo_vehicleupdates_count = Count_Sumo_VehicleUpdates_Interactions(traffic_log_lines)
     sumo_assignment_count = Count_Sumo_VehicleFederateAssignment_Interactions(traffic_log_lines)
     sumo_ignored_external_count = Count_Sumo_Ignored_External(traffic_log_lines)
-    sumo_ignored_carma1_count = Count_Sumo_Ignored_External(traffic_log_lines, vehicle_name)
+    sumo_ignored_vehicle_count = Count_Sumo_Ignored_External(traffic_log_lines, vehicle_name)
     sumo_ignored_carma_source_count = Count_Sumo_Ignored_External(traffic_log_lines, "carma")
     sumo_ignored_msger_source_count = Count_Sumo_Ignored_External(
         traffic_log_lines,
@@ -1771,7 +2081,7 @@ def main() -> None:
         sumo_vehicleupdates_count,
         sumo_assignment_count,
         sumo_ignored_external_count,
-        sumo_ignored_carma1_count,
+        sumo_ignored_vehicle_count,
         sumo_ignored_carma_source_count,
         sumo_ignored_msger_source_count,
         sumo_missing_assignment_issue,
@@ -1802,7 +2112,7 @@ def main() -> None:
         sumo_retry_count,
         sumo_connected,
         sumo_missing_assignment_issue,
-        sumo_ignored_carma1_count,
+        sumo_ignored_vehicle_count,
         sumo_ignored_msger_source_count,
         no_mapping_spawners,
         common_registration_spam,
