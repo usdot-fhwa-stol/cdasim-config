@@ -102,7 +102,7 @@ services:
       start_delay_in_seconds:=30.0
       fixed_delay_seconds:=0.1
       passive:=True
-      spawn_point:='98.44,119.20,0,0,0,180'"
+      spawn_point:='98.24,118.5,0,0,0,300'"
 
   vehicle_registration_service:
   # the ns3 image here is built from https://github.com/usdot-fhwa-stol/carma-ns3-adapter/tree/feature/vehicle-registration-module
