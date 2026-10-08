@@ -29,13 +29,20 @@ CARLA_PORT = 2000
 CONNECT_RETRY_INTERVAL_SECONDS = 2.0
 CONNECT_TIMEOUT_SECONDS = 10.0
 
+# After a map (re)load, the level needs a moment to finish streaming in
+# before actors can be spawned -- spawning too soon reliably throws CARLA's
+# generic "RuntimeError: std::exception" from spawn_actor().
+MAP_LOAD_SETTLE_SECONDS = 5.0
+SPAWN_RETRY_INTERVAL_SECONDS = 2.0
+SPAWN_RETRY_ATTEMPTS = 10
+
 TOWN_NAME = "Town10HD_Opt"
 FIRE_TRUCK_BLUEPRINT = "vehicle.firetruck.actors"
 FIRE_TRUCK_ROLE_NAME = "fire_truck"
 
 # Coordinates obtained by manually driving to the yellow dot location in
 # Town10 and reading off the CARLA transform.
-FIRE_TRUCK_LOCATION = carla.Location(x=110.10, y=47.32, z=0.03)
+FIRE_TRUCK_LOCATION = carla.Location(x=110.10, y=47.32, z=0.2)
 FIRE_TRUCK_ROTATION = carla.Rotation(yaw=270.0)
 
 
@@ -57,6 +64,33 @@ def connect_to_carla() -> carla.Client:
             time.sleep(CONNECT_RETRY_INTERVAL_SECONDS)
 
 
+def spawn_fire_truck(world: carla.World) -> carla.Actor:
+    """
+    Spawn the fire truck, retrying on failure. A freshly loaded/streamed
+    level can reject spawn_actor() calls for a few seconds with a generic
+    RuntimeError even once the world object itself is reachable, so this
+    retries rather than treating the first failure as fatal.
+    """
+    blueprint_library = world.get_blueprint_library()
+    fire_truck_bp = blueprint_library.find(FIRE_TRUCK_BLUEPRINT)
+    fire_truck_bp.set_attribute("role_name", FIRE_TRUCK_ROLE_NAME)
+    spawn_transform = carla.Transform(FIRE_TRUCK_LOCATION, FIRE_TRUCK_ROTATION)
+
+    for attempt in range(1, SPAWN_RETRY_ATTEMPTS + 1):
+        try:
+            return world.spawn_actor(fire_truck_bp, spawn_transform)
+        except RuntimeError as exc:
+            print(
+                f"spawn_actor failed (attempt {attempt}/{SPAWN_RETRY_ATTEMPTS}): "
+                f"{exc}, retrying..."
+            )
+            time.sleep(SPAWN_RETRY_INTERVAL_SECONDS)
+
+    raise RuntimeError(
+        f"Failed to spawn fire truck after {SPAWN_RETRY_ATTEMPTS} attempts"
+    )
+
+
 def main() -> None:
     client = connect_to_carla()
     world = client.get_world()
@@ -64,13 +98,10 @@ def main() -> None:
     if TOWN_NAME not in world.get_map().name:
         print(f"Switching server map to {TOWN_NAME}...")
         world = client.load_world(TOWN_NAME)
+        print(f"Waiting {MAP_LOAD_SETTLE_SECONDS}s for the level to settle...")
+        time.sleep(MAP_LOAD_SETTLE_SECONDS)
 
-    blueprint_library = world.get_blueprint_library()
-    fire_truck_bp = blueprint_library.find(FIRE_TRUCK_BLUEPRINT)
-    fire_truck_bp.set_attribute("role_name", FIRE_TRUCK_ROLE_NAME)
-
-    spawn_transform = carla.Transform(FIRE_TRUCK_LOCATION, FIRE_TRUCK_ROTATION)
-    fire_truck = world.spawn_actor(fire_truck_bp, spawn_transform)
+    fire_truck = spawn_fire_truck(world)
 
     # Static prop -- no physics simulation, so it can't be knocked over,
     # fall through the ground, or otherwise drift from its placed position.
