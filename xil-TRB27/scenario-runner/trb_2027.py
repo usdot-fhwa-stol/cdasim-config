@@ -16,14 +16,8 @@
 Spawns a static fire truck prop in Town10 for the TRB2027 Cooperative
 Perception demo.
 
-Deliberately not built on ScenarioRunner's BasicScenario framework. That
-machinery (behavior trees, timeouts, test criteria) is for actively-driven
-scenario actors; for a static, physics-free prop with no behavior of its
-own it was unnecessary complexity, and its timeout/Idle handling interacted
-badly with this script potentially starting before the rest of the
-simulation stack was ready, causing the fire truck to be torn down shortly
-after spawning. This connects to CARLA directly, spawns the fire truck
-once, and stays alive -- no scenario lifecycle to manage.
+Connects to CARLA directly, spawns the fire truck once, and stays alive --
+no scenario lifecycle to manage.
 """
 
 import time

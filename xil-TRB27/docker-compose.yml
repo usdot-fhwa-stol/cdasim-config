@@ -102,9 +102,6 @@ services:
       - ./scenario-runner/trb_2027.py:/app/scenario_runner/trb_2027.py
     # sleep is for mainly carma-platform's components to
     # activate and be ready before scenario starts.
-    # trb_2027.py is run directly (not via scenario_runner.py --scenario)
-    # since it no longer depends on the BasicScenario/srunner framework --
-    # see the script's own module docstring for why.
     entrypoint: >
       bash -c "sleep 30
       && python3 trb_2027.py"
