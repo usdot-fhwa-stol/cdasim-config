@@ -76,7 +76,7 @@ services:
       fixed_delay_seconds:=20.0
       passive:=True
       demo_restart_count:=50
-      spawn_point:='98.44,119.2,0,0,0,300'"
+      spawn_point:='-44.83,109.8,0,0,0,270'"
 
   v2x_ros_driver:
     image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
