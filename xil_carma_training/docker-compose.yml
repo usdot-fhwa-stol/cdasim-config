@@ -411,7 +411,7 @@ services:
       - ./mysql:/docker-entrypoint-initdb.d
 
   php:
-    image: usdotfhwaops/php:7.7.0
+    image: usdotfhwaops/php:develop
     container_name: php
     network_mode: service:db
     depends_on:
@@ -420,7 +420,7 @@ services:
     tty: true
 
   v2xhub:
-    image: usdotfhwaops/v2xhub:7.7.0
+    image: usdotfhwaops/v2xhub:develop
     container_name: v2xhub
     network_mode: service:db
     restart: always
