@@ -42,7 +42,7 @@ FIRE_TRUCK_ROLE_NAME = "fire_truck"
 
 # Coordinates obtained by manually driving to the yellow dot location in
 # Town10 and reading off the CARLA transform.
-FIRE_TRUCK_LOCATION = carla.Location(x=110.10, y=47.32, z=0.2)
+FIRE_TRUCK_LOCATION = carla.Location(x=-41.5, y=44.3, z=1.0)
 FIRE_TRUCK_ROTATION = carla.Rotation(yaw=270.0)
 
 
