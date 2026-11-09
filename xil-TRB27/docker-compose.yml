@@ -1,7 +1,7 @@
 services:
   carla:
     image: carlasim/carla:0.10.0
-    container_name: cdasim
+    container_name: carla
     network_mode: host
     environment:
         - DISPLAY=${DISPLAY}
@@ -72,7 +72,7 @@ services:
       host:='localhost'
       selected_route:='Town10_3way_route'
       selected_plugins:='/guidance/plugins/route_following_plugin,/guidance/plugins/cooperative_lanechange,/guidance/plugins/inlanecruising_plugin,/guidance/plugins/stop_and_wait_plugin,/guidance/plugins/pure_pursuit_wrapper'
-      start_delay_in_seconds:=500.0
+      start_delay_in_seconds:=0.0
       fixed_delay_seconds:=20.0
       passive:=True
       demo_restart_count:=50
