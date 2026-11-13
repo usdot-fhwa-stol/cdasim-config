@@ -21,7 +21,7 @@ services:
     command: bash -c "./CarlaUnreal.sh"
       
   platform_ros2_1:
-      image: usdotfhwastol/carma-platform:carma-system-4.11.0
+      image: local/carma-platform:latest
       container_name: platform_ros2_1
       network_mode: host
       volumes_from:
@@ -42,12 +42,14 @@ services:
         - /opt/carma/yolo:/opt/carma/yolo
         # ILC tuning for carma-cloud workzone (carma_2) is breaking k900 normal lanefolow regression testing, so using different tuning
         - ./carma/inlanecruising_config/parameters.yaml:/opt/carma/install/inlanecruising_plugin/share/inlanecruising_plugin/config/parameters.yaml
+        - ./carma/stop_and_wait/parameters.yaml:/opt/carma/install/stop_and_wait_plugin/share/stop_and_wait_plugin/config/parameters.yaml
         # - ./carma/environment.launch.py:/opt/carma/install/carma/share/carma/launch/environment.launch.py
         # - ./carma/light_controlled_intersection_tactical_plugin/parameters.yaml:/opt/carma/install/light_controlled_intersection_tactical_plugin/share/light_controlled_intersection_tactical_plugin/confi>
         # - ./carma/lci_strategic_plugin/parameters.yaml:/opt/carma/install/lci_strategic_plugin/share/lci_strategic_plugin/config/parameters.yaml
         # - ./carma/plugins.launch.py:/opt/carma/install/carma/share/carma/launch/plugins.launch.py
         - ./carma/system_controller/config.yaml:/opt/carma/install/system_controller/share/system_controller/config/config.yaml
         - ./carma/cooperative_lanechange/parameters.yaml:/opt/carma/install/cooperative_lanechange/share/cooperative_lanechange/config/parameters.yaml
+        - ./carma/plan_delegator/plan_delegator_params.yaml:/opt/carma/install/plan_delegator/share/plan_delegator/config/plan_delegator_params.yaml
       deploy:
         resources:
           reservations:
@@ -58,9 +60,11 @@ services:
                         && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
   carma-carla-integration_1:
-    image: usdotfhwastoldev/carma-carla-integration:develop
+    image: usdotfhwastol/carma-carla-integration:latest
     container_name: carma-carla-integration_1
     network_mode: host
+    volumes:
+      - ./carma-carla/highlightped.py:/home/carma/highlightped.py
     depends_on:
       - carla
     command: >
@@ -72,9 +76,11 @@ services:
       host:='localhost'
       selected_route:='Town10_3way_route'
       selected_plugins:='/guidance/plugins/route_following_plugin,/guidance/plugins/cooperative_lanechange,/guidance/plugins/inlanecruising_plugin,/guidance/plugins/stop_and_wait_plugin,/guidance/plugins/pure_pursuit_wrapper'
-      start_delay_in_seconds:=500.0
+      start_delay_in_seconds:=0.0
       fixed_delay_seconds:=20.0
       passive:=True
+      use_sim_time:=true
+      enable_external_objects:=false
       demo_restart_count:=50
       spawn_point:='-44.83,109.8,0,0,0,270'"
 
@@ -93,7 +99,7 @@ services:
 
   
   scenario-runner:
-    image: usdotfhwastoldev/scenario-runner:develop
+    image: usdotfhwastol/scenario-runner:latest
     container_name: scenario-runner
     network_mode: host
     depends_on:

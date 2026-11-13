@@ -55,6 +55,14 @@ def generate_launch_description():
     declare_vehicle_config_dir_arg = DeclareLaunchArgument(
         name = 'vehicle_config_dir', default_value = '/opt/carma/vehicle/config', description = "Path to vehicle configuration directory"
     )
+    # Declare the global_params_override_file launch argument
+    # Parameters in this file will override any parameters loaded in their respective packages
+    global_params_override_file = LaunchConfiguration('global_params_override_file')
+    declare_global_params_override_file_arg = DeclareLaunchArgument(
+        name = 'global_params_override_file',
+        default_value = [vehicle_config_dir, "/GlobalParamsOverride.yaml"],
+        description = "Path to global file containing the parameters overwrite"
+    )
 
     # Declare the simuation_mode argument
     use_sim_time = LaunchConfiguration('use_sim_time')
@@ -127,13 +135,21 @@ def generate_launch_description():
         default_value = 'False',
         description = 'True if user wants ROS 2 Tracing logs to be generated from CARMA Platform'
     )
-
+    # When enabled, the vehicle fuses incoming SDSM with its own sensor data to create a more accurate representation of the environment
+    # When turned off, topics get remapped to solely rely on its own sensor data
+    is_cp_mot_enabled = LaunchConfiguration('is_cp_mot_enabled')
+    declare_is_cp_mot_enabled = DeclareLaunchArgument(
+        name='is_cp_mot_enabled',
+        default_value = 'True',
+        description = 'True if user wants Cooperative Perception capability using Multiple Object Tracking to be enabled'
+    )
     # Launch the core carma launch file
     carma_src_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ get_package_share_directory('carma'), '/launch/carma_src.launch.py']),
         launch_arguments = {
             'vehicle_calibration_dir' : vehicle_calibration_dir,
             'vehicle_config_dir' : vehicle_config_dir,
+            'global_params_override_file' : global_params_override_file,
             'route_file_folder' : route_file_folder,
             'enable_guidance_plugin_validator' : enable_guidance_plugin_validator,
             'strategic_plugins_to_validate' : strategic_plugins_to_validate,
@@ -144,14 +160,15 @@ def generate_launch_description():
             'area' : area,
             'arealist_path' : arealist_path,
             'vector_map_file' : vector_map_file,
-            'use_sim_time' : use_sim_time
+            'use_sim_time' : use_sim_time,
+            'is_cp_mot_enabled': is_cp_mot_enabled
             }.items()
     )
-
     return LaunchDescription([
         logging_env_var, # Environment variables must be placed before included files
         declare_vehicle_calibration_dir_arg,
         declare_vehicle_config_dir_arg,
+        declare_global_params_override_file_arg,
         declare_route_file_folder,
         declare_enable_guidance_plugin_validator,
         declare_strategic_plugins_to_validate,
@@ -164,5 +181,6 @@ def generate_launch_description():
         declare_vector_map_file,
         declare_use_sim_time,
         declare_is_ros2_tracing_enabled,
+        declare_is_cp_mot_enabled,
         carma_src_launch
     ])
