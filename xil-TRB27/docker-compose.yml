@@ -1,7 +1,7 @@
 services:
   carla:
     image: carlasim/carla:0.10.0
-    container_name: cdasim
+    container_name: carla
     network_mode: host
     environment:
         - DISPLAY=${DISPLAY}
