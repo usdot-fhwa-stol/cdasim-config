@@ -27,6 +27,19 @@ guidance:
     inlanecruising_plugin:
       ros__parameters:
         trajectory_time_length: 12.0
+        default_downsample_ratio: 4
+        turn_downsample_ratio: 4
+        minimum_speed: 2.0
+        max_accel_multiplier: 0.4
+        lat_accel_multiplier: 0.15
+    stop_and_wait_plugin:
+      ros__parameters:
+        default_stopping_buffer: 0.5
+    cooperative_lanechange:
+      ros__parameters:
+        starting_downtrack_range: 15.0
+        turn_downsample_ratio: 20
+        back_distance: 10.0
 
 environment:
   cp_multiple_object_tracker_node:
