@@ -57,8 +57,6 @@ services:
     image: usdotfhwastol/carma-carla-integration:latest
     container_name: carma-carla-integration_1
     network_mode: host
-    volumes:
-      - ./carma-carla/highlightped.py:/home/carma/highlightped.py
     depends_on:
       - carla
     command: >
