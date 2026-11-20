@@ -50,7 +50,7 @@ tactical_plugin_service_call_timeout: 300
 
 # Activates object avoidance logics in trajectory planning plugins
 # Units: Boolean
-enable_object_avoidance: false
+enable_object_avoidance: true
 
 # Acceleration limit
 # Value type: Desired
@@ -94,7 +94,7 @@ vehicle_model_steer_tau : 0.3
 
 # Parameter to enable configurable speed limit
 # Value type: Desired
-config_speed_limit: 15.0
+config_speed_limit: 30.0
 
 # Vehicle Participation Type corresponding to the Lanelet2 participant type standards.
 # Used for interpreting traffic rules in world model instances
