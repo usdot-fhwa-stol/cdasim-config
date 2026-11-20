@@ -21,7 +21,7 @@ services:
     command: bash -c "./CarlaUnreal.sh"
       
   platform_ros2_1:
-      image: usdotfhwastol/carma-platform:latest
+      image: usdotfhwastolcandidate/carma-platform:trb-2027
       container_name: platform_ros2_1
       network_mode: host
       volumes_from:
@@ -50,7 +50,7 @@ services:
                         && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
   carma-carla-integration_1:
-    image: usdotfhwastol/carma-carla-integration:latest
+    image: usdotfhwastolcandidate/carma-carla-integration:trb-2027
     container_name: carma-carla-integration_1
     network_mode: host
     depends_on:
@@ -73,7 +73,7 @@ services:
       spawn_point:='-44.83,109.8,0,0,0,270'"
 
   v2x_ros_driver:
-    image: usdotfhwastol/v2x-ros-driver:carma-system-4.11.0
+    image: usdotfhwastol/v2x-ros-driver:carma-system-4.14.0
     container_name: v2x_ros_driver
     network_mode: host
     volumes_from:
@@ -87,15 +87,18 @@ services:
 
   
   scenario-runner:
-    image: usdotfhwastol/scenario-runner:latest
+    image: usdotfhwastolcandidate/scenario-runner:trb-2027
     container_name: scenario-runner
     network_mode: host
     depends_on:
       - carla
+    # Host path is relative to the directory `carma start all` is run from
+    # (cdasim_config/, via ./start_simulation). Overrides the copy baked into
+    # the image so the scenario can be edited without rebuilding.
     volumes:
-      - ./scenario-runner/trb_2027.py:/app/scenario_runner/trb_2027.py
+      - ./scenario-runner/trb_2027.py:/app/scenario_runner/srunner/scenarios/trb_2027.py:ro
     # sleep is for mainly carma-platform's components to
     # activate and be ready before scenario starts.
     entrypoint: >
       bash -c "sleep 30
-      && python3 trb_2027.py"
+      && python3 -u srunner/scenarios/trb_2027.py"
