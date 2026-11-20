@@ -21,7 +21,7 @@ services:
     command: bash -c "./CarlaUnreal.sh"
       
   platform_ros2_1:
-      image: usdotfhwastolcandidate/carma-platform:trb-2027
+      image: ${DOCKER_ORG}/carma-platform:${DOCKER_TAG}
       container_name: platform_ros2_1
       network_mode: host
       volumes_from:
@@ -50,7 +50,7 @@ services:
                         && ros2 launch /opt/carma/vehicle/config/carma_docker.launch.py'
 
   carma-carla-integration_1:
-    image: usdotfhwastolcandidate/carma-carla-integration:trb-2027
+    image: ${DOCKER_ORG}/carma-carla-integration:${DOCKER_TAG}
     container_name: carma-carla-integration_1
     network_mode: host
     depends_on:
@@ -87,7 +87,7 @@ services:
 
   
   scenario-runner:
-    image: usdotfhwastolcandidate/scenario-runner:trb-2027
+    image: ${DOCKER_ORG}/scenario-runner:${DOCKER_TAG}
     container_name: scenario-runner
     network_mode: host
     depends_on:
