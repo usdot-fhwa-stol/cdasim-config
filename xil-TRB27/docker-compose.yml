@@ -21,7 +21,7 @@ services:
     command: bash -c "./CarlaUnreal.sh"
       
   platform_ros2_1:
-      image: local/carma-platform:latest
+      image: usdotfhwastol/carma-platform:latest
       container_name: platform_ros2_1
       network_mode: host
       volumes_from:
