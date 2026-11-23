@@ -85,7 +85,27 @@ services:
     command: >
       bash -c "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && source /opt/carma/install/setup.bash && ros2 launch /opt/carma/vehicle/config/drivers.launch.py drivers:=v2x_ros_driver log_level:=DEBUG"
 
-  
+  # PyQt5 window that shows wall time elapsed since guidance ENGAGED.
+  # Local-only image; build it first on this host from
+  # carma-developer-tools/carma-platform/guidance_engage_timer:
+  #   docker build -t guidance-engage-timer:local .
+  guidance-engage-timer:
+    image: guidance-engage-timer:local
+    container_name: guidance-engage-timer
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=0
+      - ROS_LOCALHOST_ONLY=0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    depends_on:
+      - platform_ros2_1
+    restart: on-failure
+
   scenario-runner:
     image: ${DOCKER_ORG}/scenario-runner:${DOCKER_TAG}
     container_name: scenario-runner
