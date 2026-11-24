@@ -45,6 +45,13 @@ FIRE_TRUCK_ROLE_NAME = "fire_truck"
 FIRE_TRUCK_LOCATION = carla.Location(x=-41.5, y=44.32, z=1.0)
 FIRE_TRUCK_ROTATION = carla.Rotation(yaw=270.0)
 
+# Spectator (CARLA viewer camera) pose applied on every start, so the demo
+# always opens on the same view of the fire truck scene.
+SPECTATOR_TRANSFORM = carla.Transform(
+    carla.Location(x=-54.14, y=24.46, z=6.03),
+    carla.Rotation(pitch=-9.58, yaw=76.09, roll=0.0),
+)
+
 
 def connect_to_carla() -> carla.Client:
     """
@@ -100,6 +107,9 @@ def main() -> None:
         world = client.load_world(TOWN_NAME)
         print(f"Waiting {MAP_LOAD_SETTLE_SECONDS}s for the level to settle...")
         time.sleep(MAP_LOAD_SETTLE_SECONDS)
+
+    world.get_spectator().set_transform(SPECTATOR_TRANSFORM)
+    print(f"Spectator moved to {SPECTATOR_TRANSFORM}.")
 
     fire_truck = spawn_fire_truck(world)
 
