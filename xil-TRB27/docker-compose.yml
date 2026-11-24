@@ -69,7 +69,7 @@ services:
       passive:=True
       use_sim_time:=true
       enable_external_objects:=false
-      demo_restart_count:=50
+      demo_restart_count:=999
       spawn_point:='-44.83,109.8,0,0,0,270'"
 
   v2x_ros_driver:
