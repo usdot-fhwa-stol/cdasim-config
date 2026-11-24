@@ -117,9 +117,16 @@ def main() -> None:
     # fall through the ground, or otherwise drift from its placed position.
     fire_truck.set_simulate_physics(False)
 
+    # The spawn height keeps spawn_actor() clear of the road, but with physics
+    # off the truck never falls. Its origin is at the bottom of its bounding
+    # box, so put it at the road surface height to keep it from floating.
+    road_z = world.get_map().get_waypoint(FIRE_TRUCK_LOCATION).transform.location.z
+    grounded_location = carla.Location(x=FIRE_TRUCK_LOCATION.x, y=FIRE_TRUCK_LOCATION.y, z=road_z)
+    fire_truck.set_transform(carla.Transform(grounded_location, FIRE_TRUCK_ROTATION))
+
     print(
         f"Fire truck (id={fire_truck.id}) spawned and held static at "
-        f"{FIRE_TRUCK_LOCATION}."
+        f"{grounded_location}."
     )
 
     # Nothing else to do -- the fire truck has no behavior. Stay alive so
