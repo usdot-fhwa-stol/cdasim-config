@@ -30,6 +30,14 @@
   <arg name="vehicle_config_dir" default="/opt/carma/vehicle/config"/>
   <arg name="vehicle_calibration_dir" default="/opt/carma/vehicle/calibration"/>
 
+  <!-- Launch the CARMA-CARLA simulation -->
+  <arg name="simulation_mode" default="true"/>
+
+  <!-- Launch without drivers as those will be launched as docker containers-->
+  <arg name="launch_drivers" default="false"/>
+
   <!-- Include the detailed launch file and pass in new arguments -->
-  <include file="$(find carma)/launch/carma_src.launch" pass_all_args="true"/>
+  <include file="$(find carma)/launch/carma_src.launch" pass_all_args="true">
+    <arg name="simulation_mode" value="true"/>
+  </include>
 </launch>

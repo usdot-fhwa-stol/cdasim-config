@@ -116,6 +116,15 @@ def generate_launch_description():
         description = 'True if user wants ROS 2 Tracing logs to be generated from CARMA Platform'
     )
 
+    # When enabled, the vehicle fuses incoming SDSM with its own sensor data to create a more accurate representation of the environment
+    # When turned off, topics get remapped to solely rely on its own sensor data
+    is_cp_mot_enabled = LaunchConfiguration('is_cp_mot_enabled')
+    declare_is_cp_mot_enabled = DeclareLaunchArgument(
+        name='is_cp_mot_enabled',
+        default_value = 'False',
+        description = 'True if user wants Cooperative Perception capability using Multiple Object Tracking to be enabled'
+    )
+
     # Launch the core carma launch file
     carma_src_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ get_package_share_directory('carma'), '/launch/carma_src.launch.py']),
@@ -146,6 +155,7 @@ def generate_launch_description():
         declare_tactical_plugins_to_validate,
         declare_control_plugins_to_validate,
         declare_enable_opening_tunnels,
+        declare_is_cp_mot_enabled,
         declare_load_type,
         declare_single_pcd_path,
         declare_area,

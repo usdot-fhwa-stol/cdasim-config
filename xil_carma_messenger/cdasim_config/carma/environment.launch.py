@@ -296,8 +296,7 @@ def generate_launch_description():
                     ("incoming_mobility_path", [ EnvironmentVariable('CARMA_MSG_NS', default_value=''), "/incoming_mobility_path" ] ),
                     ("incoming_psm", [ EnvironmentVariable('CARMA_MSG_NS', default_value=''), "/incoming_psm" ] ),
                     ("incoming_bsm", [ EnvironmentVariable('CARMA_MSG_NS', default_value=''), "/incoming_bsm" ] ),
-                    ("georeference", [ EnvironmentVariable('CARMA_LOCZ_NS', default_value=''), "/map_param_loader/georeference" ] ),
-                    ("external_objects", "fused_external_objects")
+                    ("georeference", [ EnvironmentVariable('CARMA_LOCZ_NS', default_value=''), "/map_param_loader/georeference" ] )
                 ],
                 parameters=[
                     motion_computation_param_file, vehicle_config_param_file
