@@ -45,6 +45,13 @@ FIRE_TRUCK_ROLE_NAME = "fire_truck"
 FIRE_TRUCK_LOCATION = carla.Location(x=-41.5, y=44.32, z=1.0)
 FIRE_TRUCK_ROTATION = carla.Rotation(yaw=270.0)
 
+# Spectator (CARLA viewer camera) pose applied on every start, so the demo
+# always opens on the same view of the fire truck scene.
+SPECTATOR_TRANSFORM = carla.Transform(
+    carla.Location(x=-54.14, y=24.46, z=6.03),
+    carla.Rotation(pitch=-9.58, yaw=76.09, roll=0.0),
+)
+
 
 def connect_to_carla() -> carla.Client:
     """
@@ -101,15 +108,25 @@ def main() -> None:
         print(f"Waiting {MAP_LOAD_SETTLE_SECONDS}s for the level to settle...")
         time.sleep(MAP_LOAD_SETTLE_SECONDS)
 
+    world.get_spectator().set_transform(SPECTATOR_TRANSFORM)
+    print(f"Spectator moved to {SPECTATOR_TRANSFORM}.")
+
     fire_truck = spawn_fire_truck(world)
 
     # Static prop -- no physics simulation, so it can't be knocked over,
     # fall through the ground, or otherwise drift from its placed position.
     fire_truck.set_simulate_physics(False)
 
+    # The spawn height keeps spawn_actor() clear of the road, but with physics
+    # off the truck never falls. Its origin is at the bottom of its bounding
+    # box, so put it at the road surface height to keep it from floating.
+    road_z = world.get_map().get_waypoint(FIRE_TRUCK_LOCATION).transform.location.z
+    grounded_location = carla.Location(x=FIRE_TRUCK_LOCATION.x, y=FIRE_TRUCK_LOCATION.y, z=road_z)
+    fire_truck.set_transform(carla.Transform(grounded_location, FIRE_TRUCK_ROTATION))
+
     print(
         f"Fire truck (id={fire_truck.id}) spawned and held static at "
-        f"{FIRE_TRUCK_LOCATION}."
+        f"{grounded_location}."
     )
 
     # Nothing else to do -- the fire truck has no behavior. Stay alive so

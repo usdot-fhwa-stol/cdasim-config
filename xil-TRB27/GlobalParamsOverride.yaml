@@ -41,6 +41,10 @@ guidance:
         turn_downsample_ratio: 20
         back_distance: 10.0
 
+localization:
+  localization_manager:
+    ros__parameters:
+      gnss_data_timeout: 2000 # ms; CARLA 0.10 frames can stall ~1 s when spawning assets (e.g. fire truck), default 500 trips a fatal GNSS_DATA_TIMEOUT
 environment:
   cp_multiple_object_tracker_node:
     ros__parameters:
