@@ -106,9 +106,19 @@ def generate_launch_description():
     # Declare is_ros2_tracing_enabled
     is_ros2_tracing_enabled = LaunchConfiguration('is_ros2_tracing_enabled')
     declare_is_ros2_tracing_enabled = DeclareLaunchArgument(
-        name='is_ros2_tracing_enabled', 
-        default_value = 'False', 
+        name='is_ros2_tracing_enabled',
+        default_value = 'False',
         description = 'True if user wants ROS 2 Tracing logs to be generated from CARMA Platform'
+    )
+
+    # When enabled, the Foxglove Bridge node will be started
+    # By default, port 8765 needs to be exposed from carma-platform container to host machine
+    # then start foxglove studio and select "Open Connect" to use Foxglove Websocket with port 8765
+    use_foxglove = LaunchConfiguration('use_foxglove')
+    declare_use_foxglove_arg = DeclareLaunchArgument(
+        name='use_foxglove',
+        default_value = 'False',
+        description = 'True if user wants real-time foxglove studio support'
     )
 
     # Launch the core carma launch file
@@ -127,7 +137,9 @@ def generate_launch_description():
             'area' : area,
             'arealist_path' : arealist_path,
             'vector_map_file' : vector_map_file,
-            'simulation_mode' : simulation_mode
+            'use_foxglove' : use_foxglove,
+            'simulation_mode' : simulation_mode,
+            'use_foxglove' : use_foxglove,
             }.items()
     )
 
@@ -147,5 +159,6 @@ def generate_launch_description():
         declare_vector_map_file,
         declare_simulation_mode,
         declare_is_ros2_tracing_enabled,
+        declare_use_foxglove_arg,
         carma_src_launch
     ])

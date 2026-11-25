@@ -162,5 +162,6 @@ def generate_launch_description():
         declare_arealist_path,
         declare_vector_map_file,
         declare_is_ros2_tracing_enabled,
+        declare_use_foxglove_arg,
         carma_src_launch
     ])
